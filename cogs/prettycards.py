@@ -63,9 +63,10 @@ class PrettyCards:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
 
-    @commands.command()
-    async def videocard(self, *, arguments : str):
+    @commands.command(pass_context=True)
+    async def videocard(self, ctx, *, arguments : str):
         """Prints a video card from the arguments <title>;description;thumbnail;hoster=link;..."""
+        message = ctx.message
 
         content = arguments.strip().split(";")
 
@@ -113,6 +114,8 @@ class PrettyCards:
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
+
+        await self.bot.delete_message(message)
 
 
 def check_folders():
