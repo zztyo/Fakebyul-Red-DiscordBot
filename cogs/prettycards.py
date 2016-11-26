@@ -67,6 +67,7 @@ class PrettyCards:
     async def videocard(self, ctx, *, arguments : str):
         """Prints a video card from the arguments <title>;description;thumbnail;hoster=link;..."""
         message = ctx.message
+        author = message.author
 
         content = arguments.strip().split(";")
 
@@ -108,6 +109,8 @@ class PrettyCards:
 
         if thumbnail != "":
             data.set_thumbnail(url=thumbnail)
+
+        data.set_footer(text="Posted by {}. Thanks you!".format(author.name), icon_url=author.avatar_url)
 
         try:
             await self.bot.say(embed=data)
