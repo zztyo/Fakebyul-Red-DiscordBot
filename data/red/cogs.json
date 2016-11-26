@@ -1,6 +1,6 @@
 {
     "cogs.activitylog" : false,
-    "cogs.alias" : false,
+    "cogs.alias" : true,
     "cogs.audio" : true,
     "cogs.bias" : true,
     "cogs.customcom" : true,
