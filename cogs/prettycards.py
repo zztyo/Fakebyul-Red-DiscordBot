@@ -28,8 +28,11 @@ class PrettyCards:
 
         profile = dataIO.load_json(f)
 
-        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
-        colour = int(colour, 16)
+        try:
+            colour = int(profile["colour"], 16)
+        except (KeyError, ValueError):
+            colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+            colour = int(colour, 16)
 
         data = discord.Embed(
             description=profile["description"],
