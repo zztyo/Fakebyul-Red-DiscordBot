@@ -305,19 +305,21 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 message = '{}'.format(data['message'])
             else:
                 user = data['recenttracks']['@attr']['user']
+                track = data['recenttracks']['track']
                 message = ''
-                for i, track in enumerate(data['recenttracks']['track'], 1):
+                try:
+                    artist = track[0]['artist']['#text']
+                    song = track[0]['name']
+                    url = track[0]['url']
                     try:
-                        if track['@attr']['nowplaying'] == 'true':
-                            artist = track['artist']['#text']
-                            song = track['name']
-                            url = track['url']
+                        if track[0]['@attr']['nowplaying'] == 'true':
                             message = '**{}** is currently listening to **{}** by **{}**'.format(context.message.author.name, song, artist)
-                            break
                     except KeyError:
                         message = ''
-                if message == '':
-                    message = '{} is not playing music currently'.format(context.message.author.name)
+                    if message == '':
+                        message = '**{}** last listened to **{}** by **{}**'.format(context.message.author.name, song, artist)
+                except KeyError:
+                    message = 'unable to get recent tracks of {}'.format(context.message.author.name)
         else:
             message = 'No API key set for Last.fm. Get one at http://www.last.fm/api'
         await self.bot.say(message)
