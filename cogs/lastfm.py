@@ -317,7 +317,7 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                     except KeyError:
                         message = ''
                 if message == '':
-                    message = '{} is not playing music currently'.format(user)
+                    message = '{} is not playing music currently'.format(context.message.author.name)
         else:
             message = 'No API key set for Last.fm. Get one at http://www.last.fm/api'
         await self.bot.say(message)
