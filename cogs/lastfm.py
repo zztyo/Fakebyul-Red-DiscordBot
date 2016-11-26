@@ -273,6 +273,55 @@ Will remember your username after setting one. [p]lastfm last @username will bec
             message = 'No API key set. Get one at http://www.last.fm/api'
         await self.bot.say('```{}```'.format(message))
 
+    @_lastfm.command(pass_context=True, no_pm=True, name='np')
+    async def _np(self, context, *username: str):
+        """Shows what you are currently playing"""
+        if self.api_key != '':
+            if not username:
+                settings = dataIO.load_json(self.settings_file)
+                if context.message.author.id in settings['USERS']:
+                    username = settings['USERS'][context.message.author.id]
+            else:
+                user_patch = username[0].replace('!', '')
+                settings = dataIO.load_json(self.settings_file)
+                if user_patch[2:-1] in settings['USERS']:
+                    username = settings['USERS'][user_patch[2:-1]]
+                else:
+                    username = user_patch
+            try:
+                payload = self.payload
+                payload['method'] = 'user.getRecentTracks'
+                payload['username'] = username
+                url = 'http://ws.audioscrobbler.com/2.0/?'
+                headers = {'user-agent': 'Red-cog/1.0'}
+                conn = aiohttp.TCPConnector(verify_ssl=False)
+                session = aiohttp.ClientSession(connector=conn)
+                async with session.get(url, params=payload, headers=headers) as r:
+                    data = await r.json()
+                session.close()
+            except Exception as e:
+                message = 'Something went terribly wrong! [{}]'.format(e)
+            if 'error' in data:
+                message = '{}'.format(data['message'])
+            else:
+                user = data['recenttracks']['@attr']['user']
+                message = ''
+                for i, track in enumerate(data['recenttracks']['track'], 1):
+                    try:
+                        if track['@attr']['nowplaying'] == 'true':
+                            artist = track['artist']['#text']
+                            song = track['name']
+                            url = track['url']
+                            message = '**{}** is currently listening to **{}** by **{}**'.format(context.message.author.name, song, artist)
+                            break
+                    except KeyError:
+                        message = ''
+                if message == '':
+                    message = '{} is not playing music currently'.format(user)
+        else:
+            message = 'No API key set for Last.fm. Get one at http://www.last.fm/api'
+        await self.bot.say(message)
+
     @_lastfm.command(pass_context=True, name='apikey')
     @checks.is_owner()
     async def _apikey(self, context, *key: str):
