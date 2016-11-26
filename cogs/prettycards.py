@@ -11,6 +11,8 @@ __version__ = "0.1"
 class PrettyCards:
     """Shows pretty cards!"""
 
+    # documentation: https://github.com/Rapptz/discord.py/blob/master/discord/embeds.py
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -55,13 +57,62 @@ class PrettyCards:
         data.set_author(name=profile["name"], url=profile["picture"])
         data.set_thumbnail(url=profile["picture"])
 
-        #data.set_footer(icon_url=profile["picture"])
-
         try:
             await self.bot.say(embed=data)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
+
+    @commands.command()
+    async def videocard(self, *, arguments : str):
+        """Prints a video card from the arguments <title>;description;thumbnail;hoster=link;..."""
+
+        content = arguments.strip().split(";")
+
+        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = int(colour, 16)
+
+        print(content)
+        print(len(content))
+        if len(content) <= 2:
+            await self.bot.say("Not enough arguments")
+            return
+        print(content)
+
+        title = content[0]
+        content.pop(0)
+        description = content[0]
+        content.pop(0)
+        thumbnail = content[0]
+        content.pop(0)
+
+        if len(content) <= 0:
+            await self.bot.say("Not enough arguments")
+            return
+        print(content)
+
+        data = discord.Embed(
+            description=str(description),
+            colour=discord.Colour(value=colour))
+
+        for hosterandlink in content:
+            if "=" not in hosterandlink:
+                continue
+            hosterandlink = hosterandlink.split("=")
+            if len(hosterandlink) < 2:
+                continue
+            data.add_field(name=str(hosterandlink[0].strip()), value=str(hosterandlink[1].strip()))
+
+        data.set_author(name=str(title))
+
+        if thumbnail != "":
+            data.set_thumbnail(url=thumbnail)
+
+        try:
+            await self.bot.say(embed=data)
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this or you send misformatted arguments")
 
 
 def check_folders():
