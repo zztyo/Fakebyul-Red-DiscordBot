@@ -255,7 +255,7 @@ class Owner:
 
     @commands.group(name="set", pass_context=True)
     async def _set(self, ctx):
-        """Changes Red's global settings."""
+        """Changes Robyul's global settings."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
             return
@@ -284,7 +284,7 @@ class Owner:
     @_set.command(pass_context=True)
     @checks.is_owner()
     async def prefix(self, ctx, *prefixes):
-        """Sets Red's global prefixes
+        """Sets Robyul's prefixes
 
         Accepts multiple prefixes separated by a space. Enclose in double
         quotes if a prefix contains spaces.
@@ -334,7 +334,7 @@ class Owner:
     @_set.command(pass_context=True)
     @checks.is_owner()
     async def name(self, ctx, *, name):
-        """Sets Red's name"""
+        """Sets Robyul's name"""
         name = name.strip()
         if name != "":
             try:
@@ -354,7 +354,7 @@ class Owner:
     @_set.command(pass_context=True, no_pm=True)
     @checks.is_owner()
     async def nickname(self, ctx, *, nickname=""):
-        """Sets Red's nickname
+        """Sets Robyul's nickname
 
         Leaving this empty will remove it."""
         nickname = nickname.strip()
@@ -370,7 +370,7 @@ class Owner:
     @_set.command(pass_context=True)
     @checks.is_owner()
     async def game(self, ctx, *, game=None):
-        """Sets Red's playing status
+        """Sets Robyul's playing status
 
         Leaving this empty will clear it."""
 
@@ -391,7 +391,7 @@ class Owner:
     @_set.command(pass_context=True)
     @checks.is_owner()
     async def status(self, ctx, *, status=None):
-        """Sets Red's status
+        """Sets Robyul's status
 
         Statuses:
             online
@@ -426,7 +426,7 @@ class Owner:
     @_set.command(pass_context=True)
     @checks.is_owner()
     async def stream(self, ctx, streamer=None, *, stream_title=None):
-        """Sets Red's streaming status
+        """Sets Robyul's streaming status
 
         Leaving both streamer and stream_title empty will clear it."""
 
@@ -452,7 +452,7 @@ class Owner:
     @_set.command()
     @checks.is_owner()
     async def avatar(self, url):
-        """Sets Red's avatar"""
+        """Sets Robyul's avatar"""
         try:
             async with self.session.get(url) as r:
                 data = await r.read()
@@ -468,7 +468,7 @@ class Owner:
     @_set.command(name="token")
     @checks.is_owner()
     async def _token(self, token):
-        """Sets Red's login token"""
+        """Sets Robyul's login token"""
         if len(token) < 50:
             await self.bot.say("Invalid token.")
         else:
@@ -481,7 +481,7 @@ class Owner:
     @commands.command()
     @checks.is_owner()
     async def shutdown(self):
-        """Shuts down Red"""
+        """Shuts down Robyul"""
         await self.bot.logout()
 
     @commands.group(name="command", pass_context=True)
@@ -672,7 +672,7 @@ class Owner:
 
     @commands.command()
     async def info(self):
-        """Shows info about Red"""
+        """Shows info about Robyul"""
         author_repo = "https://github.com/Twentysix26"
         red_repo = author_repo + "/Red-DiscordBot"
         server_url = "https://discord.me/Red-DiscordBot"
@@ -720,7 +720,7 @@ class Owner:
 
     @commands.command()
     async def uptime(self):
-        """Shows Red's uptime"""
+        """Shows Robyul's uptime"""
         now = datetime.datetime.now()
         uptime = (now - self.bot.uptime).seconds
         uptime = datetime.timedelta(seconds=uptime)
@@ -728,7 +728,7 @@ class Owner:
 
     @commands.command()
     async def version(self):
-        """Shows Red's current version"""
+        """Shows Robyul's current version"""
         response = self.bot.loop.run_in_executor(None, self._get_version)
         result = await asyncio.wait_for(response, timeout=10)
         try:

@@ -43,7 +43,7 @@ from collections import Counter
 #                 https://github.com/Rapptz/RoboDanny/
 #
 
-description = "Red - A multifunction Discord bot by Twentysix"
+description = "Robyul"
 
 
 class Bot(commands.Bot):
@@ -290,7 +290,7 @@ def check_folders():
 
 def check_configs():
     if settings.bot_settings == settings.default_settings:
-        print("Red - First run configuration\n")
+        print("Robyul - First run configuration\n")
         print("If you haven't already, create a new account:\n"
               "https://twentysix26.github.io/Red-Docs/red_guide_bot_accounts/"
               "#creating-a-new-bot-account")
@@ -308,7 +308,7 @@ def check_configs():
             settings.password = input("\nPassword> ")
         else:
             os.remove('data/red/settings.json')
-            input("Invalid input. Restart Red and repeat the configuration "
+            input("Invalid input. Restart Robyul and repeat the configuration "
                   "process.")
             exit(1)
 
@@ -357,7 +357,7 @@ def check_configs():
             settings.default_mod = "Process"
 
         print("\nThe configuration is done. Leave this window always open to"
-              " keep Red online.\nAll commands will have to be issued through"
+              " keep Robyul online.\nAll commands will have to be issued through"
               " Discord's chat, *this window will now be read only*.\nPress"
               " enter to continue")
         input("\n")
