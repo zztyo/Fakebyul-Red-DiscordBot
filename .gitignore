@@ -9,3 +9,4 @@ data/*/*
 !data/bias/settings.json
 !data/red/cogs.json
 !data/mod/settings.json
+!data/welcome/settings.json

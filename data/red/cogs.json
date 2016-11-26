@@ -1,4 +1,5 @@
 {
+    "cogs.activitylog" : false,
     "cogs.alias" : false,
     "cogs.audio" : true,
     "cogs.bias" : true,
@@ -7,7 +8,12 @@
     "cogs.economy" : false,
     "cogs.general" : true,
     "cogs.image" : false,
+    "cogs.lastfm" : true,
     "cogs.mod" : true,
+    "cogs.owner" : true,
+    "cogs.rss" : true,
+    "cogs.statistics" : true,
     "cogs.streams" : false,
-    "cogs.trivia" : false
+    "cogs.trivia" : false,
+    "cogs.welcome" : true
 }

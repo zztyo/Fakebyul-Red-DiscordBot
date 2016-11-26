@@ -791,7 +791,7 @@ class Owner:
 
     def _get_version(self):
         url = os.popen(r'git config --get remote.origin.url')
-        url = url.read().strip()[:-4]
+        url = url.read().strip()#[:-4]
         repo_name = url.split("/")[-1]
         commits = os.popen(r'git show -s -n 3 HEAD --format="%cr|%s|%H"')
         ncommits = os.popen(r'git rev-list --count HEAD').read()
