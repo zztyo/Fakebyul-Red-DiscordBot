@@ -11,6 +11,7 @@
     "cogs.lastfm" : true,
     "cogs.mod" : true,
     "cogs.owner" : true,
+    "cogs.prettycards" : true,
     "cogs.rss" : true,
     "cogs.statistics" : true,
     "cogs.streams" : false,
