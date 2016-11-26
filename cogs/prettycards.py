@@ -110,7 +110,7 @@ class PrettyCards:
         if thumbnail != "":
             data.set_thumbnail(url=thumbnail)
 
-        data.set_footer(text="Posted by {}. Thanks you!".format(author.name), icon_url=author.avatar_url)
+        data.set_footer(text="Posted by {}. Thank you!".format(author.name), icon_url=author.avatar_url)
 
         try:
             await self.bot.say(embed=data)
