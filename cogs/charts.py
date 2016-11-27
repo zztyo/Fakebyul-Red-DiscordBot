@@ -48,8 +48,10 @@ class Charts:
             else:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1}'.format(str(entry.artists), entry.title)), inline=False)
 
-        #if thumbnail != "":
-        #    data.set_thumbnail(url=thumbnail)
+        if normalized[0][0].video != "":
+            videoId = normalized[0][0].video.split("/")
+            videoId = videoId[len(videoId)-1]
+            data.set_thumbnail(url="https://img.youtube.com/vi/{}/hqdefault.jpg".format(videoId))
 
         data.set_footer(text="Time: {0} UTC".format(str(datetime.datetime.utcnow()).split('.', 1)[0].rsplit(':', 1)[0]))
 
@@ -84,8 +86,10 @@ class Charts:
             else:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1}'.format(str(entry.artists), entry.title)), inline=False)
 
-        #if thumbnail != "":
-        #    data.set_thumbnail(url=thumbnail)
+        if normalized[0][0].video != "":
+            videoId = normalized[0][0].video.split("/")
+            videoId = videoId[len(videoId)-1]
+            data.set_thumbnail(url="https://img.youtube.com/vi/{}/hqdefault.jpg".format(videoId))
 
         data.set_footer(text="Time: {0} UTC".format(str(datetime.datetime.utcnow()).split('.', 1)[0].rsplit(':', 1)[0]))
 
@@ -126,9 +130,6 @@ class Charts:
             else:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1}'.format(str(entry.artists), entry.title)), inline=False)
 
-        #if thumbnail != "":
-        #    data.set_thumbnail(url=thumbnail)
-
         data.set_footer(text="Time: {0} UTC".format(str(datetime.datetime.utcnow()).split('.', 1)[0].rsplit(':', 1)[0]))
 
         try:
@@ -161,9 +162,6 @@ class Charts:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1} ↓{2}'.format(str(entry.artists), entry.title, entry.change_diff)), inline=False)
             else:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1}'.format(str(entry.artists), entry.title)), inline=False)
-
-        #if thumbnail != "":
-        #    data.set_thumbnail(url=thumbnail)
 
         data.set_footer(text="Time: {0} UTC".format(str(datetime.datetime.utcnow()).split('.', 1)[0].rsplit(':', 1)[0]))
 
@@ -203,9 +201,6 @@ class Charts:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1} ↓{2}'.format(str(entry.artists), entry.title, entry.change_diff)), inline=False)
             else:
                 data.add_field(name="#"+str(entry.rank), value=str('{0} - {1}'.format(str(entry.artists), entry.title)), inline=False)
-
-        #if thumbnail != "":
-        #    data.set_thumbnail(url=thumbnail)
 
         data.set_footer(text="Time: {0} UTC".format(str(datetime.datetime.utcnow()).split('.', 1)[0].rsplit(':', 1)[0]))
 
