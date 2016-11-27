@@ -74,12 +74,9 @@ class PrettyCards:
         colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
         colour = int(colour, 16)
 
-        print(content)
-        print(len(content))
         if len(content) <= 2:
             await self.bot.say("Not enough arguments")
             return
-        print(content)
 
         title = content[0]
         content.pop(0)
@@ -91,7 +88,6 @@ class PrettyCards:
         if len(content) <= 0:
             await self.bot.say("Not enough arguments")
             return
-        print(content)
 
         data = discord.Embed(
             description=str(description),

@@ -3,6 +3,7 @@
     "cogs.alias" : true,
     "cogs.audio" : true,
     "cogs.bias" : true,
+    "cogs.charts" : true,
     "cogs.customcom" : true,
     "cogs.downloader" : false,
     "cogs.economy" : false,
