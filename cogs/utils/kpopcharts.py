@@ -319,7 +319,8 @@ class IChart(Chart):
 
     def _url_from_chart_type(self):
         urls = { ChartType.Realtime : 'http://www.instiz.net/iframe_ichart_score.htm',
-                 ChartType.Week     : 'http://www.instiz.net/iframe_ichart_score.htm?week=1&selyear=2015&sel={0}'.format(datetime.date.today().isocalendar()[1] - 1) }
+                 #ChartType.Week     : 'http://www.instiz.net/iframe_ichart_score.htm?week=1&sel={0}'.format(datetime.date.today().isocalendar()[1] - 1) }
+                 ChartType.Week     : 'http://www.instiz.net/iframe_ichart_score.htm?week=1' }
 
         return urls[self.chart_type]
 
@@ -405,6 +406,8 @@ class MelonChart(Chart):
 
     def _fetch_chart(self):
         req = urllib.request.Request(self.url)
+        req.add_header('Referer', 'http://www.melon.com/')
+        req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0')
         page = urllib.request.urlopen(req, data=None, timeout=15)
 
         root = lxml.html.parse(page)
@@ -412,17 +415,14 @@ class MelonChart(Chart):
         rank = 1
         entry = None
 
-        print(root)
         for element in root.iter(tag=lxml.etree.Element):
             cls = element.get('class')
 
-            print(element)
 
             if cls is None:
                 continue
 
-            if cls == 'wrap' and len(element) == 3:
-                print("bla")
+            if cls == 'wrap_rank':
                 entry = ChartEntry()
 
                 entry.rank = rank
