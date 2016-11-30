@@ -158,12 +158,13 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 for i, track in enumerate(data['recenttracks']['track'], 1):
                     try:
                         if track['@attr']['nowplaying'] == 'true':
-                            nowplaying = '(Now playing)'
+                            nowplaying = ':musical_note: '
                     except KeyError:
                         nowplaying = ''
+                    print(track['artist'])
                     artist = track['artist']['#text']
                     song = track['name']
-                    embedData.add_field(name="{0} {1}".format(str(i).ljust(4), nowplaying), value="{0} by {1}".format(song, artist), inline=False)
+                    embedData.add_field(name="{0}".format(str(i).ljust(4)), value="{2}{0} by {1}".format(song, artist, nowplaying), inline=False)
                     #message += '{} {}{} - {}\n'.format(str(i).ljust(4), nowplaying, artist, song)
                     if i > 9:
                         break
@@ -312,7 +313,6 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 session = aiohttp.ClientSession(connector=conn)
                 async with session.get(url, params=payload, headers=headers) as r:
                     data = await r.json()
-                    print('ayy')
                 session.close()
             except Exception as e:
                 message = 'Something went terribly wrong! [{}]'.format(e)
@@ -375,7 +375,6 @@ Will remember your username after setting one. [p]lastfm last @username will bec
             if 'error' in data:
                 message = '{}'.format(data['message'])
             else:
-                print(data)
                 user = data['recenttracks']['@attr']['user']
                 track = data['recenttracks']['track']
                 message = ''
@@ -394,13 +393,13 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                         if track[0]['@attr']['nowplaying'] == 'true':
                             #message = '**{}** is currently listening to **{}** by **{}**'.format(context.message.author.name, song, artist)
                             embedData = discord.Embed(
-                                title="{2} is currently listening to {0} by {1}".format(song, artist, context.message.author.name),
+                                title="{2} is currently listening to {0} by {1}".format(song, artist, user),
                                 url=url,
                                 colour=discord.Colour(value=int("B90000", 16)))
                     except KeyError:
                     #    message = ''
                         embedData = discord.Embed(
-                            title="{2} last listened to {0} by {1}".format(song, artist, context.message.author.name),
+                            title="{2} last listened to {0} by {1}".format(song, artist, user),
                             url=url,
                             colour=discord.Colour(value=int("B90000", 16)))
                     #if message == '':
@@ -408,7 +407,7 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                     embedData.set_author(name="last.fm", url="https://www.last.fm/")
                     embedData.set_thumbnail(url=image)
                 except KeyError:
-                    message = 'unable to get recent tracks of {}'.format(context.message.author.name)
+                    message = 'unable to get recent tracks of {}'.format(user)
         else:
             message = 'No API key set for Last.fm. Get one at http://www.last.fm/api'
         if embedData != None:
