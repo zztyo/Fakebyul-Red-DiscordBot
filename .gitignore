@@ -12,3 +12,4 @@ data/*/*
 !data/welcome/settings.json
 !data/alias/aliases.json
 !data/prettycards/*.json
+!data/greetingandgoodbye/settings.json

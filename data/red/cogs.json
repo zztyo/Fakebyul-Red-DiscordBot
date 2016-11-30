@@ -8,6 +8,7 @@
     "cogs.downloader" : false,
     "cogs.economy" : false,
     "cogs.general" : true,
+    "cogs.greetingandgoodbye" : true,
     "cogs.image" : false,
     "cogs.lastfm" : true,
     "cogs.mod" : true,
@@ -17,5 +18,5 @@
     "cogs.statistics" : true,
     "cogs.streams" : false,
     "cogs.trivia" : false,
-    "cogs.welcome" : true
+    "cogs.welcome" : false
 }
