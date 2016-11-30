@@ -678,6 +678,7 @@ class Owner:
         server_url = "https://discord.me/Red-DiscordBot"
         dpy_repo = "https://github.com/Rapptz/discord.py"
         python_url = "https://www.python.org/"
+        fork_repo = "https://github.com/Seklfreak/Robyul-Red-DiscordBot"
         since = datetime.datetime(2016, 1, 2, 0, 0)
         days_since = (datetime.datetime.now() - since).days
         dpy_version = "[{}]({})".format(discord.__version__, dpy_repo)
@@ -702,7 +703,8 @@ class Owner:
             "Red is backed by a passionate community who contributes and "
             "creates content for everyone to enjoy. [Join us today]({}) "
             "and help us improve!\n\n"
-            "".format(red_repo, author_repo, server_url))
+            "This is a modified version of Red, you can find the source [here]({}).\n\n"
+            "".format(red_repo, author_repo, server_url, fork_repo))
 
         embed = discord.Embed(colour=discord.Colour.red())
         embed.add_field(name="Instance owned by", value=str(owner))
