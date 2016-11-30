@@ -347,23 +347,33 @@ class General:
         else:
             return user.joined_at
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def emojis(self, ctx):
+    @commands.command(no_pm=True)
+    async def emojis(self):
         """Shows all available custom emojis"""
 
         emojis = list(self.bot.get_all_emojis())
+
+        # disabled because embeds are not yet fully supported in the ios app
+        #colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        #colour = int(colour, 16)
+        #data = discord.Embed(
+        #    colour=discord.Colour(value=colour))
+        #data.set_author(name="Custom emojis")
 
         if len(emojis) > 0:
             message = "**Custom emojis**\n"
             for emoji in emojis:
                 if emoji.require_colons:
+                    #data.add_field(name="`:{0}:`".format(emoji.name), value=str("<:{0}:{1}>".format(emoji.name, emoji.id)), inline=False)
                     message += "<:{0}:{1}> `:{0}:`\n".format(emoji.name, emoji.id)
                 else:
+                    #data.add_field(name="`{0}`".format(emoji.name), value=str("<:{0}:{1}>".format(emoji.name, emoji.id)), inline=False)
                     message += "<:{0}:{1}> `{0}`\n".format(emoji.name, emoji.id)
         else:
             message = "**No custom emojis found!** :warning:"
 
         await self.bot.say(message)
+        #await self.bot.say(embed=data)
 
 class NewPoll():
     def __init__(self, message, main):
