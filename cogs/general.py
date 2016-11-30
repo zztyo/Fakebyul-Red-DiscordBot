@@ -347,6 +347,24 @@ class General:
         else:
             return user.joined_at
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def emojis(self, ctx):
+        """Shows all available custom emojis"""
+
+        emojis = list(self.bot.get_all_emojis())
+
+        if len(emojis) > 0:
+            message = "**Custom emojis**\n"
+            for emoji in emojis:
+                if emoji.require_colons:
+                    message += "<:{0}:{1}> `:{0}:`\n".format(emoji.name, emoji.id)
+                else:
+                    message += "<:{0}:{1}> `{0}`\n".format(emoji.name, emoji.id)
+        else:
+            message = "**No custom emojis found!** :warning:"
+
+        await self.bot.say(message)
+
 class NewPoll():
     def __init__(self, message, main):
         self.channel = message.channel
