@@ -80,6 +80,7 @@ class YouTube:
     async def _youtube(self, context, *, query: str):
         """Search on Youtube"""
         try:
+            await self.bot.type()
             url = 'https://www.youtube.com/results?'
             payload = {'search_query': " ".join(query), 'hl': 'en'}
             headers = {'user-agent': 'Red-cog/1.0'}
