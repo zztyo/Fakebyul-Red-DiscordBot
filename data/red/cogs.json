@@ -1,5 +1,6 @@
 {
     "cogs.activitylog" : false,
+    "cogs.advgoogle" : false,
     "cogs.alias" : true,
     "cogs.audio" : true,
     "cogs.bias" : true,
@@ -8,6 +9,7 @@
     "cogs.downloader" : false,
     "cogs.economy" : false,
     "cogs.general" : true,
+    "cogs.google" : false,
     "cogs.greetingandgoodbye" : true,
     "cogs.image" : false,
     "cogs.lastfm" : true,
@@ -18,5 +20,7 @@
     "cogs.statistics" : true,
     "cogs.streams" : false,
     "cogs.trivia" : false,
-    "cogs.welcome" : false
+    "cogs.welcome" : false,
+    "cogs.wolfram" : true,
+    "cogs.youtube" : true
 }

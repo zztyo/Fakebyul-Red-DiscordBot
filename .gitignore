@@ -13,3 +13,4 @@ data/*/*
 !data/alias/aliases.json
 !data/prettycards/*.json
 !data/greetingandgoodbye/settings.json
+!data/youtube/settings.json
