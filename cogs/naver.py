@@ -32,7 +32,6 @@ class Naver:
             for i in range(0, len(text), n):
                 translation += await self._translate("ko", "en", str(text[i:i+n]))
                 await asyncio.sleep(1)
-            print(translation)
 
             for page in pagify(translation, [" "]):
                 if page != "":
@@ -52,7 +51,6 @@ class Naver:
             for i in range(0, len(text), n):
                 translation += await self._translate("en", "ko", str(text[i:i+n]))
                 await asyncio.sleep(1)
-            print(translation)
 
             for page in pagify(translation, [" "]):
                 if page != "":
@@ -71,7 +69,6 @@ class Naver:
             async with session.post(url, data=payload, headers=headers) as r:
                 result = await r.json()
             session.close()
-            print(result)
             return result["message"]["result"]["translatedText"]
         except Exception as e:
             print("translation api error: {0}".format(e))
