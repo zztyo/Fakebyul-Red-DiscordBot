@@ -14,6 +14,7 @@
     "cogs.image" : false,
     "cogs.lastfm" : true,
     "cogs.mod" : true,
+    "cogs.naver" : true,
     "cogs.owner" : true,
     "cogs.prettycards" : true,
     "cogs.rss" : true,
