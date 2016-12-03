@@ -3,6 +3,7 @@ import os
 from .utils.dataIO import dataIO
 import discord
 from discord.ext import commands
+import random
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -53,7 +54,7 @@ class Bias:
 
             if message.content[0] == "+":
                 if changingRole in author.roles:
-                    successMessage = await self.bot.send_message(channel, "{} you already got that role!".format(author.mention))
+                    successMessage = await self.bot.send_message(channel, "{} you already got that role! :thinking:".format(author.mention))
 
                     await asyncio.sleep(10)
                     await self.bot.delete_message(message)
@@ -64,7 +65,7 @@ class Bias:
                     if role.name in list(availableRoles.values()):
                         selfAssignableRoles += 1
                 if selfAssignableRoles > self.settings["BIAS_MAX_ROLES"]-1:
-                    successMessage = await self.bot.send_message(channel, "{} you already have enough roles!".format(author.mention))
+                    successMessage = await self.bot.send_message(channel, "{} you already have enough roles! :warning:".format(author.mention))
 
                     await asyncio.sleep(10)
                     await self.bot.delete_message(message)
@@ -73,7 +74,7 @@ class Bias:
 
             if message.content[0] == "-":
                 if changingRole not in author.roles:
-                    successMessage = await self.bot.send_message(channel, "{} you don't have that role!".format(author.mention))
+                    successMessage = await self.bot.send_message(channel, "{} you don't have that role! :thinking:".format(author.mention))
 
                     await asyncio.sleep(10)
                     await self.bot.delete_message(message)
@@ -81,11 +82,14 @@ class Bias:
                     return
 
             try:
+                randomEmoji = ""
                 if message.content[0] == "+":
+                    randomEmoji = random.choice([":clap:", ":thumbsup:", ":blush:", ":sparkles:"])
                     await self.bot.add_roles(author, changingRole)
                 else:
+                    randomEmoji = random.choice([":scream:", ":thumbsdown:", ":mask:", ":flushed:"])
                     await self.bot.remove_roles(author, changingRole)
-                successMessage = await self.bot.send_message(channel, "{} done!".format(author.mention))
+                successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention, randomEmoji))
 
                 await asyncio.sleep(10)
                 await self.bot.delete_message(message)
