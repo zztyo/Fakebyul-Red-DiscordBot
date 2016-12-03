@@ -4,6 +4,7 @@ from .utils import checks
 from discord.ext import commands
 import os
 from .utils.dataIO import dataIO
+import asyncio
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -92,6 +93,7 @@ class PrettyCards:
         data = discord.Embed(
             description=str(description),
             colour=discord.Colour(value=colour))
+        fallbackText = ""
 
         for hosterandlink in content:
             if "=" not in hosterandlink:
@@ -100,6 +102,8 @@ class PrettyCards:
             if len(hosterandlink) < 2:
                 continue
             data.add_field(name=str(hosterandlink[0].strip()), value=str(hosterandlink[1].strip()))
+            fallbackText += "`{0}:` <{1}>\n".format(hosterandlink[0].strip(), hosterandlink[1].strip())
+
 
         data.set_author(name=str(title))
 
@@ -109,11 +113,13 @@ class PrettyCards:
         data.set_footer(text="Posted by {}. Thank you!".format(author.name), icon_url=author.avatar_url)
 
         try:
-            await self.bot.say(embed=data)
+            await self.bot.say(fallbackText, embed=data)
+            #await self.bot.say(embed=data)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
 
+        await asyncio.sleep(10)
         await self.bot.delete_message(message)
 
 
