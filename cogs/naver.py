@@ -3,6 +3,7 @@ from discord.ext import commands
 import aiohttp
 import asyncio
 from __main__ import send_cmd_help
+from .utils.chat_formatting import pagify, box
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -26,8 +27,16 @@ class Naver:
         text = ' '.join(text)
         await self.bot.type()
         if text != "":
-            translation = await self._translate("ko", "en", str(text))
-            await self.bot.say("```English translation:\n{0}```".format(translation))
+            translation = "English translation:\n"
+            n = 200
+            for i in range(0, len(text), n):
+                translation += await self._translate("ko", "en", str(text[i:i+n]))
+                await asyncio.sleep(1)
+            print(translation)
+
+            for page in pagify(translation, [" "]):
+                if page != "":
+                    await self.bot.say(box(page))
         else:
             await send_cmd_help(context)
 
@@ -38,8 +47,16 @@ class Naver:
         text = ' '.join(text)
         await self.bot.type()
         if text != "":
-            translation = await self._translate("en", "ko", str(text))
-            await self.bot.say("```Korean translation:\n{0}```".format(translation))
+            translation = "Korean translation:\n"
+            n = 200
+            for i in range(0, len(text), n):
+                translation += await self._translate("en", "ko", str(text[i:i+n]))
+                await asyncio.sleep(1)
+            print(translation)
+
+            for page in pagify(translation, [" "]):
+                if page != "":
+                    await self.bot.say(box(page))
         else:
             await send_cmd_help(context)
 
@@ -54,6 +71,7 @@ class Naver:
             async with session.post(url, data=payload, headers=headers) as r:
                 result = await r.json()
             session.close()
+            print(result)
             return result["message"]["result"]["translatedText"]
         except Exception as e:
             print("translation api error: {0}".format(e))
