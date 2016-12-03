@@ -27,7 +27,7 @@ class Naver:
         await self.bot.type()
         if text != "":
             translation = await self._translate("ko", "en", str(text))
-            await self.bot.say(translation)
+            await self.bot.say("```English translation:\n{0}```".format(translation))
         else:
             await send_cmd_help(context)
 
@@ -39,7 +39,7 @@ class Naver:
         await self.bot.type()
         if text != "":
             translation = await self._translate("en", "ko", str(text))
-            await self.bot.say(translation)
+            await self.bot.say("```Korean translation:\n{0}```".format(translation))
         else:
             await send_cmd_help(context)
 
