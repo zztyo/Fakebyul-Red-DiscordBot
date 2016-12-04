@@ -347,11 +347,15 @@ class General:
         else:
             return user.joined_at
 
-    @commands.command(no_pm=True)
-    async def emojis(self):
+    @commands.command(pass_context=True, no_pm=True)
+    async def emojis(self, ctx):
         """Shows all available custom emojis"""
+        server = ctx.message.server
 
         emojis = list(self.bot.get_all_emojis())
+        for emoji in emojis:
+            if emoji.server != server:
+                emojis = tuple(x for x in emojis if x != emoji)
 
         # disabled because embeds are not yet fully supported in the ios app
         #colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
