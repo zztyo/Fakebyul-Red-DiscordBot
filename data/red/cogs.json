@@ -17,6 +17,8 @@
     "cogs.naver" : true,
     "cogs.owner" : true,
     "cogs.prettycards" : true,
+    "cogs.reactionpoll" : false,
+    "cogs.reactionpolls" : true,
     "cogs.rss" : true,
     "cogs.statistics" : true,
     "cogs.streams" : false,
