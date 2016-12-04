@@ -365,10 +365,10 @@ class General:
             for emoji in emojis:
                 if emoji.require_colons:
                     #data.add_field(name="`:{0}:`".format(emoji.name), value=str("<:{0}:{1}>".format(emoji.name, emoji.id)), inline=False)
-                    message += "<:{0}:{1}> `:{0}:`\n".format(emoji.name, emoji.id)
+                    message += "{0} `:{1}:`\n".format(str(emoji), emoji.name)
                 else:
                     #data.add_field(name="`{0}`".format(emoji.name), value=str("<:{0}:{1}>".format(emoji.name, emoji.id)), inline=False)
-                    message += "<:{0}:{1}> `{0}`\n".format(emoji.name, emoji.id)
+                    message += "{0} `{1}`\n".format(str(emoji), emoji.name)
         else:
             message = "**No custom emojis found!** :warning:"
 
