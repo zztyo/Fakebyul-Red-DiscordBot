@@ -139,6 +139,7 @@ class ReactionPolls:
         i = 0
         for reaction in message.reactions:
             reactionUsers = await self.bot.get_reaction_users(reaction, limit=100)
+            # todo: pagifying for more than 100 reactions
             if user in reactionUsers:
                 i += 1
         return i
@@ -151,7 +152,7 @@ class ReactionPolls:
                 if emoji == None:
                     emoji = reaction.emoji
                 reactionsByUser = await self.numberOfReactionsByUserOnMessage(reaction.message, user)
-                if str(emoji) not in poll["allowedEmojis"] or (poll["maxReactions"] != 0 and reactionsByUser > poll["maxReactions"]) or poll["status"] != "active":
+                if user != self.bot.user and (str(emoji) not in poll["allowedEmojis"] or (poll["maxReactions"] != 0 and reactionsByUser > poll["maxReactions"]) or poll["status"] != "active"):
                     try:
                         await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
                     except Exception as e:
