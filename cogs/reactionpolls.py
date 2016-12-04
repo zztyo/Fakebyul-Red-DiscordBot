@@ -13,6 +13,7 @@ class ReactionPolls:
         self.bot = bot
         self.polls_file_path = "data/reactionpolls/polls.json"
         self.polls = dataIO.load_json(self.polls_file_path)
+        self.cache_messages() # TODO: not really working, add messages to cache somehow
 
     @commands.group(pass_context=True, no_pm=True, aliases=['rp'])
     async def reactionpoll(self, ctx):
@@ -63,7 +64,7 @@ class ReactionPolls:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
             return
-        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions}
+        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions, "channelId": message.channel.id}
         dataIO.save_json(self.polls_file_path, self.polls)
 
     def getCustomEmoji(self, emojiStr, allCustomEmojis):
@@ -129,7 +130,50 @@ class ReactionPolls:
             self.polls[str(pollId)]["status"] = "active"
             await self.bot.say("Poll unfreezed! :zap:")
 
-        dataIO.save_json(self.polls_file_path, self.polls)
+    @reactionpoll.command(pass_context=True, no_pm=True, aliases=['clr'])
+    async def clear(self, ctx, pollId: str):
+        """Clears all reactions from a poll"""
+        message = ctx.message
+        author = message.author
+        try:
+            pollId = str(pollId.replace("#", ""))
+            self.bot.say(pollId)
+        except ValueError:
+            await self.bot.say("You have to tell me the poll id... :thinking:")
+            return
+
+        if str(pollId) not in self.polls:
+            await self.bot.say("Unable to find poll! :scream:")
+            return
+
+        poll = self.polls[str(pollId)]
+
+        if poll["createdBy"] != author.id:# and not checks.mod_or_permissions(manage_messages=True):
+            await self.bot.say("You are not allowed to manage this reaction poll... :warning:")
+            return
+
+        if poll["status"] != "active":
+            await self.bot.say("This poll is freezed, you have to unfreeze it before clearing it... :warning:")
+            return
+
+        try:
+            pollChannel = self.bot.get_channel(poll["channelId"])
+            pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
+        except Exception as e:
+            print(e)
+            await self.bot.say("Unable to find poll! :warning:")
+            return
+
+        await self.bot.clear_reactions(pollMessage)
+
+        allCustomEmojis = list(self.bot.get_all_emojis())
+        for emoji in poll["allowedEmojis"]:
+            customEmoji = self.getCustomEmoji(emoji, allCustomEmojis)
+            if customEmoji == None:
+                await self.bot.add_reaction(pollMessage, emoji)
+            else:
+                await self.bot.add_reaction(pollMessage, customEmoji)
+        await self.bot.say("Poll cleared! :cloud_tornado:")
 
     async def numberOfReactionsByUserOnMessage(self, message, user):
         i = 0
@@ -139,6 +183,12 @@ class ReactionPolls:
             if user in reactionUsers:
                 i += 1
         return i
+
+    def cache_messages(self):
+        for key in self.polls:
+            poll = self.polls[key]
+            pollChannel = self.bot.get_channel(poll["channelId"])
+            self.bot.get_message(pollChannel, poll["messageId"])
 
     async def check_reaction(self, reaction, user):
         for key in self.polls:
@@ -167,6 +217,7 @@ def check_file():
     if not dataIO.is_valid_json(f):
         print("Creating default reactionpolls polls.json...")
         dataIO.save_json(f, polls)
+
 
 def setup(bot):
     check_folder()
