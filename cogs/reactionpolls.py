@@ -5,6 +5,7 @@ from discord.ext import commands
 from __main__ import send_cmd_help
 from random import choice as randchoice
 from cogs.utils import checks
+import asyncio
 
 class ReactionPolls:
     """Create reaction polls!"""
@@ -13,7 +14,6 @@ class ReactionPolls:
         self.bot = bot
         self.polls_file_path = "data/reactionpolls/polls.json"
         self.polls = dataIO.load_json(self.polls_file_path)
-        self.cache_messages() # TODO: not really working, add messages to cache somehow
 
     @commands.group(pass_context=True, no_pm=True, aliases=['rp'])
     async def reactionpoll(self, ctx):
@@ -175,6 +175,23 @@ class ReactionPolls:
                 await self.bot.add_reaction(pollMessage, customEmoji)
         await self.bot.say("Poll cleared! :cloud_tornado:")
 
+
+    async def cache_loop(self):
+        await self.bot.wait_until_ready()
+        while self == self.bot.get_cog('ReactionPolls'):
+            await self.cache()
+            await asyncio.sleep(300)
+
+    async def cache(self):
+        """Caches all reaction polls"""
+        for key in self.polls:
+            poll = self.polls[key]
+            pollChannel = self.bot.get_channel(poll["channelId"])
+            pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
+            self.bot.messages.append(pollMessage)
+            print("Cached message #{0.id}".format(pollMessage))
+
+
     async def numberOfReactionsByUserOnMessage(self, message, user):
         i = 0
         for reaction in message.reactions:
@@ -183,12 +200,6 @@ class ReactionPolls:
             if user in reactionUsers:
                 i += 1
         return i
-
-    def cache_messages(self):
-        for key in self.polls:
-            poll = self.polls[key]
-            pollChannel = self.bot.get_channel(poll["channelId"])
-            self.bot.get_message(pollChannel, poll["messageId"])
 
     async def check_reaction(self, reaction, user):
         for key in self.polls:
@@ -224,4 +235,5 @@ def setup(bot):
     check_file()
     n = ReactionPolls(bot)
     bot.add_listener(n.check_reaction, "on_reaction_add")
+    bot.loop.create_task(n.cache_loop())
     bot.add_cog(n)
