@@ -48,9 +48,10 @@ class ReactionPolls:
         data.set_footer(text="Poll by {0}".format(author.name), icon_url=author.avatar_url)
 
         try:
+            allCustomEmojis = list(self.bot.get_all_emojis())
             pollMessage = await self.bot.say(embed=data)
             for emoji in allowedEmojis:
-                customEmoji = self.getCustomEmoji(emoji)
+                customEmoji = self.getCustomEmoji(emoji, allCustomEmojis)
                 if customEmoji == None:
                     await self.bot.add_reaction(pollMessage, emoji)
                 else:
@@ -65,15 +66,10 @@ class ReactionPolls:
         self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions}
         dataIO.save_json(self.polls_file_path, self.polls)
 
-    def getCustomEmoji(self, emojiStr):
-        allCustomEmojis = list(self.bot.get_all_emojis())
+    def getCustomEmoji(self, emojiStr, allCustomEmojis):
         for customEmoji in allCustomEmojis:
-            if customEmoji.require_colons:
-                if "<:{0}:{1}>".format(customEmoji.name, customEmoji.id) == emojiStr:
-                    return customEmoji
-            else:
-                if "<:{0}:{1}>".format(customEmoji.name, customEmoji.id) == emojiStr:
-                    return customEmoji
+            if str(customEmoji) == emojiStr:
+                return customEmoji
         return None
 
     @reactionpoll.command(pass_context=True, no_pm=True, aliases=['del'])
@@ -138,7 +134,7 @@ class ReactionPolls:
     async def numberOfReactionsByUserOnMessage(self, message, user):
         i = 0
         for reaction in message.reactions:
-            reactionUsers = await self.bot.get_reaction_users(reaction, limit=100)
+            reactionUsers = await self.bot.get_reaction_users(reaction)
             # todo: pagifying for more than 100 reactions
             if user in reactionUsers:
                 i += 1
@@ -148,11 +144,11 @@ class ReactionPolls:
         for key in self.polls:
             poll = self.polls[key]
             if poll["messageId"] == reaction.message.id:
-                emoji = self.getCustomEmoji(reaction.emoji)
+                allCustomEmojis = list(self.bot.get_all_emojis())
+                emoji = self.getCustomEmoji(reaction.emoji, allCustomEmojis)
                 if emoji == None:
                     emoji = reaction.emoji
-                reactionsByUser = await self.numberOfReactionsByUserOnMessage(reaction.message, user)
-                if user != self.bot.user and (str(emoji) not in poll["allowedEmojis"] or (poll["maxReactions"] != 0 and reactionsByUser > poll["maxReactions"]) or poll["status"] != "active"):
+                if user != self.bot.user and (poll["status"] != "active" or str(emoji) not in poll["allowedEmojis"] or (poll["maxReactions"] != 0 and await self.numberOfReactionsByUserOnMessage(reaction.message, user) > poll["maxReactions"])):
                     try:
                         await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
                     except Exception as e:
