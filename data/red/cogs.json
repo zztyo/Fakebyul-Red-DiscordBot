@@ -25,5 +25,5 @@
     "cogs.trivia" : false,
     "cogs.welcome" : false,
     "cogs.wolfram" : true,
-    "cogs.youtube" : true
+    "cogs.youtube" : false
 }
