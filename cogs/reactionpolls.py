@@ -21,8 +21,9 @@ class ReactionPolls:
             await send_cmd_help(ctx)
 
     @reactionpoll.command(pass_context=True, no_pm=True, aliases=['crt'])
-    async def create(self, ctx, question: str, *allowedEmojis: str):
-        """Create a new reaction poll"""
+    async def create(self, ctx, question: str, maxReactions: int, *allowedEmojis: str):
+        """Create a new reaction poll
+        maxReactions: 0 = unlimited"""
         message = ctx.message
         author = message.author
 
@@ -61,7 +62,7 @@ class ReactionPolls:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
             return
-        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id}
+        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions}
         dataIO.save_json(self.polls_file_path, self.polls)
 
     def getCustomEmoji(self, emojiStr):
@@ -134,6 +135,14 @@ class ReactionPolls:
 
         dataIO.save_json(self.polls_file_path, self.polls)
 
+    async def numberOfReactionsByUserOnMessage(self, message, user):
+        i = 0
+        for reaction in message.reactions:
+            reactionUsers = await self.bot.get_reaction_users(reaction, limit=100)
+            if user in reactionUsers:
+                i += 1
+        return i
+
     async def check_reaction(self, reaction, user):
         for key in self.polls:
             poll = self.polls[key]
@@ -141,7 +150,8 @@ class ReactionPolls:
                 emoji = self.getCustomEmoji(reaction.emoji)
                 if emoji == None:
                     emoji = reaction.emoji
-                if str(emoji) not in poll["allowedEmojis"] or poll["status"] != "active":
+                reactionsByUser = await self.numberOfReactionsByUserOnMessage(reaction.message, user)
+                if str(emoji) not in poll["allowedEmojis"] or (poll["maxReactions"] != 0 and reactionsByUser > poll["maxReactions"]) or poll["status"] != "active":
                     try:
                         await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
                     except Exception as e:
