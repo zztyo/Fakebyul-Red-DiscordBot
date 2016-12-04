@@ -41,9 +41,9 @@ class ReactionPolls:
             return
 
         data = discord.Embed(
-            description=str(question),
+            description=str("Poll #{0}").format(pollNumber),
             colour=discord.Colour(value=colour))
-        data.set_author(name=str("Poll #{0}").format(pollNumber))
+        data.set_author(name=str(question))
         data.set_footer(text="Poll by {0}".format(author.name), icon_url=author.avatar_url)
 
         try:
