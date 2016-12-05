@@ -22,6 +22,7 @@
     "cogs.rss" : true,
     "cogs.statistics" : true,
     "cogs.streams" : false,
+    "cogs.translated" : true,
     "cogs.trivia" : false,
     "cogs.welcome" : false,
     "cogs.wolfram" : true,
