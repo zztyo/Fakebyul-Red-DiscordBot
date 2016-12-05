@@ -6,6 +6,7 @@ from __main__ import send_cmd_help
 from random import choice as randchoice
 from cogs.utils import checks
 import asyncio
+from discord import utils
 
 class ReactionPolls:
     """Create reaction polls!"""
@@ -186,11 +187,11 @@ class ReactionPolls:
         """Caches all reaction polls"""
         for key in self.polls:
             poll = self.polls[key]
-            pollChannel = self.bot.get_channel(poll["channelId"])
-            pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
-            # TODO: check if message already in message cache?
-            self.bot.messages.append(pollMessage)
-            print("Cached message #{0.id}".format(pollMessage))
+            if not utils.find(lambda m: m.id == poll["messageId"], self.bot.messages):
+                pollChannel = self.bot.get_channel(poll["channelId"])
+                pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
+                self.bot.messages.append(pollMessage)
+                #print("Cached: message #{0.id}".format(pollMessage))
 
 
     async def numberOfReactionsByUserOnMessage(self, message, user):
