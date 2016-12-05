@@ -5,6 +5,7 @@ from discord.ext import commands
 import os
 from .utils.dataIO import dataIO
 import asyncio
+import re
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -23,6 +24,10 @@ class PrettyCards:
         """Prints a profile card from the specified profile"""
 
         name = name.strip().lower()
+
+        if re.match(r"^([A-Za-z0-9]+)$", name) == None:
+            await self.bot.say("Invalid profile name :warning:")
+            return
 
         f = "data/prettycards/profile-" + name + ".json"
         if not dataIO.is_valid_json(f):

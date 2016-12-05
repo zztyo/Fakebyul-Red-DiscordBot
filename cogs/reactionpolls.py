@@ -188,6 +188,7 @@ class ReactionPolls:
             poll = self.polls[key]
             pollChannel = self.bot.get_channel(poll["channelId"])
             pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
+            # TODO: check if message already in message cache?
             self.bot.messages.append(pollMessage)
             print("Cached message #{0.id}".format(pollMessage))
 
