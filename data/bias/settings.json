@@ -1,33 +1,50 @@
 {
-    "BIAS_ASSIGNABLE_ROLES" : {
-        "chaeyeon" : "Chaeyeon",
-        "chungha" : "Chungha",
-        "doyeon" : "Doyeon",
-        "jieqiong" : "Jieqiong",
-        "mina" : "Mina",
-        "nayoung" : "Nayoung",
-        "ot11" : "OT11",
-        "pinky" : "Jieqiong",
-        "sejeong" : "Sejeong",
-        "sohye" : "Sohye",
-        "somi" : "Somi",
-        "yeonjung" : "Yeonjung",
-        "yoojung" : "Yoojung",
-        "\u5468\u6d01\u743c" : "Jieqiong",
-        "\uac15\ubbf8\ub098" : "Mina",
-        "\uae40\ub3c4\uc5f0" : "Doyeon",
-        "\uae40\uc138\uc815" : "Sejeong",
-        "\uae40\uc18c\ud61c" : "Sohye",
-        "\uae40\ucc2c\ubbf8" : "Chungha",
-        "\uc720\uc5f0\uc815" : "Yeonjung",
-        "\uc784\ub098\uc601" : "Nayoung",
-        "\uc804\uc18c\ubbf8" : "Somi",
-        "\uc815\ucc44\uc5f0" : "Chaeyeon",
-        "\ucd5c\uc720\uc815" : "Yoojung"
+    "250216966436945920" : {
+        "ASSIGNABLE_ROLES" : {
+            "somi" : "Somi",
+            "sejeong" : "Sejeong",
+            "yoojung" : "Yoojung",
+            "chungha" : "Chungha",
+            "sohye" : "Sohye",
+            "jieqiong" : "Jieqiong",
+            "chaeyeon" : "Chaeyeon",
+            "doyeon" : "Doyeon",
+            "mina" : "Mina",
+            "nayoung" : "Nayoung",
+            "yeonjung" : "Yeonjung",
+            "ot11" : "OT11",
+            "pinky" : "Jieqiong",
+            "\u5468\u6d01\u743c" : "Jieqiong",
+            "\uac15\ubbf8\ub098" : "Mina",
+            "\uae40\ub3c4\uc5f0" : "Doyeon",
+            "\uae40\uc138\uc815" : "Sejeong",
+            "\uae40\uc18c\ud61c" : "Sohye",
+            "\uae40\ucc2c\ubbf8" : "Chungha",
+            "\uc720\uc5f0\uc815" : "Yeonjung",
+            "\uc784\ub098\uc601" : "Nayoung",
+            "\uc804\uc18c\ubbf8" : "Somi",
+            "\uc815\ucc44\uc5f0" : "Chaeyeon",
+            "\ucd5c\uc720\uc815" : "Yoojung"
+        },
+        "CHANNELS" : [
+            "250220888077631489"
+        ],
+        "MAX_ROLES" : 3
     },
-    "BIAS_CHANNELS" : [
-        "252000620565889024",
-        "250220888077631489"
-    ],
-    "BIAS_MAX_ROLES" : 3
+    "208673735580844032": {
+        "ASSIGNABLE_ROLES" : {
+            "nayoung" : "Nayoung",
+            "sohye" : "Sohye",
+            "yoojung" : "Yoojung",
+            "chungha" : "Chungha",
+            "\uc784\ub098\uc601" : "Nayoung",
+            "\uae40\uc18c\ud61c" : "Sohye",
+            "\ucd5c\uc720\uc815" : "Yoojung",
+            "\uae40\ucc2c\ubbf8" : "Chungha"
+        },
+        "CHANNELS" : [
+            "252000620565889024"
+        ],
+        "MAX_ROLES" : 1
+    }
 }

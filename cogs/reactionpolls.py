@@ -184,7 +184,6 @@ class ReactionPolls:
             await asyncio.sleep(300)
 
     async def cache(self):
-        """Caches all reaction polls"""
         for key in self.polls:
             poll = self.polls[key]
             if not utils.find(lambda m: m.id == poll["messageId"], self.bot.messages):
