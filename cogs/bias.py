@@ -154,7 +154,7 @@ Available biases: Somi, Sejeong, Yoojung, Chungha, Sohye, Jieqiong, Chaeyeon, Do
         return role
 
     def _is_command(self, msg):
-        for p in self.bot.command_prefix:
+        for p in self.bot.settings.prefixes:
             if msg.startswith(p):
                 return True
         return False
