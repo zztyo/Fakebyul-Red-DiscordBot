@@ -87,58 +87,65 @@ Available biases: Somi, Sejeong, Yoojung, Chungha, Sohye, Jieqiong, Chaeyeon, Do
             return
 
         availableRoles = self.settings[server.id]["ASSIGNABLE_ROLES"]
-        if changingRoleAlias in availableRoles:
-            changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
-            if changingRole is None:
-                print("role not found")
-                await self.bot.send_message(channel, "Something went wrong.")
-                return
+        if changingRoleAlias not in availableRoles:
+            successMessage = await self.bot.send_message(channel, "{} I can't find this bias role! :thinking:".format(author.mention))
 
-            if message.content[0] == "+":
-                if changingRole in author.roles:
-                    successMessage = await self.bot.send_message(channel, "{} you already got that role! :thinking:".format(author.mention))
+            await asyncio.sleep(10)
+            await self.bot.delete_message(message)
+            await self.bot.delete_message(successMessage)
+            return
 
-                    await asyncio.sleep(10)
-                    await self.bot.delete_message(message)
-                    await self.bot.delete_message(successMessage)
-                    return
-                selfAssignableRoles = 0
-                for role in author.roles:
-                    if role.name in list(availableRoles.values()):
-                        selfAssignableRoles += 1
-                if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
-                    successMessage = await self.bot.send_message(channel, "{} you already have enough roles! :warning:".format(author.mention))
+        changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
+        if changingRole is None:
+            print("role not found")
+            await self.bot.send_message(channel, "Something went wrong.")
+            return
 
-                    await asyncio.sleep(10)
-                    await self.bot.delete_message(message)
-                    await self.bot.delete_message(successMessage)
-                    return
-
-            if message.content[0] == "-":
-                if changingRole not in author.roles:
-                    successMessage = await self.bot.send_message(channel, "{} you don't have that role! :thinking:".format(author.mention))
-
-                    await asyncio.sleep(10)
-                    await self.bot.delete_message(message)
-                    await self.bot.delete_message(successMessage)
-                    return
-
-            try:
-                randomEmoji = ""
-                if message.content[0] == "+":
-                    randomEmoji = random.choice([":clap:", ":thumbsup:", ":blush:", ":sparkles:"])
-                    await self.bot.add_roles(author, changingRole)
-                else:
-                    randomEmoji = random.choice([":scream:", ":thumbsdown:", ":mask:", ":flushed:"])
-                    await self.bot.remove_roles(author, changingRole)
-                successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention, randomEmoji))
+        if message.content[0] == "+":
+            if changingRole in author.roles:
+                successMessage = await self.bot.send_message(channel, "{} you already got this bias role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
                 await self.bot.delete_message(message)
                 await self.bot.delete_message(successMessage)
-            except Exception as e:
-                print(e)
-                await self.bot.send_message(channel, "Something went wrong.")
+                return
+            selfAssignableRoles = 0
+            for role in author.roles:
+                if role.name in list(availableRoles.values()):
+                    selfAssignableRoles += 1
+            if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
+                successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
+
+                await asyncio.sleep(10)
+                await self.bot.delete_message(message)
+                await self.bot.delete_message(successMessage)
+                return
+
+        if message.content[0] == "-":
+            if changingRole not in author.roles:
+                successMessage = await self.bot.send_message(channel, "{} you don't have this bias role! :thinking:".format(author.mention))
+
+                await asyncio.sleep(10)
+                await self.bot.delete_message(message)
+                await self.bot.delete_message(successMessage)
+                return
+
+        try:
+            randomEmoji = ""
+            if message.content[0] == "+":
+                randomEmoji = random.choice([":clap:", ":thumbsup:", ":blush:", ":sparkles:"])
+                await self.bot.add_roles(author, changingRole)
+            else:
+                randomEmoji = random.choice([":scream:", ":thumbsdown:", ":mask:", ":flushed:"])
+                await self.bot.remove_roles(author, changingRole)
+            successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention, randomEmoji))
+
+            await asyncio.sleep(10)
+            await self.bot.delete_message(message)
+            await self.bot.delete_message(successMessage)
+        except Exception as e:
+            print(e)
+            await self.bot.send_message(channel, "Something went wrong.")
 
     def _role_from_string(self, server, rolename, roles=None):
         if roles is None:
