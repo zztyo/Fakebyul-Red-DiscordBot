@@ -15,4 +15,5 @@ data/*/*
 !data/greetingandgoodbye/settings.json
 !data/youtube/settings.json
 !data/customcom/commands.json
+!data/instagram/feeds.json
 updateFork.bat
