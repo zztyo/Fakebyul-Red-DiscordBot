@@ -8,6 +8,9 @@ import asyncio
 from random import choice as randchoice
 from .utils import checks
 
+__author__ = "Sebastian Winkler <sekl@slmn.de>"
+__version__ = "0.1"
+
 class Instagram:
     """Cog to get instagram feeds"""
 
@@ -124,8 +127,7 @@ class Instagram:
             await asyncio.sleep(600)
 
     def get_embed_for_item(self, item):
-        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
-        colour = int(colour, 16)
+        colour = int("F56040", 16)
 
         itemUserName = item["user"]["username"]
         itemUserProfilepicture = item["user"]["profile_pic_url"]

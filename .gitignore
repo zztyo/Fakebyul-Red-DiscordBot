@@ -16,4 +16,5 @@ data/*/*
 !data/youtube/settings.json
 !data/customcom/commands.json
 !data/instagram/feeds.json
+!data/twitter/feeds.json
 updateFork.bat

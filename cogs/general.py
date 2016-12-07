@@ -365,7 +365,7 @@ class General:
         #data.set_author(name="Custom emojis")
 
         if len(emojis) > 0:
-            message = "**Custom emojis**\n"
+            message = "**Custom emojis on this server**\n"
             for emoji in emojis:
                 if emoji.require_colons:
                     #data.add_field(name="`:{0}:`".format(emoji.name), value=str("<:{0}:{1}>".format(emoji.name, emoji.id)), inline=False)
