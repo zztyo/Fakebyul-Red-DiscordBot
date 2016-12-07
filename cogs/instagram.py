@@ -64,7 +64,7 @@ class Instagram:
         listMessage = ""
         for feed in self.feeds:
             if feed["serverId"] == server.id:
-                listMessage += "#{1}: @{0[userName]} posting to <#{0[channelId]}>\n".format(feed, self.feeds.index(feed))
+                listMessage += "#{1}: `@{0[userName]}` posting to <#{0[channelId]}>\n".format(feed, self.feeds.index(feed))
 
         if listMessage == "":
             await self.bot.say("No user in database!")
