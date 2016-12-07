@@ -22,7 +22,7 @@
     },
     {
         "channelId" : "250221434071285771",
-        "lastTimestamp" : 1480602095,
+        "lastTimestamp" : 1481112378,
         "serverId" : "250216966436945920",
         "userId" : 2367197625,
         "userName" : "j_chaeyeoni"
@@ -33,5 +33,40 @@
         "serverId" : "250216966436945920",
         "userId" : 2976814275,
         "userName" : "uyj_s"
+    },
+    {
+        "channelId" : "208673735580844032",
+        "lastTimestamp" : 1480699528,
+        "serverId" : "208673735580844032",
+        "userId" : 1460871211,
+        "userName" : "gfriendofficial"
+    },
+    {
+        "channelId" : "208673735580844032",
+        "lastTimestamp" : 1481106921,
+        "serverId" : "208673735580844032",
+        "userId" : 4008202404,
+        "userName" : "gugudan_schooltrip"
+    },
+    {
+        "channelId" : "208673735580844032",
+        "lastTimestamp" : 1481106622,
+        "serverId" : "208673735580844032",
+        "userId" : 2920560812,
+        "userName" : "artist_eunji"
+    },
+    {
+        "channelId" : "208673735580844032",
+        "lastTimestamp" : 1481107030,
+        "serverId" : "208673735580844032",
+        "userId" : 3408064405,
+        "userName" : "gu9udan"
+    },
+    {
+        "channelId" : "208673735580844032",
+        "lastTimestamp" : 1481083428,
+        "serverId" : "208673735580844032",
+        "userId" : 2107411892,
+        "userName" : "twicetagram"
     }
 ]

@@ -84,37 +84,63 @@ class Instagram:
 
         await self.bot.say("User deleted from database")
 
+    @_instagram.command(no_pm=True, name="force", hidden=True)
+    @checks.serverowner_or_permissions(administrator=True)
+    async def _force(self, username : str, channel : discord.Channel):
+        """Forces to print the latest instagram post"""
+
+        if self.instagramAPI.searchUsername(username) == False:
+            await self.bot.say("Something went wrong!")
+            return
+
+        userId = self.instagramAPI.LastJson["user"]["pk"]
+
+        if self.instagramAPI.getUserFeed(userId) == False:
+            await self.bot.say("Something went wrong!")
+            return
+
+        data = self.get_embed_for_item(self.instagramAPI.LastJson["items"][0])
+        await self.bot.send_message(channel, embed=data)
+
     async def check_feed_loop(self):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Instagram'):
             for feed in self.feeds:
                 channel = self.bot.get_channel(feed["channelId"])
+                if channel == None:
+                    print("Channel not found")
+                    continue
                 if self.instagramAPI.getUserFeed(feed["userId"], minTimestamp=feed["lastTimestamp"]) == False:
                     await self.bot.send_message(channel,
                         "Something went wrong fetching @{0}'s instagram feed!".format(feed["userName"]))
                     continue
                 for item in self.instagramAPI.LastJson["items"]:
-                    colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
-                    colour = int(colour, 16)
-
-                    itemUserName = item["user"]["username"]
-                    itemUserProfilepicture = item["user"]["profile_pic_url"]
-                    itemCaption = item["caption"]["text"]
-                    itemPicture = item["image_versions2"]["candidates"][0]["url"]
-                    itemTakenAt = item["taken_at"]
-                    itemUrl = "https://www.instagram.com/p/{0}/".format(item["code"])
-
-                    data = discord.Embed(
-                        description=itemCaption,
-                        colour=discord.Colour(value=colour))
-                    data.set_author(name=itemUserName, icon_url=itemUserProfilepicture, url=itemUrl)
-                    data.set_image(url=itemPicture)
+                    data = self.get_embed_for_item(item)
 
                     await self.bot.send_message(channel, embed=data)
                     if itemTakenAt > feed["lastTimestamp"]:
                         self.feeds[self.feeds.index(feed)]["lastTimestamp"] = itemTakenAt
                         dataIO.save_json(self.feeds_file_path, self.feeds)
             await asyncio.sleep(600)
+
+    def get_embed_for_item(self, item):
+        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = int(colour, 16)
+
+        itemUserName = item["user"]["username"]
+        itemUserProfilepicture = item["user"]["profile_pic_url"]
+        itemCaption = item["caption"]["text"]
+        itemPicture = item["image_versions2"]["candidates"][0]["url"]
+        itemTakenAt = item["taken_at"]
+        itemUrl = "https://www.instagram.com/p/{0}/".format(item["code"])
+
+        data = discord.Embed(
+            description=itemCaption,
+            colour=discord.Colour(value=colour))
+        data.set_author(name=itemUserName, icon_url=itemUserProfilepicture, url=itemUrl)
+        data.set_image(url=itemPicture)
+        data.set_footer(text="via instagram")
+        return data
 
 def check_folders():
     folders = ("data", "data/instagram/")
