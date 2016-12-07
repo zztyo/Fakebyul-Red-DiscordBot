@@ -166,5 +166,5 @@ def setup(bot):
     check_folders()
     check_files()
     n = Instagram(bot)
-    bot.loop.create_task(n.check_feed_loop())
     bot.add_cog(n)
+    bot.loop.create_task(n.check_feed_loop())

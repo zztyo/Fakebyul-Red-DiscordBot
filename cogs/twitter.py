@@ -20,10 +20,11 @@ class Twitter:
         self.settings = dataIO.load_json(self.file_path)
         self.feeds_file_path = "data/twitter/feeds.json"
         self.feeds = dataIO.load_json(self.feeds_file_path)
+
+    def authenticate(self):
         auth = tweepy.OAuthHandler(self.settings["CONSUMER_KEY"], self.settings["CONSUMER_SECRET"])
         auth.set_access_token(self.settings["ACCESS_TOKEN"], self.settings["ACCESS_TOKEN_SECRET"])
         self.twitterAPI = tweepy.API(auth)
-
 
     @commands.group(pass_context=True, no_pm=True, name="twitter", aliases=["tw"])
     async def _twitter(self, context):
@@ -35,6 +36,7 @@ class Twitter:
     @checks.serverowner_or_permissions(administrator=True)
     async def _add(self, username : str, channel : discord.Channel):
         """Adds a new twitter user feed to a channel"""
+        self.authenticate()
 
         try:
             twitterUser = self.twitterAPI.get_user(username)
@@ -91,6 +93,7 @@ class Twitter:
     @checks.serverowner_or_permissions(administrator=True)
     async def _force(self, username : str, channel : discord.Channel):
         """Forces to print the latest tweet"""
+        self.authenticate()
 
         try:
             twitterUserTimeline = self.twitterAPI.user_timeline(screen_name=username, include_rts=True, count=1)
@@ -127,6 +130,7 @@ class Twitter:
     async def check_feed_loop(self):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Twitter'):
+            self.authenticate()
             for feed in self.feeds:
                 channel = self.bot.get_channel(feed["channelId"])
                 if channel == None:
@@ -176,5 +180,5 @@ def setup(bot):
     check_folders()
     check_files()
     n = Twitter(bot)
-    bot.loop.create_task(n.check_feed_loop())
     bot.add_cog(n)
+    bot.loop.create_task(n.check_feed_loop())
