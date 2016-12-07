@@ -152,7 +152,7 @@ class Twitter:
                 for item in twitterUserTimeline:
                     data = self.get_embed_for_item(item)
                     await self.bot.send_message(channel, embed=data)
-                await asyncio.sleep(600)
+            await asyncio.sleep(600)
 
 def check_folders():
     folders = ("data", "data/twitter/")
