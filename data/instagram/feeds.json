@@ -1,1 +1,37 @@
-[]
+[
+    {
+        "channelId" : "250221575599554560",
+        "lastTimestamp" : 1478850624,
+        "serverId" : "250216966436945920",
+        "userId" : 3105151388,
+        "userName" : "ioi_official_ig"
+    },
+    {
+        "channelId" : "250221328047669248",
+        "lastTimestamp" : 1479828620,
+        "serverId" : "250216966436945920",
+        "userId" : 1633170666,
+        "userName" : "s_sohye"
+    },
+    {
+        "channelId" : "250221272343117824",
+        "lastTimestamp" : 1480783351,
+        "serverId" : "250216966436945920",
+        "userId" : 1495935856,
+        "userName" : "ioiyoojung"
+    },
+    {
+        "channelId" : "250221434071285771",
+        "lastTimestamp" : 1480602095,
+        "serverId" : "250216966436945920",
+        "userId" : 2367197625,
+        "userName" : "j_chaeyeoni"
+    },
+    {
+        "channelId" : "250221539260235776",
+        "lastTimestamp" : 1479913665,
+        "serverId" : "250216966436945920",
+        "userId" : 2976814275,
+        "userName" : "uyj_s"
+    }
+]
