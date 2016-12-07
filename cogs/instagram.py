@@ -118,7 +118,7 @@ class Instagram:
                     data = self.get_embed_for_item(item)
 
                     await self.bot.send_message(channel, embed=data)
-                    if itemTakenAt > feed["lastTimestamp"]:
+                    if item["taken_at"] > feed["lastTimestamp"]:
                         self.feeds[self.feeds.index(feed)]["lastTimestamp"] = itemTakenAt
                         dataIO.save_json(self.feeds_file_path, self.feeds)
             await asyncio.sleep(600)
