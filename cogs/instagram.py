@@ -65,6 +65,7 @@ class Instagram:
 
         if listMessage == "":
             await self.bot.say("No user in database!")
+            return
 
         await self.bot.say("Found these users:\n{0}".format(listMessage))
 
