@@ -7,6 +7,7 @@ import random
 from .utils import checks
 from collections import OrderedDict
 import json
+import re
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -35,22 +36,24 @@ class Bias:
 
         with open(self.file_path, encoding='utf-8', mode="r") as f:
             orderedSettings = json.load(f, object_pairs_hook=OrderedDict)
-        """Use +name or -name to add or remove a bias role. You can have up to three biases.
-Available biases: Somi, Sejeong, Yoojung, Chungha, Sohye, Jieqiong, Chaeyeon, Doyeon, Mina, Nayoung, Yeonjung, OT11"""
-        helpMessage = "Use `+name` or `-name` to add or remove a bias role. You can have up to {0} {1}.\nAvailable biases: ".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+        helpMessage = "Use `+name` to add or `-name` to remove a bias role. You can have up to {0} {1}.\nAvailable biases: ".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
         for alias, role in orderedSettings[server.id]["ASSIGNABLE_ROLES"].items():
             if role not in rolesHandled:
                 rolesHandled.append(role)
+                alias = str(alias).title()
+                if re.match(r"^Ot[0-9]+$", alias):
+                    alias = alias.replace("Ot", "OT")
                 aliasToPrint.append(alias)
         i = 0
         for role in aliasToPrint:
             i += 1
             if i == 1:
-                helpMessage += "{0}".format(str(role).title())
+                helpMessage += "`{0}`".format(role)
             elif i < len(aliasToPrint):
-                helpMessage += ", {0}".format(str(role).title())
+                helpMessage += ", `{0}`".format(role)
             else:
-                helpMessage += " and {0}".format(str(role).title())
+                helpMessage += " and `{0}`".format(role)
+        helpMessage += "."
 
         await self.bot.send_message(channel, helpMessage)
 

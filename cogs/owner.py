@@ -303,7 +303,7 @@ class Owner:
     @_set.command(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(administrator=True)
     async def serverprefix(self, ctx, *prefixes):
-        """Sets Red's prefixes for this server
+        """Sets Robyul's prefixes for this server
 
         Accepts multiple prefixes separated by a space. Enclose in double
         quotes if a prefix contains spaces.
