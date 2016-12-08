@@ -44,7 +44,9 @@ class Instagram:
             await self.bot.say("Something went wrong!")
             return
 
-        lastItemTimestamp = self.instagramAPI.LastJson["items"][0]["taken_at"]
+        lastItemTimestamp = 0
+        if len(self.instagramAPI.LastJson["items"]) > 0:
+            lastItemTimestamp = self.instagramAPI.LastJson["items"][0]["taken_at"]
 
         self.feeds.append({"userId": userId,
             "userName": username,
@@ -122,7 +124,7 @@ class Instagram:
 
                     await self.bot.send_message(channel, embed=data)
                     if item["taken_at"] > feed["lastTimestamp"]:
-                        self.feeds[self.feeds.index(feed)]["lastTimestamp"] = itemTakenAt
+                        self.feeds[self.feeds.index(feed)]["lastTimestamp"] = item["taken_at"]
                         dataIO.save_json(self.feeds_file_path, self.feeds)
             await asyncio.sleep(600)
 
@@ -131,9 +133,10 @@ class Instagram:
 
         itemUserName = item["user"]["username"]
         itemUserProfilepicture = item["user"]["profile_pic_url"]
-        itemCaption = item["caption"]["text"]
+        itemCaption = ""
+        if item["caption"] != None:
+            itemCaption = item["caption"]["text"]
         itemPicture = item["image_versions2"]["candidates"][0]["url"]
-        itemTakenAt = item["taken_at"]
         itemUrl = "https://www.instagram.com/p/{0}/".format(item["code"])
 
         data = discord.Embed(
