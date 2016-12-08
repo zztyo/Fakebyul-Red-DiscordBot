@@ -62,7 +62,7 @@ class Naver:
         url = "http://labspace.naver.com/api/n2mt/translate"
 
         payload = {"source": source, "target": target, "text": text}
-        headers = {"user-agent": "Red-cog-Naver/"+__version__}
+        headers = {"user-agent": "Red-cog-Naver/"+__version__, "x-naver-client-id": "labspace"}
         try:
             conn = aiohttp.TCPConnector()
             session = aiohttp.ClientSession(connector=conn)
