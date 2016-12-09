@@ -72,8 +72,6 @@ class Bias:
         if not self.bot.user_allowed(message):
             return
 
-        if self._is_command(message.content):
-            return
 
         if server.id not in self.settings:
             return
@@ -81,8 +79,18 @@ class Bias:
         if message.channel.id not in self.settings[server.id]["CHANNELS"]:
             return
 
+        if message.author is self.bot.user:
+            return
+
+        if self._is_command(message.content):
+            await asyncio.sleep(10)
+            await self.bot.delete_message(message)
+            return
+
         message.content = message.content.strip().lower()
         if message.content[0] != "+" and message.content[0] != "-":
+            await asyncio.sleep(10)
+            await self.bot.delete_message(message)
             return
 
         changingRoleAlias = message.content[1:].strip()
