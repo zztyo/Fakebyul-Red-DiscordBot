@@ -161,7 +161,7 @@ class PrettyCards:
         for hosterandlink in content:
             if "=" not in hosterandlink:
                 continue
-            hosterandlink = hosterandlink.split("=")
+            hosterandlink = hosterandlink.split("=", 1)
             if len(hosterandlink) < 2:
                 continue
             data.add_field(name=str(hosterandlink[0].strip()), value=str(hosterandlink[1].strip()))
