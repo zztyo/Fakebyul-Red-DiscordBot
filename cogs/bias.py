@@ -39,6 +39,9 @@ class Bias:
         helpMessage = "Use `+name` to add or `-name` to remove a bias role."
         if self.settings[server.id]["MAX_ROLES"] > 1:
             helpMessage += " You can have up to {0} {1}.".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+
+        if ("PRIMARY_ROLE_PREFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_PREFIX"] != "") or ("PRIMARY_ROLE_SUFFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_SUFFIX"] != ""):
+            helpMessage += "\nThe role you assign first will be your primary role and appear above the others. "
         helpMessage += "\nAvailable biases: "
         example = ""
         for alias, role in orderedSettings[server.id]["ASSIGNABLE_ROLES"].items():
@@ -111,6 +114,13 @@ class Bias:
             await self.bot.delete_message(message)
             return
 
+        prefix = ""
+        suffix = ""
+        if "PRIMARY_ROLE_PREFIX" in self.settings[server.id]:
+            prefix = self.settings[server.id]["PRIMARY_ROLE_PREFIX"]
+        if "PRIMARY_ROLE_SUFFIX" in self.settings[server.id]:
+            suffix = self.settings[server.id]["PRIMARY_ROLE_SUFFIX"]
+
         changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
         if changingRole is None:
             print("role not found")
@@ -120,9 +130,10 @@ class Bias:
             await self.bot.delete_message(somethingWentWrong)
             await self.bot.delete_message(message)
             return
+        changingPrimaryRole = self._role_from_string(server, prefix+availableRoles[changingRoleAlias]+suffix)
 
         if message.content[0] == "+":
-            if changingRole in author.roles:
+            if changingRole in author.roles or (changingPrimaryRole != None and changingPrimaryRole in author.roles):
                 successMessage = await self.bot.send_message(channel, "{} you already got this bias role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
@@ -131,7 +142,10 @@ class Bias:
                 return
             selfAssignableRoles = 0
             for role in author.roles:
-                if role.name in list(availableRoles.values()):
+                cleanedRoleName = role.name
+                cleanedRoleName = cleanedRoleName.replace(prefix, "")
+                cleanedRoleName = cleanedRoleName.replace(suffix, "")
+                if cleanedRoleName in list(availableRoles.values()):
                     selfAssignableRoles += 1
             if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
                 successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
@@ -142,7 +156,7 @@ class Bias:
                 return
 
         if message.content[0] == "-":
-            if changingRole not in author.roles:
+            if changingRole not in author.roles and (changingPrimaryRole != None and changingPrimaryRole not in author.roles):
                 successMessage = await self.bot.send_message(channel, "{} you don't have this bias role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
@@ -154,10 +168,16 @@ class Bias:
             randomEmoji = ""
             if message.content[0] == "+":
                 randomEmoji = random.choice([":clap:", ":thumbsup:", ":blush:", ":sparkles:"])
-                await self.bot.add_roles(author, changingRole)
+                if changingPrimaryRole != None and selfAssignableRoles <= 0:
+                    await self.bot.add_roles(author, changingPrimaryRole)
+                else:
+                    await self.bot.add_roles(author, changingRole)
             else:
                 randomEmoji = random.choice([":scream:", ":thumbsdown:", ":mask:", ":flushed:"])
-                await self.bot.remove_roles(author, changingRole)
+                if changingPrimaryRole != None and changingPrimaryRole in author.roles:
+                    await self.bot.remove_roles(author, changingPrimaryRole)
+                else:
+                    await self.bot.remove_roles(author, changingRole)
             successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention, randomEmoji))
         except Exception as e:
             print(e)
@@ -243,7 +263,9 @@ def check_files():
         "ASSIGNABLE_ROLES": {
             "alias": "role"
         },
-        "CHANNELS": ["your channel"]
+        "CHANNELS": ["your channel"],
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : ""
     }
     }
 

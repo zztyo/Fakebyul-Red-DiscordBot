@@ -29,7 +29,9 @@
         "CHANNELS" : [
             "250220888077631489"
         ],
-        "MAX_ROLES" : 3
+        "MAX_ROLES" : 3,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : " 💎"
     },
     "208673735580844032": {
         "ASSIGNABLE_ROLES" : {
@@ -47,6 +49,8 @@
         "CHANNELS" : [
             "252000620565889024"
         ],
-        "MAX_ROLES" : 1
+        "MAX_ROLES" : 2,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : " 💎"
     }
 }
