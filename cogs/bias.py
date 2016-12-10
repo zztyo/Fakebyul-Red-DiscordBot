@@ -36,12 +36,12 @@ class Bias:
 
         with open(self.file_path, encoding='utf-8', mode="r") as f:
             orderedSettings = json.load(f, object_pairs_hook=OrderedDict)
-        helpMessage = "Use `+name` to add or `-name` to remove a bias role."
+        helpMessage = "Use **`+name` to add** or **`-name` to remove** a bias role."
         if self.settings[server.id]["MAX_ROLES"] > 1:
-            helpMessage += " You can have up to {0} {1}.".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+            helpMessage += " You can have up to **{0} {1}**.".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
 
         if ("PRIMARY_ROLE_PREFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_PREFIX"] != "") or ("PRIMARY_ROLE_SUFFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_SUFFIX"] != ""):
-            helpMessage += "\nThe role you assign first will be your primary role and appear above the others. "
+            helpMessage += "\nThe role you assign **first** will be your **primary role** and **appear above the others**. "
         helpMessage += "\nAvailable biases: "
         example = ""
         for alias, role in orderedSettings[server.id]["ASSIGNABLE_ROLES"].items():
@@ -55,12 +55,12 @@ class Bias:
         for role in aliasToPrint:
             i += 1
             if i == 1:
-                helpMessage += "`{0}`".format(role)
+                helpMessage += "**`{0}`**".format(role)
                 example = "\nExample: `+{0}` or `-{0}`".format(role)
             elif i < len(aliasToPrint):
-                helpMessage += ", `{0}`".format(role)
+                helpMessage += ", **`{0}`**".format(role)
             else:
-                helpMessage += " and `{0}`".format(role)
+                helpMessage += " and **`{0}`**".format(role)
         helpMessage += "."
         helpMessage += example
 
