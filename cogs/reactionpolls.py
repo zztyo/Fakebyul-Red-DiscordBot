@@ -181,6 +181,7 @@ class ReactionPolls:
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('ReactionPolls'):
             await self.cache()
+            #await self._update_description()
             await asyncio.sleep(300)
 
     async def cache(self):
@@ -192,6 +193,29 @@ class ReactionPolls:
                 self.bot.messages.append(pollMessage)
                 #print("Cached: message #{0.id}".format(pollMessage))
 
+    async def _update_description(self):
+        for key in self.polls:
+            poll = self.polls[key]
+            pollChannel = self.bot.get_channel(poll["channelId"])
+            pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
+            if len(pollMessage.embeds) > 0:
+                embed = pollMessage.embeds[0]
+                numberOfReactions = await self._count_all_reactions(pollMessage)-len(poll["allowedEmojis"])
+                newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
+                if embed["description"] != newDescription:
+                    data = discord.Embed(
+                        description=newDescription,
+                        colour=embed["color"])
+                    data.set_author(name=embed["author"]["name"])
+                    data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
+                    await self.bot.edit_message(pollMessage, embed=data)
+                    #print("Updated: message #{0.id}".format(pollMessage))
+
+    async def _count_all_reactions(self, message):
+        n = 0
+        for reaction in message.reactions:
+            n += reaction.count
+        return n
 
     async def numberOfReactionsByUserOnMessage(self, message, user):
         i = 0
@@ -215,6 +239,36 @@ class ReactionPolls:
                         await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
                     except Exception as e:
                         print(e)
+                elif len(reaction.message.embeds) > 0:
+                    embed = reaction.message.embeds[0]
+                    numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
+                    newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
+                    if embed["description"] != newDescription:
+                        data = discord.Embed(
+                            description=newDescription,
+                            colour=embed["color"])
+                        data.set_author(name=embed["author"]["name"])
+                        data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
+                        await self.bot.edit_message(reaction.message, embed=data)
+                        #print("Updated: message #{0.id}".format(reaction.message))
+
+    async def check_reaction_removal(self, reaction, user):
+        for key in self.polls:
+            poll = self.polls[key]
+            if poll["messageId"] == reaction.message.id:
+                if len(reaction.message.embeds) > 0:
+                    embed = reaction.message.embeds[0]
+                    numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
+                    newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
+                    if embed["description"] != newDescription:
+                        data = discord.Embed(
+                            description=newDescription,
+                            colour=embed["color"])
+                        data.set_author(name=embed["author"]["name"])
+                        data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
+                        await self.bot.edit_message(reaction.message, embed=data)
+                        #print("Updated: message #{0.id}".format(reaction.message))
+
 
 def check_folder():
     if not os.path.exists("data/reactionpolls"):
@@ -236,5 +290,6 @@ def setup(bot):
     check_file()
     n = ReactionPolls(bot)
     bot.add_listener(n.check_reaction, "on_reaction_add")
+    bot.add_listener(n.check_reaction_removal, "on_reaction_remove")
     bot.loop.create_task(n.cache_loop())
     bot.add_cog(n)
