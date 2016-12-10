@@ -36,7 +36,11 @@ class Bias:
 
         with open(self.file_path, encoding='utf-8', mode="r") as f:
             orderedSettings = json.load(f, object_pairs_hook=OrderedDict)
-        helpMessage = "Use `+name` to add or `-name` to remove a bias role. You can have up to {0} {1}.\nAvailable biases: ".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+        helpMessage = "Use `+name` to add or `-name` to remove a bias role."
+        if self.settings[server.id]["MAX_ROLES"] > 1:
+            helpMessage += " You can have up to {0} {1}.".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+        helpMessage += "\nAvailable biases: "
+        example = ""
         for alias, role in orderedSettings[server.id]["ASSIGNABLE_ROLES"].items():
             if role not in rolesHandled:
                 rolesHandled.append(role)
@@ -49,11 +53,13 @@ class Bias:
             i += 1
             if i == 1:
                 helpMessage += "`{0}`".format(role)
+                example = "\nExample: `+{0}` or `-{0}`".format(role)
             elif i < len(aliasToPrint):
                 helpMessage += ", `{0}`".format(role)
             else:
                 helpMessage += " and `{0}`".format(role)
         helpMessage += "."
+        helpMessage += example
 
         await self.bot.send_message(channel, helpMessage)
 
@@ -102,14 +108,18 @@ class Bias:
             successMessage = await self.bot.send_message(channel, "{} I can't find this bias role! :thinking:".format(author.mention))
 
             await asyncio.sleep(10)
-            await self.bot.delete_message(message)
             await self.bot.delete_message(successMessage)
+            await self.bot.delete_message(message)
             return
 
         changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
         if changingRole is None:
             print("role not found")
-            await self.bot.send_message(channel, "Something went wrong.")
+            somethingWentWrong = await self.bot.send_message(channel, "Something went wrong.")
+
+            await asyncio.sleep(10)
+            await self.bot.delete_message(somethingWentWrong)
+            await self.bot.delete_message(message)
             return
 
         if message.content[0] == "+":
@@ -117,8 +127,8 @@ class Bias:
                 successMessage = await self.bot.send_message(channel, "{} you already got this bias role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
-                await self.bot.delete_message(message)
                 await self.bot.delete_message(successMessage)
+                await self.bot.delete_message(message)
                 return
             selfAssignableRoles = 0
             for role in author.roles:
@@ -128,8 +138,8 @@ class Bias:
                 successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
 
                 await asyncio.sleep(10)
-                await self.bot.delete_message(message)
                 await self.bot.delete_message(successMessage)
+                await self.bot.delete_message(message)
                 return
 
         if message.content[0] == "-":
@@ -137,8 +147,8 @@ class Bias:
                 successMessage = await self.bot.send_message(channel, "{} you don't have this bias role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
-                await self.bot.delete_message(message)
                 await self.bot.delete_message(successMessage)
+                await self.bot.delete_message(message)
                 return
 
         try:
@@ -150,13 +160,20 @@ class Bias:
                 randomEmoji = random.choice([":scream:", ":thumbsdown:", ":mask:", ":flushed:"])
                 await self.bot.remove_roles(author, changingRole)
             successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention, randomEmoji))
-
-            await asyncio.sleep(10)
-            await self.bot.delete_message(message)
-            await self.bot.delete_message(successMessage)
         except Exception as e:
             print(e)
-            await self.bot.send_message(channel, "Something went wrong.")
+            somethingWentWrong = await self.bot.send_message(channel, "Something went wrong.")
+            await asyncio.sleep(10)
+            await self.bot.delete_message(somethingWentWrong)
+            await self.bot.delete_message(message)
+            return
+        
+        await asyncio.sleep(10)
+        try:
+            await self.bot.delete_message(successMessage)
+            await self.bot.delete_message(message)
+        except Exception:
+            print(e)
 
     def _role_from_string(self, server, rolename, roles=None):
         if roles is None:
