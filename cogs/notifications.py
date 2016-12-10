@@ -12,7 +12,7 @@ class Notifications:
         self.keywords_file_path = "data/notifications/keywords.json"
         self.keywords = dataIO.load_json(self.keywords_file_path)
 
-    @commands.group(pass_context=True, no_pm=True, name="notifications")
+    @commands.group(pass_context=True, no_pm=True, name="notifications", aliases=["notification"])
     async def _notifications(self, ctx):
         """Get a dm when someone says a keyword"""
         if ctx.invoked_subcommand is None:
