@@ -64,7 +64,7 @@ class Bias:
         await self.bot.send_message(channel, helpMessage)
 
 
-    async def on_message(self, message):
+    async def check_message(self, message):
         channel = message.channel
         author = message.author
         server = message.server
@@ -77,7 +77,6 @@ class Bias:
 
         if not self.bot.user_allowed(message):
             return
-
 
         if server.id not in self.settings:
             return
@@ -255,4 +254,6 @@ def check_files():
 def setup(bot):
     check_folders()
     check_files()
-    bot.add_cog(Bias(bot))
+    n = Bias(bot)
+    bot.add_listener(n.check_message, "on_message")
+    bot.add_cog(n)
