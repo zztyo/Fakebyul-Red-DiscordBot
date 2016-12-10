@@ -30,7 +30,7 @@ class Instagram:
             await send_cmd_help(context)
 
     @_instagram.command(no_pm=True, name="add")
-    @checks.serverowner_or_permissions(administrator=True)
+    @checks.mod_or_permissions(administrator=True)
     async def _add(self, username : str, channel : discord.Channel):
         """Adds a new instagram user feed to a channel"""
 
@@ -58,7 +58,6 @@ class Instagram:
         await self.bot.say("Added user to database!")
 
     @_instagram.command(pass_context=True, no_pm=True, name="list")
-    @checks.serverowner_or_permissions(administrator=True)
     async def _list(self, ctx):
         """Lists all instagram users in the database on this server"""
         server = ctx.message.server
@@ -75,7 +74,7 @@ class Instagram:
         await self.bot.say("Found these users:\n{0}".format(listMessage))
 
     @_instagram.command(no_pm=True, name="del")
-    @checks.serverowner_or_permissions(administrator=True)
+    @checks.mod_or_permissions(administrator=True)
     async def _del(self, feedId : int):
         """Deletes an instagram user from the database"""
 
@@ -89,8 +88,7 @@ class Instagram:
 
         await self.bot.say("User deleted from database")
 
-    @_instagram.command(no_pm=True, name="force", hidden=True)
-    @checks.serverowner_or_permissions(administrator=True)
+    @_instagram.command(no_pm=True, name="force")
     async def _force(self, username : str, channel : discord.Channel):
         """Forces to print the latest instagram post"""
 

@@ -33,7 +33,7 @@ class Twitter:
             await send_cmd_help(context)
 
     @_twitter.command(no_pm=True, name="add")
-    @checks.serverowner_or_permissions(administrator=True)
+    @checks.mod_or_permissions(administrator=True)
     async def _add(self, username : str, channel : discord.Channel):
         """Adds a new twitter user feed to a channel"""
         self.authenticate()
@@ -58,7 +58,6 @@ class Twitter:
         await self.bot.say("Added user to database!")
 
     @_twitter.command(pass_context=True, no_pm=True, name="list")
-    @checks.serverowner_or_permissions(administrator=True)
     async def _list(self, ctx):
         """Lists all twitter users in the database on this server"""
         server = ctx.message.server
@@ -75,7 +74,7 @@ class Twitter:
         await self.bot.say("Found these users:\n{0}".format(listMessage))
 
     @_twitter.command(no_pm=True, name="del")
-    @checks.serverowner_or_permissions(administrator=True)
+    @checks.mod_or_permissions(administrator=True)
     async def _del(self, feedId : int):
         """Deletes an twitter user from the database"""
 
@@ -89,8 +88,7 @@ class Twitter:
 
         await self.bot.say("User deleted from database")
 
-    @_twitter.command(no_pm=True, name="force", hidden=True)
-    @checks.serverowner_or_permissions(administrator=True)
+    @_twitter.command(no_pm=True, name="force")
     async def _force(self, username : str, channel : discord.Channel):
         """Forces to print the latest tweet"""
         self.authenticate()
