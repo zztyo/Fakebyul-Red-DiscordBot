@@ -101,7 +101,7 @@ class Bias:
             await self.bot.delete_message(message)
             return
 
-        changingRoleAlias = message.content[1:].strip()
+        changingRoleAlias = message.content[1:].strip().replace("name ", "")
         if changingRoleAlias == "":
             return
 
