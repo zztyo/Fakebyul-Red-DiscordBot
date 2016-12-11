@@ -191,7 +191,7 @@ class Bias:
         try:
             await self.bot.delete_message(successMessage)
             await self.bot.delete_message(message)
-        except Exception:
+        except Exception as e:
             print(e)
 
     def _role_from_string(self, server, rolename, roles=None):
