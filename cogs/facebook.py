@@ -111,10 +111,12 @@ class Facebook:
         itemUserProfilepicture = picture["url"]
         itemCaption = item["message"]
 
-        itemUrl = ""
-        for action in item["actions"]:
-            itemUrl = action["link"]
-            break
+        postIdOnly = item["id"].replace("{0[from][id]}_".format(item), "")
+        itemUrl = "https://www.facebook.com/{0[from][id]}/posts/{1}".format(item, postIdOnly)
+        if "action" in item:
+            for action in item["actions"]:
+                itemUrl = action["link"]
+                break
 
         data = discord.Embed(
             description=itemCaption,
