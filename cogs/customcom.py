@@ -1,7 +1,7 @@
 from discord.ext import commands
 from .utils.dataIO import dataIO
 from .utils import checks
-from __main__ import user_allowed
+from __main__ import user_allowed, send_cmd_help
 import os
 import re
 
@@ -14,13 +14,53 @@ class CustomCommands:
         self.file_path = "data/customcom/commands.json"
         self.c_commands = dataIO.load_json(self.file_path)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True, no_pm=True, name="commands")
+    async def _commands(self, ctx):
+        """Custom commands."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @_commands.command(pass_context=True, no_pm=True, name="add")
+    @checks.mod_or_permissions(administrator=True)
+    async def _add(self, ctx, command : str, *, text):
+        """Adds a custom command
+
+        Example:
+        /commands add yourcommand Text you want
+        """
+        return await self.addcom.callback(self=self, ctx=ctx, command=command, text=text)
+
+    @_commands.command(pass_context=True, no_pm=True, name="edit")
+    @checks.mod_or_permissions(administrator=True)
+    async def _edit(self, ctx, command : str, *, text):
+        """Edits a custom command
+
+        Example:
+        /commands edit yourcommand Text you want
+        """
+        return await self.editcom.callback(self=self, ctx=ctx, command=command, text=text)
+
+    @_commands.command(pass_context=True, no_pm=True, name="del")
+    @checks.mod_or_permissions(administrator=True)
+    async def _del(self, ctx, command : str):
+        """Deletes a custom command
+
+        Example:
+        /commands del yourcommand"""
+        return await self.delcom.callback(self=self, ctx=ctx, command=command)
+
+    @_commands.command(pass_context=True, no_pm=True, name="list")
+    async def _list(self, ctx):
+        """Shows custom commands list"""
+        return await self.customcommands.callback(self=self, ctx=ctx)
+
+    @commands.command(pass_context=True, no_pm=True, hidden=True)
     @checks.mod_or_permissions(administrator=True)
     async def addcom(self, ctx, command : str, *, text):
         """Adds a custom command
 
         Example:
-        !addcom yourcommand Text you want
+        /addcom yourcommand Text you want
         """
         server = ctx.message.server
         command = command.lower()
@@ -38,13 +78,13 @@ class CustomCommands:
         else:
             await self.bot.say("This command already exists. Use editcom to edit it.")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, hidden=True)
     @checks.mod_or_permissions(administrator=True)
     async def editcom(self, ctx, command : str, *, text):
         """Edits a custom command
 
         Example:
-        !editcom yourcommand Text you want
+        /editcom yourcommand Text you want
         """
         server = ctx.message.server
         command = command.lower()
@@ -60,13 +100,13 @@ class CustomCommands:
         else:
              await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, hidden=True)
     @checks.mod_or_permissions(administrator=True)
     async def delcom(self, ctx, command : str):
         """Deletes a custom command
 
         Example:
-        !delcom yourcommand"""
+        /delcom yourcommand"""
         server = ctx.message.server
         command = command.lower()
         if server.id in self.c_commands:
@@ -81,7 +121,7 @@ class CustomCommands:
         else:
             await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, hidden=True)
     async def customcommands(self, ctx):
         """Shows custom commands list"""
         server = ctx.message.server

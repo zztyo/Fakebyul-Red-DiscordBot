@@ -78,8 +78,8 @@ class Bias:
         if author == self.bot.user:
             return
 
-        if not self.bot.user_allowed(message):
-            return
+        #if not self.bot.user_allowed(message):
+        #    return
 
         if server.id not in self.settings:
             return
