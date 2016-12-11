@@ -140,7 +140,7 @@ class Notifications:
 
                     await self.bot.send_message(userToNotify, embed=data)
                     """
-                    notifyMessage = ":bell: {0.author.name} mentioned `{1[keyword]}` in {0.channel.mention}:\n```{0.content}```".format(message, keywordData)
+                    notifyMessage = ":bell: {0.author.mention} mentioned `{1[keyword]}` in {0.channel.mention}:\n```{0.content}```".format(message, keywordData)
                     await self.bot.send_message(userToNotify, notifyMessage)
 
     def _is_command(self, msg):
