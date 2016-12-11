@@ -6,6 +6,8 @@ import os
 from .utils.dataIO import dataIO
 import asyncio
 import re
+import aiohttp
+import json
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -17,6 +19,8 @@ class PrettyCards:
 
     def __init__(self, bot):
         self.bot = bot
+        self.file_path = "data/prettycards/settings.json"
+        self.settings = dataIO.load_json(self.file_path)
 
     @commands.command()
     @checks.mod_or_permissions(administrator=True)
@@ -164,8 +168,9 @@ class PrettyCards:
             hosterandlink = hosterandlink.split("=", 1)
             if len(hosterandlink) < 2:
                 continue
-            data.add_field(name=str(hosterandlink[0].strip()), value=str(hosterandlink[1].strip()))
-            fallbackText += "`{0}:` <{1}>\n".format(hosterandlink[0].strip(), hosterandlink[1].strip())
+            shortenedLink = await self._shorten_url_googl(str(hosterandlink[1].strip()))
+            data.add_field(name=str(hosterandlink[0].strip()), value=shortenedLink)
+            fallbackText += "`{0}:` <{1}>\n".format(hosterandlink[0].strip(), shortenedLink)
 
 
         data.set_author(name=str(title))
@@ -186,6 +191,26 @@ class PrettyCards:
         await self.bot.delete_message(message)
 
 
+    async def _shorten_url_googl(self, longUrl):
+        if "GOOGL_URL_SHORTENER_API_KEY" not in self.settings or self.settings["GOOGL_URL_SHORTENER_API_KEY"] == "":
+            return longUrl
+
+        url = "https://www.googleapis.com/urlshortener/v1/url?key={0}".format(self.settings["GOOGL_URL_SHORTENER_API_KEY"])
+
+        payload = {"longUrl": longUrl}
+        headers = {"user-agent": "Red-cog-Prettycards/"+__version__, "content-type": "application/json"}
+        try:
+            conn = aiohttp.TCPConnector()
+            session = aiohttp.ClientSession(connector=conn)
+            async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+                result = await r.json()
+            session.close()
+            return result["id"]
+        except Exception as e:
+            print("Shortening url failed: {0}".format(e))
+            return longUrl
+
+
 def check_folders():
     folders = ("data", "data/prettycards/")
     for folder in folders:
@@ -193,6 +218,15 @@ def check_folders():
             print("Creating " + folder + " folder...")
             os.makedirs(folder)
 
+def check_files():
+    settings = {"GOOGL_URL_SHORTENER_API_KEY": ""}
+
+    if not os.path.isfile("data/prettycards/settings.json"):
+        print("Creating empty settings.json...")
+        dataIO.save_json("data/prettycards/settings.json", settings)
+
+
 def setup(bot):
     check_folders()
+    check_files()
     bot.add_cog(PrettyCards(bot))
