@@ -32,7 +32,9 @@ class Greetingandgoodbye:
                 channel = server.get_channel(serverSettings["CHANNEL"])
             except:
                 return None
-            await self.bot.send_message(channel, serverSettings["GOODBYE"].format(member))
+            safeMention = member.name
+            print("leaving member.name: {0.name}, member.mention: {0.mention}, id: {0.id}".format(member))
+            await self.bot.send_message(channel, serverSettings["GOODBYE"].format(member, safeMention))
 
 def check_folders():
     folders = ("data", "data/greetingandgoodbye/")
@@ -45,7 +47,7 @@ def check_files():
     settings = {"<SERVER ID>" : {
     "CHANNEL": "<CHANNEL ID>",
     "GREETING": "Welcome {0.mention}! :clap:",
-    "GOODBYE": "Goodbye {0.mention}! :wave:"
+    "GOODBYE": "Goodbye {1}! :wave:"
     },
     }
 
