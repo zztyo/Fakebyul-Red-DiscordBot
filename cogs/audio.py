@@ -1450,6 +1450,39 @@ class Audio:
         else:
             await self.bot.say("There are no playlists.")
 
+    @playlist.command(pass_context=True, no_pm=True, name="show")
+    async def playlist_show(self, ctx, name):
+        """Show songs on a playlist"""
+        server = ctx.message.server
+
+        if not self._valid_playlist_name(name):
+            await self.bot.say("The playlist's name contains invalid "
+                               "characters.")
+            return
+
+        if self._playlist_exists(server, name):
+            playlist = self._load_playlist(server, name,
+                                           local=self._playlist_exists_local(
+                                               server, name))
+            msg = ""
+
+            await self.bot.say("Gathering information...")
+
+            playlist_song_list = await self._download_all(playlist.playlist)
+
+            song_info = []
+            for num, song in enumerate(playlist_song_list, 1):
+                try:
+                    song_info.append("{}. {.title}".format(num, song))
+                    print(song)
+                except AttributeError:
+                    song_info.append("{}. {.webpage_url}".format(num, song))
+            msg += "\n***Playlist {0}:***\n".format(name) + "\n".join(song_info)
+
+            await self.bot.say(msg)
+        else:
+            await self.bot.say("Playlist not found.")
+
     @playlist.command(pass_context=True, no_pm=True, name="queue")
     async def playlist_queue(self, ctx, url):
         """Adds a song to the playlist loop.
