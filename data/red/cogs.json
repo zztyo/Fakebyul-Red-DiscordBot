@@ -9,6 +9,7 @@
     "cogs.downloader" : false,
     "cogs.economy" : false,
     "cogs.facebook" : true,
+    "cogs.gallery" : true,
     "cogs.general" : true,
     "cogs.google" : false,
     "cogs.greetingandgoodbye" : true,

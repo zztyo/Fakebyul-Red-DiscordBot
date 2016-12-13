@@ -43,7 +43,7 @@ class Notifications:
 
     @_notifications.command(pass_context=True, no_pm=True, name="del")
     async def _del(self, ctx, keyword : str):
-        """Removed  keyword from  your list"""
+        """Removes a keyword from your list"""
         author = ctx.message.author
         server = ctx.message.server
 
