@@ -114,6 +114,7 @@ class Notifications:
         if server.id not in self.keywords:
             return
 
+        toNotifyUserForList = []
         messageList = message.content.lower().split()
         for keywordData in self.keywords[server.id]:
             if keywordData["keyword"] in messageList:
@@ -140,8 +141,20 @@ class Notifications:
 
                     await self.bot.send_message(userToNotify, embed=data)
                     """
-                    notifyMessage = ":bell: User {0.author.name} ({0.author.mention}) mentioned `{1[keyword]}` in {0.channel.mention}:\n```{0.content}```".format(message, keywordData)
-                    await self.bot.send_message(userToNotify, notifyMessage)
+                    toNotifyUserForList.append(keywordData["keyword"])
+        if len(toNotifyUserForList) > 0:
+            keywordListText = ""
+            i = 0
+            for keyword in toNotifyUserForList:
+                i += 1
+                if i == 1:
+                    keywordListText += "`{0}`".format(keyword)
+                elif i < len(toNotifyUserForList):
+                    keywordListText += ", `{0}`".format(keyword)
+                else:
+                    keywordListText += " and `{0}`".format(keyword)
+            notifyMessage = ":bell: User {0.author.name} ({0.author.mention}) mentioned {1} in {0.channel.mention}:\n```{0.content}```".format(message, keywordListText)
+            await self.bot.send_message(userToNotify, notifyMessage)
 
     def _is_command(self, msg):
         for p in self.bot.settings.prefixes:
