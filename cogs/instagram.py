@@ -114,8 +114,7 @@ class Instagram:
                     print("Channel not found")
                     continue
                 if self.instagramAPI.getUserFeed(feed["userId"], minTimestamp=feed["lastTimestamp"]) == False:
-                    await self.bot.send_message(channel,
-                        "Something went wrong fetching @{0}'s instagram feed!".format(feed["userName"]))
+                    print("Something went wrong fetching @{0}'s instagram feed!".format(feed["userName"]))
                     continue
                 for item in self.instagramAPI.LastJson["items"]:
                     data = self.get_embed_for_item(item)

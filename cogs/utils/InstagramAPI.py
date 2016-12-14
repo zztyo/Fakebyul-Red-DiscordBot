@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import requests
 import random
 import json
@@ -10,9 +11,15 @@ import uuid
 import time
 import copy
 import math
-from cogs.utils.ImageUtils import getImageSize
+import sys
+
+#The urllib library was split into other modules from Python 2 to Python 3
+if sys.version_info.major == 3:
+    import urllib.parse
+
+-from cogs.utils.ImageUtils import getImageSize
 from requests_toolbelt import MultipartEncoder
-#from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip
 
 class InstagramAPI:
     API_URL = 'https://i.instagram.com/api/v1/'
@@ -558,7 +565,12 @@ class InstagramAPI:
         return self.SendRequest('feed/liked/?max_id='+str(maxid))
 
     def generateSignature(self, data):
-        return 'ig_sig_key_version=' + self.SIG_KEY_VERSION + '&signed_body=' + hmac.new(self.IG_SIG_KEY.encode('utf-8'), data.encode('utf-8'), hashlib.sha256).hexdigest() + '.' + urllib.parse.quote(data)
+        try:
+            parsedData = urllib.parse.quote(data)
+        except AttributeError:
+            parsedData = urllib.quote(data)
+
+        return 'ig_sig_key_version=' + self.SIG_KEY_VERSION + '&signed_body=' + hmac.new(self.IG_SIG_KEY.encode('utf-8'), data.encode('utf-8'), hashlib.sha256).hexdigest() + '.' + parsedData
 
     def generateDeviceId(self, seed):
         volatile_seed = "12345"
@@ -674,4 +686,3 @@ class InstagramAPI:
             for item in temp["items"]:
                 liked_items.append(item)
         return liked_items
-

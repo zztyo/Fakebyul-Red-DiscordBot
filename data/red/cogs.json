@@ -14,7 +14,7 @@
     "cogs.google" : false,
     "cogs.greetingandgoodbye" : true,
     "cogs.image" : false,
-    "cogs.instagram" : true,
+    "cogs.instagram" : false,
     "cogs.lastfm" : true,
     "cogs.mod" : true,
     "cogs.naver" : true,
