@@ -738,6 +738,11 @@ class Owner:
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
+    @commands.command()
+    @checks.mod_or_permissions(administrator=True)
+    async def echo(self, channel : discord.Channel, *, message):
+        """Lets Robyul say something"""
+        await self.bot.send_message(channel, message)
 
     def _load_cog(self, cogname):
         if not self._does_cogfile_exist(cogname):
