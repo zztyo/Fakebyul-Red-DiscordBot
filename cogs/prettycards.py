@@ -191,6 +191,71 @@ class PrettyCards:
         await self.bot.delete_message(message)
 
 
+    @commands.command(pass_context=True, name="videocard-replace")
+    @checks.mod_or_permissions(administrator=True)
+    async def videocard_replace(self, ctx, editChannel : discord.Channel, editMessageId : str, *, arguments : str):
+        """Prints a video card from the arguments <title>;description;thumbnail;hoster=link;..."""
+
+        try:
+            editMessage = await self.bot.get_message(editChannel, editMessageId)
+        except Exception:
+            await self.bot.say("Unable to get message :warning:")
+            return
+
+        message = ctx.message
+        author = message.author
+
+        content = arguments.strip().split(";")
+
+        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = int(colour, 16)
+
+        if len(content) <= 2:
+            await self.bot.say("Not enough arguments")
+            return
+
+        title = content[0]
+        content.pop(0)
+        description = content[0]
+        content.pop(0)
+        thumbnail = content[0]
+        content.pop(0)
+
+        if len(content) <= 0:
+            await self.bot.say("Not enough arguments")
+            return
+
+        data = discord.Embed(
+            description=str(description),
+            colour=discord.Colour(value=colour))
+        fallbackText = ""
+
+        for hosterandlink in content:
+            if "=" not in hosterandlink:
+                continue
+            hosterandlink = hosterandlink.split("=", 1)
+            if len(hosterandlink) < 2:
+                continue
+            shortenedLink = await self._shorten_url_googl(str(hosterandlink[1].strip()))
+            data.add_field(name=str(hosterandlink[0].strip()), value=shortenedLink)
+            fallbackText += "`{0}:` <{1}>\n".format(hosterandlink[0].strip(), shortenedLink)
+
+
+        data.set_author(name=str(title))
+
+        if thumbnail != "":
+            data.set_thumbnail(url=thumbnail)
+
+        data.set_footer(text="Posted by {}. Thank you!".format(author.name), icon_url=author.avatar_url)
+
+        try:
+            await self.bot.edit_message(editMessage, fallbackText, embed=data)
+            await self.bot.say("Done :ok_hand:")
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this or you send misformatted arguments")
+
+
     async def _shorten_url_googl(self, longUrl):
         if "GOOGL_URL_SHORTENER_API_KEY" not in self.settings or self.settings["GOOGL_URL_SHORTENER_API_KEY"] == "":
             return longUrl
