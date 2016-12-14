@@ -141,7 +141,8 @@ class Notifications:
 
                     await self.bot.send_message(userToNotify, embed=data)
                     """
-                    toNotifyUserForList.append(keywordData["keyword"])
+                    if keywordData["keyword"] not in toNotifyUserForList:
+                        toNotifyUserForList.append(keywordData["keyword"])
         if len(toNotifyUserForList) > 0:
             keywordListText = ""
             i = 0
