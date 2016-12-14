@@ -19,7 +19,7 @@ class Notifications:
             await send_cmd_help(ctx)
 
     @_notifications.command(pass_context=True, no_pm=True, name="add")
-    async def _add(self, ctx, keyword : str):
+    async def _add(self, ctx, *, keyword):
         """Adds a keyword to your list"""
         author = ctx.message.author
         server = ctx.message.server
@@ -42,7 +42,7 @@ class Notifications:
         await self.bot.say("{0} Added keyword `{1}` to your list! :ok_hand:".format(author.mention, keyword))
 
     @_notifications.command(pass_context=True, no_pm=True, name="del")
-    async def _del(self, ctx, keyword : str):
+    async def _del(self, ctx, *, keyword):
         """Removes a keyword from your list"""
         author = ctx.message.author
         server = ctx.message.server
@@ -115,9 +115,9 @@ class Notifications:
             return
 
         toNotifyUserForList = []
-        messageList = message.content.lower().split()
+        #messageList = message.content.lower().split()
         for keywordData in self.keywords[server.id]:
-            if keywordData["keyword"] in messageList:
+            if self._words_in_text(message.content.lower(), keywordData["keyword"]):
                 userToNotify = message.server.get_member(keywordData["userId"])
                 if userToNotify == None:
                     print("user #{0[userId]} for keyword notification \"{0[keyword]}\" not found!")
@@ -155,6 +155,21 @@ class Notifications:
                     keywordListText += " and `{0}`".format(keyword)
             notifyMessage = ":bell: User {0.author.name} ({0.author.mention}) mentioned {1} in {0.channel.mention}:\n```{0.content}```".format(message, keywordListText)
             await self.bot.send_message(userToNotify, notifyMessage)
+
+    def _words_in_text(self, haystack, needle):
+        if haystack == needle:
+            return True
+        if haystack.startswith(needle + " "):
+            return True
+        if haystack.endswith(" " + needle):
+            return True
+        if haystack.find(" " + needle + " ") != -1:
+            return True
+        if haystack.find(" " + needle + ",") != -1:
+            return True
+        if haystack.find("," + needle + " ") != -1:
+            return True
+        return False
 
     def _is_command(self, msg):
         for p in self.bot.settings.prefixes:
