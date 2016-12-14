@@ -814,6 +814,24 @@ class Owner:
 
         return embed
 
+    async def check_mention(self, message):
+        channel = message.channel
+        author = message.author
+        server = message.server
+
+        if message.server is None:
+            return
+
+        if author == self.bot.user:
+            return
+
+        if not self.bot.user_allowed(message):
+            return
+
+        if message.content.startswith(self.bot.user.mention):
+            message = "Follow me on twitter: https://twitter.com/s3kl_ :eyes:"
+            await self.bot.send_message(channel, message)
+
 def check_files():
     if not os.path.isfile("data/red/disabled_commands.json"):
         print("Creating empty disabled_commands.json...")
@@ -823,4 +841,5 @@ def check_files():
 def setup(bot):
     check_files()
     n = Owner(bot)
+    bot.add_listener(n.check_mention, "on_message")
     bot.add_cog(n)
