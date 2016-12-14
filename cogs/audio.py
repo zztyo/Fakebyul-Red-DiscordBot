@@ -1474,7 +1474,6 @@ class Audio:
             for num, song in enumerate(playlist_song_list, 1):
                 try:
                     song_info.append("{}. {.title}".format(num, song))
-                    print(song)
                 except AttributeError:
                     song_info.append("{}. {.webpage_url}".format(num, song))
             msg += "\n***Playlist {0}:***\n".format(name) + "\n".join(song_info)
@@ -1776,6 +1775,11 @@ class Audio:
         if not self.get_server_settings(server)["VOTE_ENABLED"]:
             return True
 
+        is_music_mod = False
+        serverSettings = self.get_server_settings(server)
+        if "MUSIC_MOD_ROLE" in serverSettings and serverSettings["MUSIC_MOD_ROLE"] != "":
+            is_music_mod = discord.utils.get(member.roles, name=serverSettings["MUSIC_MOD_ROLE"]) is not None
+
         admin_role = settings.get_server_admin(server)
         mod_role = settings.get_server_mod(server)
 
@@ -1783,11 +1787,10 @@ class Audio:
         is_admin = discord.utils.get(member.roles, name=admin_role) is not None
         is_mod = discord.utils.get(member.roles, name=mod_role) is not None
 
-
         nonbots = sum(not m.bot for m in member.voice_channel.voice_members)
         alone = nonbots <= 1
 
-        return is_owner or is_admin or is_mod or alone
+        return is_owner or is_admin or is_mod or is_music_mod or alone
 
     #@commands.command(pass_context=True, no_pm=True)
     #async def sing(self, ctx):
