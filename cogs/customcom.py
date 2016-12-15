@@ -4,7 +4,7 @@ from .utils import checks
 from __main__ import user_allowed, send_cmd_help
 import os
 import re
-
+from .utils.chat_formatting import pagify
 
 class CustomCommands:
     """Custom commands."""
@@ -53,6 +53,25 @@ class CustomCommands:
     async def _list(self, ctx):
         """Shows custom commands list"""
         return await self.customcommands.callback(self=self, ctx=ctx)
+
+    @_commands.command(pass_context=True, no_pm=True, name="full-list")
+    async def _list(self, ctx):
+        """Shows custom commands with their contents, can consume much traffic!"""
+        server = ctx.message.server
+        if server.id in self.c_commands:
+            cmdlist = self.c_commands[server.id]
+            if cmdlist:
+                msg = "`Custom commands:`\n"
+                for cmd in sorted([cmd for cmd in cmdlist.keys()]):
+                    msg += " `{}{}:`\n".format(ctx.prefix, cmd)
+                    msg += "{}\n".format(self.format_cc(cmdlist[cmd], ctx.message))
+                for page in pagify(msg, ["\n"]):
+                    if page != "":
+                        await self.bot.whisper(msg)
+            else:
+                await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+        else:
+            await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
     @checks.mod_or_permissions(administrator=True)
