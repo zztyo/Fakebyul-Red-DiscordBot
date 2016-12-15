@@ -62,12 +62,11 @@ class CustomCommands:
             cmdlist = self.c_commands[server.id]
             if cmdlist:
                 msg = "`Custom commands:`\n"
+                await self.bot.send_message(ctx.message.author, msg)
                 for cmd in sorted([cmd for cmd in cmdlist.keys()]):
-                    msg += " `{}{}:`\n".format(ctx.prefix, cmd)
+                    msg = " `{}{}:`\n".format(ctx.prefix, cmd)
                     msg += "{}\n".format(self.format_cc(cmdlist[cmd], ctx.message))
-                for page in pagify(msg, ["\n"]):
-                    if page != "":
-                        await self.bot.whisper(msg)
+                    await self.bot.send_message(ctx.message.author, msg)
             else:
                 await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
         else:
