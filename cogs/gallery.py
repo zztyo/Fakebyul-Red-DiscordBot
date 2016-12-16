@@ -113,7 +113,7 @@ class Gallery:
                 if len(message.content) > 0:
                     if "http" in message.content:
                         for item in message.content.split(" "):
-                            link = re.search("(?P<url>https?://[^\s]+)", item)
+                            link = re.search("(?P<url>https?://[^\s>]+)", item)
                             if link != None:
                                 link = link.group("url")
                                 links.append(link)

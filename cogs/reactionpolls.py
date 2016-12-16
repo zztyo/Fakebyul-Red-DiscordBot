@@ -320,8 +320,8 @@ class ReactionPolls:
                         pollMessageContent = reaction.message.content
                         if "votes" in pollMessageContent.lower() or "replies" in pollMessageContent.lower():
                             numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
-                            pollMessageContent = re.sub("(votes)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
-                            pollMessageContent = re.sub("(replies)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                            pollMessageContent = re.sub("(votes(:)?)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                            pollMessageContent = re.sub("(replies(:)?)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
 
                         if pollMessageContent != reaction.message.content:
                             await self.bot.edit_message(reaction.message, pollMessageContent)
