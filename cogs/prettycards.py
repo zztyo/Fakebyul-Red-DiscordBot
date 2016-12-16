@@ -255,6 +255,15 @@ class PrettyCards:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
 
+    # @commands.group(pass_context=True, no_pm=True, name="countdown")
+    # async def _countdown(self, ctx):
+    #     """Creates countdown cards"""
+    #     if ctx.invoked_subcommand is None:
+    #         await send_cmd_help(ctx)
+
+    # @_countdown.command(pass_context=True, name="until")
+    # async def _countdown_until(self, ctx, time : str):
+    #     pass
 
     async def _shorten_url_googl(self, longUrl):
         if "GOOGL_URL_SHORTENER_API_KEY" not in self.settings or self.settings["GOOGL_URL_SHORTENER_API_KEY"] == "":

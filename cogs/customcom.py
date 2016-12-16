@@ -54,8 +54,42 @@ class CustomCommands:
         """Shows custom commands list"""
         return await self.customcommands.callback(self=self, ctx=ctx)
 
+    @_commands.command(pass_context=True, no_pm=True, name="search")
+    async def _search(self, ctx, keyword : str):
+        """Searches in the custom commands"""
+        server = ctx.message.server
+        if keyword == "":
+            await send_cmd_help(ctx)
+            return
+        if server.id in self.c_commands:
+            cmdlist = self.c_commands[server.id]
+            if cmdlist:
+                i = 0
+                commandsFound = 0
+                msg = ["```Custom commands with \"{0}\":\n".format(keyword)]
+                for cmd in sorted([cmd for cmd in cmdlist.keys()]): 
+                    if keyword not in cmd:
+                        continue
+                    commandsFound += 1
+                    if len(msg[i]) + len(ctx.prefix) + len(cmd) + 5 > 2000:
+                        msg[i] += "```"
+                        i += 1
+                        msg.append("``` {}{}\n".format(ctx.prefix, cmd))
+                    else:
+                        msg[i] += " {}{}\n".format(ctx.prefix, cmd)
+                msg[i] += "```"
+                if commandsFound <= 0:
+                    await self.bot.say("There are no custom commands with that keyword in this server. Use addcom [command] [text]")
+                    return
+                for cmds in msg:
+                    await self.bot.say(cmds)
+            else:
+                await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+        else:
+            await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+
     @_commands.command(pass_context=True, no_pm=True, name="full-list")
-    async def _list(self, ctx):
+    async def _full_list(self, ctx):
         """Shows custom commands with their contents, can consume much traffic!"""
         server = ctx.message.server
         if server.id in self.c_commands:
