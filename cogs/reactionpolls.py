@@ -7,6 +7,7 @@ from random import choice as randchoice
 from cogs.utils import checks
 import asyncio
 from discord import utils
+import re
 
 class ReactionPolls:
     """Create reaction polls!"""
@@ -16,11 +17,55 @@ class ReactionPolls:
         self.polls_file_path = "data/reactionpolls/polls.json"
         self.polls = dataIO.load_json(self.polls_file_path)
 
-    @commands.group(pass_context=True, no_pm=True, aliases=['rp'])
+    @commands.group(pass_context=True, no_pm=True, aliases=['rp', 'reactionpolls'])
     async def reactionpoll(self, ctx):
         """Manage reaction polls"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @checks.mod_or_permissions(administrator=True)
+    @reactionpoll.command(pass_context=True, no_pm=True)
+    async def attach(self, ctx, pollChannel : discord.Channel, messageId, maxReactions: int, *allowedEmojis: str):
+        """Attaches a reaction poll to every message
+        maxReactions: 0 = unlimited"""
+        message = ctx.message
+        author = message.author
+
+        pollNumber = str(len(self.polls)+1)
+        while True:
+            if pollNumber in self.polls:
+                pollNumber = str(int(pollNumber)+1)
+            else:
+                break
+
+        if len(allowedEmojis) <= 0:
+            await send_cmd_help(ctx)
+            return
+
+        pollMessage = await self.bot.get_message(pollChannel, messageId)
+        if pollMessage == None:
+            await self.bot.say("Unable to find message")
+            return
+
+        try:
+            allCustomEmojis = list(self.bot.get_all_emojis())
+            for emoji in allowedEmojis:
+                customEmoji = self.getCustomEmoji(emoji, allCustomEmojis)
+                if customEmoji == None:
+                    await self.bot.add_reaction(pollMessage, emoji)
+                else:
+                    allowedEmojis = tuple(x for x in allowedEmojis if x != emoji)
+                    allowedEmojis = allowedEmojis + (emoji,)
+                    await self.bot.add_reaction(pollMessage, customEmoji)
+        except discord.HTTPException as e:
+            print(e)
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this or you send misformatted arguments")
+            return
+        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions, "channelId": message.channel.id, "type": "attached"}
+        dataIO.save_json(self.polls_file_path, self.polls)
+
+        await self.bot.say("Done! :ok_hand:")
 
     @reactionpoll.command(pass_context=True, no_pm=True, aliases=['crt'])
     async def create(self, ctx, question: str, maxReactions: int, *allowedEmojis: str):
@@ -65,7 +110,7 @@ class ReactionPolls:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
             return
-        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions, "channelId": message.channel.id}
+        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions, "channelId": message.channel.id, "type": "user"}
         dataIO.save_json(self.polls_file_path, self.polls)
 
     def getCustomEmoji(self, emojiStr, allCustomEmojis):
@@ -193,24 +238,6 @@ class ReactionPolls:
                 self.bot.messages.append(pollMessage)
                 #print("Cached: message #{0.id}".format(pollMessage))
 
-    async def _update_description(self):
-        for key in self.polls:
-            poll = self.polls[key]
-            pollChannel = self.bot.get_channel(poll["channelId"])
-            pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
-            if len(pollMessage.embeds) > 0:
-                embed = pollMessage.embeds[0]
-                numberOfReactions = await self._count_all_reactions(pollMessage)-len(poll["allowedEmojis"])
-                newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
-                if embed["description"] != newDescription:
-                    data = discord.Embed(
-                        description=newDescription,
-                        colour=embed["color"])
-                    data.set_author(name=embed["author"]["name"])
-                    data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
-                    await self.bot.edit_message(pollMessage, embed=data)
-                    #print("Updated: message #{0.id}".format(pollMessage))
-
     async def _count_all_reactions(self, message):
         n = 0
         for reaction in message.reactions:
@@ -239,35 +266,66 @@ class ReactionPolls:
                         await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
                     except Exception as e:
                         print(e)
-                elif len(reaction.message.embeds) > 0:
-                    embed = reaction.message.embeds[0]
-                    numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
-                    newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
-                    if embed["description"] != newDescription:
-                        data = discord.Embed(
-                            description=newDescription,
-                            colour=embed["color"])
-                        data.set_author(name=embed["author"]["name"])
-                        data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
-                        await self.bot.edit_message(reaction.message, embed=data)
-                        #print("Updated: message #{0.id}".format(reaction.message))
+                else:
+                    pollType = "user"
+                    if "type" in poll and poll["type"] != "":
+                        pollType = poll["type"]
+                    if pollType == "user":
+                        if len(reaction.message.embeds) > 0:
+                            embed = reaction.message.embeds[0]
+                            numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
+                            newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
+                            if embed["description"] != newDescription:
+                                data = discord.Embed(
+                                    description=newDescription,
+                                    colour=embed["color"])
+                                data.set_author(name=embed["author"]["name"])
+                                data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
+                                await self.bot.edit_message(reaction.message, embed=data)
+                                #print("Updated: user poll #{0.id}".format(reaction.message))
+                    if pollType == "attached":
+                        if reaction.message.author == self.bot.user:
+                            pollMessageContent = reaction.message.content
+                            if "votes" in pollMessageContent.lower() or "replies" in pollMessageContent.lower():
+                                numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
+                                pollMessageContent = re.sub("(votes)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                                pollMessageContent = re.sub("(replies)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+
+                            if pollMessageContent != reaction.message.content:
+                                await self.bot.edit_message(reaction.message, pollMessageContent)
+                                #print("Updated: attached poll #{0.id}".format(reaction.message))
 
     async def check_reaction_removal(self, reaction, user):
         for key in self.polls:
             poll = self.polls[key]
             if poll["messageId"] == reaction.message.id:
-                if len(reaction.message.embeds) > 0:
-                    embed = reaction.message.embeds[0]
-                    numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
-                    newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
-                    if embed["description"] != newDescription:
-                        data = discord.Embed(
-                            description=newDescription,
-                            colour=embed["color"])
-                        data.set_author(name=embed["author"]["name"])
-                        data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
-                        await self.bot.edit_message(reaction.message, embed=data)
-                        #print("Updated: message #{0.id}".format(reaction.message))
+                pollType = "user"
+                if "type" in poll and poll["type"] != "":
+                    pollType = poll["type"]
+                if pollType == "user":
+                    if len(reaction.message.embeds) > 0:
+                        embed = reaction.message.embeds[0]
+                        numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
+                        newDescription = "Poll #{0}, total votes: {1}".format(key, numberOfReactions)
+                        if embed["description"] != newDescription:
+                            data = discord.Embed(
+                                description=newDescription,
+                                colour=embed["color"])
+                            data.set_author(name=embed["author"]["name"])
+                            data.set_footer(text=embed["footer"]["text"], icon_url=embed["footer"]["icon_url"])
+                            await self.bot.edit_message(reaction.message, embed=data)
+                            #print("Updated: user poll #{0.id}".format(reaction.message))
+                if pollType == "attached":
+                    if reaction.message.author == self.bot.user:
+                        pollMessageContent = reaction.message.content
+                        if "votes" in pollMessageContent.lower() or "replies" in pollMessageContent.lower():
+                            numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
+                            pollMessageContent = re.sub("(votes)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                            pollMessageContent = re.sub("(replies)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+
+                        if pollMessageContent != reaction.message.content:
+                            await self.bot.edit_message(reaction.message, pollMessageContent)
+                            #print("Updated: attached poll #{0.id}".format(reaction.message))
 
 
 def check_folder():
