@@ -128,6 +128,7 @@ class Twitter:
     async def check_feed_loop(self):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Twitter'):
+            print("checking twitter feed...")
             self.authenticate()
             for feed in self.feeds:
                 channel = self.bot.get_channel(feed["channelId"])

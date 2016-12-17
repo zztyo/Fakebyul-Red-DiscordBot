@@ -138,6 +138,7 @@ class Facebook:
     async def check_feed_loop(self):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Facebook'):
+            print("checking facebook feed...")
             self.authenticate()
             for feed in self.feeds:
                 profile = self.graph.get_object(id=feed["userId"], fields="id,name")
