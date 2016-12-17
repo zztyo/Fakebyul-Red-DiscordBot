@@ -102,8 +102,7 @@ class Instagram:
             await self.bot.say("Something went wrong!")
             return
 
-        data = self.get_embed_for_item(self.instagramAPI.LastJson["items"][0])
-        await self.bot.send_message(channel, embed=data)
+        await self._post_item(channel, self.instagramAPI.LastJson["items"][0])
 
     async def check_feed_loop(self):
         await self.bot.wait_until_ready()
@@ -118,13 +117,17 @@ class Instagram:
                     print("Something went wrong fetching @{0}'s instagram feed!".format(feed["userName"]))
                     continue
                 for item in self.instagramAPI.LastJson["items"]:
-                    data = self.get_embed_for_item(item)
-
-                    await self.bot.send_message(channel, embed=data)
+                    await self._post_item(channel, item)
                     if item["taken_at"] > feed["lastTimestamp"]:
                         self.feeds[self.feeds.index(feed)]["lastTimestamp"] = item["taken_at"]
                         dataIO.save_json(self.feeds_file_path, self.feeds)
             await asyncio.sleep(600)
+
+    async def _post_item(self, channel, item):
+        data = self.get_embed_for_item(item)
+        itemUrl = "https://www.instagram.com/p/{0}/".format(item["code"])
+
+        await self.bot.send_message(channel, "<{0}>".format(itemUrl), embed=data)
 
     def get_embed_for_item(self, item):
         colour = int("F56040", 16)

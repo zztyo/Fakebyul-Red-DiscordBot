@@ -101,8 +101,14 @@ class Facebook:
             await self.bot.say("No posts found!")
             return
 
-        data = self._get_embed_for_item(profile, picture, posts['data'][0])
-        await self.bot.send_message(channel, embed=data)
+        await self._post_item(channel, profile, picture, posts['data'][0])
+
+    async def _post_item(self, channel, profile, picture, item):
+        data = self._get_embed_for_item(profile, picture, item)
+        postIdOnly = item["id"].replace("{0[from][id]}_".format(item), "")
+        itemUrl = "https://www.facebook.com/{0[from][id]}/posts/{1}".format(item, postIdOnly)
+
+        await self.bot.send_message(channel, "<{0}>".format(itemUrl), embed=data)
 
     def _get_embed_for_item(self, profile, picture, item):
         colour = int("3b5998", 16)
@@ -158,8 +164,7 @@ class Facebook:
                         if feed["lastId"] == item["id"]:
                             break
 
-                        data = self._get_embed_for_item(profile, picture, item)
-                        await self.bot.send_message(channel, embed=data)
+                        await self._post_item(channel, profile, picture, item)
 
                     if posts["data"][0]["id"] != self.feeds[self.feeds.index(feed)]["lastId"]:
                         self.feeds[self.feeds.index(feed)]["lastId"] = posts["data"][0]["id"]

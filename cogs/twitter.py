@@ -103,8 +103,13 @@ class Twitter:
             await self.bot.say("No tweets found!")
             return
 
-        data = self.get_embed_for_item(twitterUserTimeline[0])
-        await self.bot.send_message(channel, embed=data)
+        await self._post_item(channel, twitterUserTimeline[0])
+
+    async def _post_item(self, channel, item):
+        data = self.get_embed_for_item(item)
+        itemUrl = "https://twitter.com/statuses/{0}".format(item.id_str)
+
+        await self.bot.send_message(channel, "<{0}>".format(itemUrl), embed=data)
 
     def get_embed_for_item(self, item):
         colour = int("1DA1F2", 16)
@@ -149,8 +154,7 @@ class Twitter:
                     dataIO.save_json(self.feeds_file_path, self.feeds)
 
                 for item in twitterUserTimeline:
-                    data = self.get_embed_for_item(item)
-                    await self.bot.send_message(channel, embed=data)
+                    await self._post_item(channel, item)
             await asyncio.sleep(600)
 
 def check_folders():
