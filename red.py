@@ -538,10 +538,10 @@ def main():
     yield from bot.connect()
 
 if __name__ == '__main__':
-    sys.stdout = TextIOWrapper(sys.stdout.detach(),
-                               encoding=sys.stdout.encoding,
-                               errors="replace",
-                               line_buffering=True)
+    #sys.stdout = TextIOWrapper(sys.stdout.detach(),
+    #                           encoding=sys.stdout.encoding,
+    #                           errors="replace",
+    #                           line_buffering=True)
     set_logger()
     error = False
     loop = asyncio.get_event_loop()

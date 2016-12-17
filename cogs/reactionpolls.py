@@ -62,7 +62,7 @@ class ReactionPolls:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
             return
-        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions, "channelId": message.channel.id, "type": "attached"}
+        self.polls[pollNumber] = {"messageId": pollMessage.id, "allowedEmojis": allowedEmojis, "status": "active", "createdBy": author.id, "maxReactions": maxReactions, "channelId": pollMessage.channel.id, "type": "attached"}
         dataIO.save_json(self.polls_file_path, self.polls)
 
         await self.bot.say("Done! :ok_hand:")
@@ -234,9 +234,15 @@ class ReactionPolls:
             poll = self.polls[key]
             if not utils.find(lambda m: m.id == poll["messageId"], self.bot.messages):
                 pollChannel = self.bot.get_channel(poll["channelId"])
-                pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
-                self.bot.messages.append(pollMessage)
-                #print("Cached: message #{0.id}".format(pollMessage))
+                if pollChannel == None:
+                    print("Caching failed: message #{0}, channel not found".format(poll["messageId"]))
+                else:
+                    try:
+                        pollMessage = await self.bot.get_message(pollChannel, poll["messageId"])
+                        self.bot.messages.append(pollMessage)
+                        #print("Cached: message #{0.id}".format(pollMessage))
+                    except Exception as e:
+                        print("Caching failed: message #{0}, error: {1}".format(poll["messageId"], e))
 
     async def _count_all_reactions(self, message):
         n = 0
@@ -288,8 +294,8 @@ class ReactionPolls:
                             pollMessageContent = reaction.message.content
                             if "votes" in pollMessageContent.lower() or "replies" in pollMessageContent.lower():
                                 numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
-                                pollMessageContent = re.sub("(votes)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
-                                pollMessageContent = re.sub("(replies)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                                pollMessageContent = re.sub("(votes(:)?)\ (-)?[0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                                pollMessageContent = re.sub("(replies(:)?)\ (-)?[0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
 
                             if pollMessageContent != reaction.message.content:
                                 await self.bot.edit_message(reaction.message, pollMessageContent)
@@ -320,8 +326,8 @@ class ReactionPolls:
                         pollMessageContent = reaction.message.content
                         if "votes" in pollMessageContent.lower() or "replies" in pollMessageContent.lower():
                             numberOfReactions = await self._count_all_reactions(reaction.message)-len(poll["allowedEmojis"])
-                            pollMessageContent = re.sub("(votes(:)?)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
-                            pollMessageContent = re.sub("(replies(:)?)\ [0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                            pollMessageContent = re.sub("(votes(:)?)\ (-)?[0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
+                            pollMessageContent = re.sub("(replies(:)?)\ (-)?[0-9]+", "\g<1> {0}".format(numberOfReactions), pollMessageContent, flags=re.IGNORECASE)
 
                         if pollMessageContent != reaction.message.content:
                             await self.bot.edit_message(reaction.message, pollMessageContent)
