@@ -2,37 +2,86 @@ import discord
 import os
 from .utils.dataIO import dataIO
 from discord.ext import commands
+from cogs.utils import checks
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
-__version__ = "0.1"
+__version__ = "1.0"
 
 class Greetingandgoodbye:
-    """My custom cog that does stuff!"""
+    """Shows welcome and goodbye messages!"""
 
     def __init__(self, bot):
         self.bot = bot
         self.file_path = "data/greetingandgoodbye/settings.json"
         self.settings = dataIO.load_json(self.file_path)
 
+    @commands.command(pass_context=True, no_pm=True, name='toggle-greeting')
+    @checks.mod_or_permissions(administrator=True)
+    async def _toggle_greeting(self, ctx):
+        """Toggles the greeting message"""
+        server = ctx.message.server
+        if server == None or server.id not in self.settings:
+            await self.bot.say("Server not found!")
+            return
+        serverSettings = self.settings[server.id]
+        postGreeting = True
+        if "POST_GREETING" in serverSettings and serverSettings["POST_GREETING"] == False:
+            postGreeting = False
+        postGreeting = not postGreeting
+        self.settings[server.id]["POST_GREETING"] = postGreeting
+        dataIO.save_json(self.file_path, self.settings)
+        if postGreeting == True:
+            await self.bot.say("I will post a greeting when a user joins!")
+        else:
+            await self.bot.say("I will **not** post a greeting when a user joins!")
+
+    @commands.command(pass_context=True, no_pm=True, name='toggle-goodbye')
+    @checks.mod_or_permissions(administrator=True)
+    async def _toggle_goodbye(self, ctx):
+        """Toggles the goodbye message"""
+        server = ctx.message.server
+        if server == None or server.id not in self.settings:
+            await self.bot.say("Server not found!")
+            return
+        serverSettings = self.settings[server.id]
+        postGoodbye = True
+        if "POST_GOODBYE" in serverSettings and serverSettings["POST_GOODBYE"] == False:
+            postGoodbye = False
+        postGoodbye = not postGoodbye
+        self.settings[server.id]["POST_GOODBYE"] = postGoodbye
+        dataIO.save_json(self.file_path, self.settings)
+        if postGoodbye == True:
+            await self.bot.say("I will post a goodbye when a user leaves!")
+        else:
+            await self.bot.say("I will **not** post a goodbye when a user leaves!")
+
     async def member_join(self, member):
         server = member.server
         if server != None and server.id in self.settings:
             serverSettings = self.settings[server.id]
-            try:
-                channel = server.get_channel(serverSettings["CHANNEL"])
-            except:
-                return None
-            await self.bot.send_message(channel, serverSettings["GREETING"].format(member))
+            postGreeting = True
+            if "POST_GREETING" in serverSettings and serverSettings["POST_GREETING"] == False:
+                postGreeting = False
+            if postGreeting == True:
+                try:
+                    channel = server.get_channel(serverSettings["CHANNEL"])
+                except:
+                    return None
+                await self.bot.send_message(channel, serverSettings["GREETING"].format(member))
 
     async def member_remove(self, member):
         server = member.server
         if server != None and server.id in self.settings:
             serverSettings = self.settings[server.id]
-            try:
-                channel = server.get_channel(serverSettings["CHANNEL"])
-            except:
-                return None
-            await self.bot.send_message(channel, serverSettings["GOODBYE"].format(member))
+            postGoodbye = True
+            if "POST_GOODBYE" in serverSettings and serverSettings["POST_GOODBYE"] == False:
+                postGoodbye = False
+            if postGoodbye == True:
+                try:
+                    channel = server.get_channel(serverSettings["CHANNEL"])
+                except:
+                    return None
+                await self.bot.send_message(channel, serverSettings["GOODBYE"].format(member))
 
 def check_folders():
     folders = ("data", "data/greetingandgoodbye/")
@@ -45,7 +94,9 @@ def check_files():
     settings = {"<SERVER ID>" : {
     "CHANNEL": "<CHANNEL ID>",
     "GREETING": "Welcome {0.mention}! :clap:",
-    "GOODBYE": "Goodbye {0.name}! :wave:"
+    "GOODBYE": "Goodbye {0.name}! :wave:",
+    "POST_GREETING": True,
+    "POST_GOODBYE": True
     },
     }
 

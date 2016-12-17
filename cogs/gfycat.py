@@ -28,7 +28,7 @@ class Gfycat:
 
         statusMessage = await self.bot.say("Talking to gfycat.com, this may take a while... :telephone:")
         upload = await GfycatApi.GfycatApi().upload(url)
-        print(upload)
+        #print(upload)
 
         if "gfyName" not in upload:
             await self.bot.say("{0.mention} Something went wrong, please try again later! :warning:".format(author))
