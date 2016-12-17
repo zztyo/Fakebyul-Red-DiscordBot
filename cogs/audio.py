@@ -1787,13 +1787,14 @@ class Audio:
         mod_role = settings.get_server_mod(server)
 
         is_owner = member.id == settings.owner
+        is_server_owner = member == server.owner
         is_admin = discord.utils.get(member.roles, name=admin_role) is not None
         is_mod = discord.utils.get(member.roles, name=mod_role) is not None
 
         nonbots = sum(not m.bot for m in member.voice_channel.voice_members)
         alone = nonbots <= 1
 
-        return is_owner or is_admin or is_mod or is_music_mod or alone
+        return is_owner or is_server_owner or is_admin or is_mod or is_music_mod or alone
 
     #@commands.command(pass_context=True, no_pm=True)
     #async def sing(self, ctx):
