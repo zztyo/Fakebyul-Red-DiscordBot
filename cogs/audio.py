@@ -16,6 +16,7 @@ import math
 import time
 import inspect
 import subprocess
+from .utils.chat_formatting import pagify
 
 __author__ = "tekulvw"
 __version__ = "0.1.1"
@@ -1478,7 +1479,9 @@ class Audio:
                     song_info.append("{}. {.webpage_url}".format(num, song))
             msg += "\n***Playlist {0}:***\n".format(name) + "\n".join(song_info)
 
-            await self.bot.say(msg)
+            for page in pagify(msg, ["\n"]):
+                if page != "":
+                    await self.bot.say(page)
         else:
             await self.bot.say("Playlist not found.")
 

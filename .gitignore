@@ -2,6 +2,7 @@
 *.pyc
 __pycache__
 data/*/*
+data/audio/playlists/*/*
 !data/trivia/*
 *.exe
 *.dll
