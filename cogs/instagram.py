@@ -7,7 +7,6 @@ from .utils.dataIO import dataIO
 import asyncio
 from random import choice as randchoice
 from .utils import checks
-from pprint import pprint
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -142,7 +141,6 @@ class Instagram:
         itemUrl = "https://www.instagram.com/p/{0}/".format(item["code"])
         if "video_versions" in item and len(item["video_versions"]) > 0:
             itemUserName += " (Video 🎞)"
-        pprint(item)
 
         data = discord.Embed(
             description=itemCaption,

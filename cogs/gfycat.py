@@ -26,12 +26,12 @@ class Gfycat:
             await send_cmd_help(ctx)
             return
 
-        statusMessage = await self.bot.say("Talking to gfycat.com... :telephone:")
+        statusMessage = await self.bot.say("Talking to gfycat.com, this may take a while... :telephone:")
         upload = await GfycatApi.GfycatApi().upload(url)
         print(upload)
 
         if "gfyName" not in upload:
-            await self.bot.say("{0.mention} Something went wrong! :warning:".format(author))
+            await self.bot.say("{0.mention} Something went wrong, please try again later! :warning:".format(author))
             return
 
         gfycatUrl = "https://gfycat.com/{0}".format(upload["gfyName"])
