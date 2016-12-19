@@ -6,6 +6,7 @@
     "cogs.bias" : true,
     "cogs.charts" : true,
     "cogs.customcom" : true,
+    "cogs.dota" : true,
     "cogs.downloader" : false,
     "cogs.economy" : false,
     "cogs.facebook" : true,
