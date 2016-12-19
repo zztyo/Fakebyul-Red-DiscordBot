@@ -24,6 +24,7 @@
     "cogs.owner" : true,
     "cogs.prettycards" : true,
     "cogs.reactionpolls" : true,
+    "cogs.remindme" : true,
     "cogs.rss" : true,
     "cogs.statistics" : true,
     "cogs.streams" : false,
