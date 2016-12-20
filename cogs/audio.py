@@ -1786,6 +1786,8 @@ class Audio:
         self._clear_queue(server)
         self._add_to_queue(server, url)
 
+        await asyncio.sleep(10) # fix for initial check
+
         songId = None
         while True:
             nowPlaying = self._get_queue_nowplaying(server)
@@ -1818,6 +1820,7 @@ class Audio:
             message = random.choice([":hear_no_evil: Robyul doesn't want to hear that again! {0} points! :confounded:".format(score)])
         await self.bot.say(message)
         # todo: block vc queue?
+        # todo: translate score to emojis! (71 => :seven: :one:)
 
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):
