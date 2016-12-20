@@ -17,6 +17,7 @@ import time
 import inspect
 import subprocess
 from .utils.chat_formatting import pagify
+import random
 
 __author__ = "tekulvw"
 __version__ = "0.1.1"
@@ -1724,6 +1725,99 @@ class Audio:
         self._shuffle_temp_queue(server)
 
         await self.bot.say("Queues shuffled.")
+
+    @commands.command(pass_context=True, no_pm=True, name="karaoke")
+    async def _karaoke(self, ctx, url_or_search_terms):
+        """Let Robyul judge your singing skills!"""
+        url = url_or_search_terms
+        server = ctx.message.server
+        author = ctx.message.author
+        voice_channel = author.voice_channel
+
+        # Checking if playing in current server
+
+        if self.is_playing(server):
+            await self.bot.say("Robyul is already playing something!")
+            return  # Default to queue
+
+        # Checking already connected, will join if not
+
+        try:
+            self.has_connect_perm(author, server)
+        except AuthorNotConnected:
+            await self.bot.say("You must join a voice channel before I can"
+                               " play anything.")
+            return
+        except UnauthorizedConnect:
+            await self.bot.say("I don't have permissions to join your"
+                               " voice channel.")
+            return
+        except UnauthorizedSpeak:
+            await self.bot.say("I don't have permissions to speak in your"
+                               " voice channel.")
+            return
+
+        if not self.voice_connected(server):
+            await self._join_voice_channel(voice_channel)
+        else:  # We are connected but not to the right channel
+            if self.voice_client(server).channel != voice_channel:
+                await self._stop_and_disconnect(server)
+                await self._join_voice_channel(voice_channel)
+
+        # If not playing, spawn a downloader if it doesn't exist and begin
+        #   downloading the next song
+
+        if self.currently_downloading(server):
+            await self.bot.say("I'm already downloading a file!")
+            return
+
+        if "." in url:
+            if not self._valid_playable_url(url):
+                await self.bot.say("That's not a valid URL.")
+                return
+        else:
+            url = url.replace("/", "&#47")
+            url = "[SEARCH:]" + url
+
+        if "[SEARCH:]" not in url and "youtube" in url:
+            url = url.split("&")[0]  # Temp fix for the &list issue
+
+        self._stop_player(server)
+        self._clear_queue(server)
+        self._add_to_queue(server, url)
+
+        songId = None
+        while True:
+            nowPlaying = self._get_queue_nowplaying(server)
+            if songId == None:
+                if nowPlaying != None:
+                    songId = nowPlaying.id
+            else:
+                if nowPlaying == None or songId != nowPlaying.id or not self.is_playing(server):
+                    print("break")
+                    break
+            await asyncio.sleep(1)
+
+        await self.bot.say("Uhh... I will think about your score :thinking:")
+        await self.bot.type()
+        await asyncio.sleep(4)
+
+        score = random.randint(70, 100)
+        message = "{0} points!".format(score)
+        if score >= 100:
+            message = random.choice([":confetti_ball: You hit daebak! :100: points! :trophy: :confetti_ball:"])
+        elif score >= 95:
+            message = random.choice(["That was awesome! {0} points! :heart_eyes:".format(score)])
+        elif score >= 90:
+            message = random.choice(["Not bad! {0} points! :blush:".format(score)])
+        elif score >= 80:
+            message = random.choice(["Please try again! {0} points! :unamused:".format(score)])
+        elif score >= 71:
+            message = random.choice(["That was terrible! {0} points! :angry:".format(score)])
+        elif score >= 70:
+            message = random.choice([":hear_no_evil: Robyul doesn't want to hear that again! {0} points! :confounded:".format(score)])
+        await self.bot.say(message)
+        # todo: block vc queue?
 
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):
