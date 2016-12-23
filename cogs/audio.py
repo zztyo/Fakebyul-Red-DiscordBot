@@ -1786,7 +1786,7 @@ class Audio:
         self._clear_queue(server)
         self._add_to_queue(server, url)
 
-        await asyncio.sleep(10) # fix for initial check
+        await asyncio.sleep(10) # fix for initial check, terrible fix
 
         songId = None
         while True:
@@ -1821,6 +1821,7 @@ class Audio:
         await self.bot.say(message)
         # todo: block vc queue?
         # todo: translate score to emojis! (71 => :seven: :one:)
+        # todo: scoreboard
 
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):

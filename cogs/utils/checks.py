@@ -53,7 +53,8 @@ def mod_or_permissions(**perms):
         server = ctx.message.server
         mod_role = settings.get_server_mod(server).lower()
         admin_role = settings.get_server_admin(server).lower()
-        return role_or_permissions(ctx, lambda r: r.name.lower() in (mod_role,admin_role), **perms)
+        submod_role = settings.get_server_submod(server).lower()
+        return role_or_permissions(ctx, lambda r: r.name.lower() in (mod_role,admin_role,submod_role), **perms)
 
     return commands.check(predicate)
 
