@@ -545,10 +545,10 @@ def main(bot):
 
 
 if __name__ == '__main__':
-    sys.stdout = TextIOWrapper(sys.stdout.detach(),
-                               encoding=sys.stdout.encoding,
-                               errors="replace",
-                               line_buffering=True)
+    #sys.stdout = TextIOWrapper(sys.stdout.detach(),
+    #                           encoding=sys.stdout.encoding,
+    #                           errors="replace",
+    #                           line_buffering=True)
     bot = initialize()
     error = False
     loop = asyncio.get_event_loop()
