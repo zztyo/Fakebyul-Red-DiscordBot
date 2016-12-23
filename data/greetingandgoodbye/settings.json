@@ -2,13 +2,15 @@
     "208673735580844032" : {
         "CHANNEL" : "208673735580844032",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
-        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#252003581060841473> and go to <#252000620565889024> to get your bias role.",
+        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#252003581060841473> and go to <#252000620565889024> to get your bias roles.",
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
     },
     "250216966436945920" : {
         "CHANNEL" : "250216966436945920",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
-        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#250220822583574528> and go to <#250220888077631489> to get your bias role."
+        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#250220822583574528> and go to <#250220888077631489> to get your bias roles.",
+        "POST_GOODBYE" : true,
+        "POST_GREETING" : true
     }
 }
