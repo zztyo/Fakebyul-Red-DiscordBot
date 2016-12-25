@@ -12,7 +12,7 @@ import copy
 from datetime import datetime
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
-__version__ = "1.0"
+__version__ = "1.1"
 
 class PrettyCards:
     """Shows pretty cards!"""
@@ -268,11 +268,12 @@ class PrettyCards:
 
     @_countdown.command(pass_context=True, name="until")
     @checks.mod_or_permissions(administrator=True)
-    async def _countdown_until(self, ctx, datetime_str : str, *, description):
+    async def _countdown_until(self, ctx, datetime_str : str, description : str, finished_message=""):
         """Creates a countdown until date, YYYY-MM-DD HH:MM (24 hour clock, UTC)"""
         message = ctx.message
         author = message.author
         description = description.strip()
+        finished_message = finished_message.strip()
         try:
             datetime_countdown = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
         except ValueError:
@@ -291,10 +292,9 @@ class PrettyCards:
                 countdown_number = str(int(countdown_number)+1)
             else:
                 break
-            return
         countdown_message = await self.bot.say(embed=data)
 
-        self.countdowns[countdown_number] = {"messageId": countdown_message.id, "type": "until", "createdBy": author.id, "channelId": countdown_message.channel.id, "description": description, "datetime": datetime_countdown.strftime("%Y-%m-%d %H:%M")}
+        self.countdowns[countdown_number] = {"messageId": countdown_message.id, "type": "until", "createdBy": author.id, "channelId": countdown_message.channel.id, "description": description, "datetime": datetime_countdown.strftime("%Y-%m-%d %H:%M"), "finishedMessage": finished_message}
         dataIO.save_json(self.countdowns_file_path, self.countdowns)
 
     def _get_countdown_embed(self, datetime_countdown, description):
@@ -345,6 +345,8 @@ class PrettyCards:
                             del self.countdowns[str(key)]
                             dataIO.save_json(self.countdowns_file_path, self.countdowns)
                             print("Deleted countdown (time is over): message #{0.id}".format(countdown_message))
+                            if "finishedMessage" in countdown and countdown["finishedMessage"] != "":
+                                await self.bot.send_message(countdown_channel, countdown["finishedMessage"])
                     except Exception as e:
                         print("Updating countdown failed: message #{0}, error: {1}".format(countdown["messageId"], e))
             del countdown_cache
