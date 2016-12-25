@@ -11,7 +11,8 @@ data/audio/playlists/*/*
 !data/mod/settings.json
 !data/welcome/settings.json
 !data/alias/aliases.json
-!data/prettycards/*.json
+!data/prettycards/profile-*.json
+!data/prettycards/settings.json
 !data/greetingandgoodbye/settings.json
 !data/youtube/settings.json
 !data/customcom/commands.json

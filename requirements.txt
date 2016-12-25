@@ -3,4 +3,4 @@ git+git://github.com/Rapptz/discord.py.git#egg=discord.py[voice]
 youtube_dl
 imgurpython
 tweepy
-facebook
+facebook-sdk

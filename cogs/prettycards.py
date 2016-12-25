@@ -8,9 +8,11 @@ import asyncio
 import re
 import aiohttp
 import json
+import copy
+from datetime import datetime
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
-__version__ = "0.1"
+__version__ = "1.0"
 
 class PrettyCards:
     """Shows pretty cards!"""
@@ -21,6 +23,8 @@ class PrettyCards:
         self.bot = bot
         self.file_path = "data/prettycards/settings.json"
         self.settings = dataIO.load_json(self.file_path)
+        self.countdowns_file_path = "data/prettycards/countdowns.json"
+        self.countdowns = dataIO.load_json(self.countdowns_file_path)
 
     @commands.command()
     @checks.mod_or_permissions(administrator=True)
@@ -255,15 +259,96 @@ class PrettyCards:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this or you send misformatted arguments")
 
-    # @commands.group(pass_context=True, no_pm=True, name="countdown")
-    # async def _countdown(self, ctx):
-    #     """Creates countdown cards"""
-    #     if ctx.invoked_subcommand is None:
-    #         await send_cmd_help(ctx)
+    @commands.group(pass_context=True, no_pm=True, name="countdown")
+    @checks.mod_or_permissions(administrator=True)
+    async def _countdown(self, ctx):
+        """Creates countdown cards"""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
 
-    # @_countdown.command(pass_context=True, name="until")
-    # async def _countdown_until(self, ctx, time : str):
-    #     pass
+    @_countdown.command(pass_context=True, name="until")
+    @checks.mod_or_permissions(administrator=True)
+    async def _countdown_until(self, ctx, datetime_str : str, *, description):
+        """Creates a countdown until date, YYYY-MM-DD HH:MM (24 hour clock, UTC)"""
+        message = ctx.message
+        author = message.author
+        description = description.strip()
+        try:
+            datetime_countdown = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            await self.bot.say("Invalid date!")
+            return
+        datetime_now = datetime.utcnow()
+        if datetime_now > datetime_countdown:
+            await self.bot.say("You gave me a date from the past... :thinking:")
+            return
+
+        data = self._get_countdown_embed(datetime_countdown, description)
+
+        countdown_number = str(len(self.countdowns)+1)
+        while True:
+            if countdown_number in self.countdowns:
+                countdown_number = str(int(countdown_number)+1)
+            else:
+                break
+            return
+        countdown_message = await self.bot.say(embed=data)
+
+        self.countdowns[countdown_number] = {"messageId": countdown_message.id, "type": "until", "createdBy": author.id, "channelId": countdown_message.channel.id, "description": description, "datetime": datetime_countdown.strftime("%Y-%m-%d %H:%M")}
+        dataIO.save_json(self.countdowns_file_path, self.countdowns)
+
+    def _get_countdown_embed(self, datetime_countdown, description):
+        datetime_now = datetime.utcnow()
+
+        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = int(colour, 16)
+
+        data = discord.Embed(
+            description=str(description),
+            colour=discord.Colour(value=colour))
+        data.set_author(name=str("Countdown"))
+        data.set_footer(text="last updated: {0} UTC".format(datetime_now.strftime("%Y-%m-%d %H:%M")))
+
+        if datetime_now > datetime_countdown:
+            data.set_author(name=str("Countdown over!"))
+        else:
+            datetime_delta = datetime_countdown - datetime_now
+            delta_seconds = datetime_delta.total_seconds()
+            delta_hours = int((delta_seconds-(datetime_delta.days*24*3600)) // 3600)
+            delta_minutes = int((delta_seconds % 3600) // 60)
+
+            data.add_field(name="Days left", value=datetime_delta.days)
+            data.add_field(name="Hours left", value=delta_hours)
+            data.add_field(name="Minutes left", value=delta_minutes)
+        return data
+
+    async def update_countdowns(self):
+        await self.bot.wait_until_ready()
+        while self == self.bot.get_cog('PrettyCards'):
+            countdown_cache = copy.deepcopy(self.countdowns)
+            for key in countdown_cache:
+                countdown = countdown_cache[key]
+                countdown_channel = self.bot.get_channel(countdown["channelId"])
+                countdown_message = await self.bot.get_message(countdown_channel, countdown["messageId"])
+                if countdown_channel == None:
+                    print("Updating countdown failed: message #{0}, channel not found".format(countdown["messageId"]))
+                elif countdown_message == None:
+                    print("Updating countdown failed: message #{0} not found".format(countdown["messageId"]))
+                else:
+                    try:
+                        datetime_countdown = datetime.strptime(countdown["datetime"], "%Y-%m-%d %H:%M")
+                        datetime_now = datetime.utcnow()
+                        data = self._get_countdown_embed(datetime_countdown, countdown["description"])
+                        countdown_message = await self.bot.edit_message(countdown_message, embed=data)
+                        #print("Updated countdown: message #{0.id}".format(countdown_message))
+                        if datetime_now > datetime_countdown:
+                            del self.countdowns[str(key)]
+                            dataIO.save_json(self.countdowns_file_path, self.countdowns)
+                            print("Deleted countdown (time is over): message #{0.id}".format(countdown_message))
+                    except Exception as e:
+                        print("Updating countdown failed: message #{0}, error: {1}".format(countdown["messageId"], e))
+            del countdown_cache
+            await asyncio.sleep(300)
 
     async def _shorten_url_googl(self, longUrl):
         if "GOOGL_URL_SHORTENER_API_KEY" not in self.settings or self.settings["GOOGL_URL_SHORTENER_API_KEY"] == "":
@@ -294,13 +379,22 @@ def check_folders():
 
 def check_files():
     settings = {"GOOGL_URL_SHORTENER_API_KEY": ""}
+    countdowns = {}
 
     if not os.path.isfile("data/prettycards/settings.json"):
         print("Creating empty settings.json...")
         dataIO.save_json("data/prettycards/settings.json", settings)
 
+    f = "data/prettycards/countdowns.json"
+    if not dataIO.is_valid_json(f):
+        print("Creating default prettycards countdowns.json...")
+        dataIO.save_json(f, countdowns)
+
 
 def setup(bot):
     check_folders()
     check_files()
-    bot.add_cog(PrettyCards(bot))
+    n = PrettyCards(bot)
+    bot.loop.create_task(n.update_countdowns())
+    bot.add_cog(n)
+
