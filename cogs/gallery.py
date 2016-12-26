@@ -113,10 +113,14 @@ class Gallery:
                 if len(message.content) > 0:
                     if "http" in message.content:
                         for item in message.content.split(" "):
-                            link = re.search("(?P<url>https?://[^\s>]+)", item)
-                            if link != None:
-                                link = link.group("url")
-                                links.append(link)
+                            linksFound = re.findall("(?P<url><?https?://[^\s]+>?)", item)
+                            if linksFound != None:
+                                for linkFound in linksFound:
+                                    if not (linkFound[0] == "<" and linkFound[len(linkFound)-1] == ">"):
+                                        if linkFound[0] == "<":
+                                            links.append(linkFound[1:len(linkFound)])
+                                        else:
+                                            links.append(linkFound)
                 if len(links) > 0:
                     sourceChannel = server.get_channel(galleryData["sourceChannelId"])
                     targetChannel = server.get_channel(galleryData["targetChannelId"])
