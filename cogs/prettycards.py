@@ -307,7 +307,7 @@ class PrettyCards:
             description=str(description),
             colour=discord.Colour(value=colour))
         data.set_author(name=str("Countdown"))
-        data.set_footer(text="last updated: {0} UTC".format(datetime_now.strftime("%Y-%m-%d %H:%M")))
+        data.set_footer(text="countdown until: {0} UTC, last updated: {1} UTC".format(datetime_countdown.strftime("%Y-%m-%d %H:%M"), datetime_now.strftime("%Y-%m-%d %H:%M")))
 
         if datetime_now > datetime_countdown:
             data.set_author(name=str("Countdown over!"))
@@ -329,26 +329,34 @@ class PrettyCards:
             for key in countdown_cache:
                 countdown = countdown_cache[key]
                 countdown_channel = self.bot.get_channel(countdown["channelId"])
-                countdown_message = await self.bot.get_message(countdown_channel, countdown["messageId"])
                 if countdown_channel == None:
                     print("Updating countdown failed: message #{0}, channel not found".format(countdown["messageId"]))
-                elif countdown_message == None:
+                    del self.countdowns[str(key)]
+                    dataIO.save_json(self.countdowns_file_path, self.countdowns)
+                    print("Deleted countdown (channel not found): message #{0}".format(countdown["messageId"]))
+                    continue
+                try:
+                    countdown_message = await self.bot.get_message(countdown_channel, countdown["messageId"])
+                except discord.NotFound:
                     print("Updating countdown failed: message #{0} not found".format(countdown["messageId"]))
-                else:
-                    try:
-                        datetime_countdown = datetime.strptime(countdown["datetime"], "%Y-%m-%d %H:%M")
-                        datetime_now = datetime.utcnow()
-                        data = self._get_countdown_embed(datetime_countdown, countdown["description"])
-                        countdown_message = await self.bot.edit_message(countdown_message, embed=data)
-                        #print("Updated countdown: message #{0.id}".format(countdown_message))
-                        if datetime_now > datetime_countdown:
-                            del self.countdowns[str(key)]
-                            dataIO.save_json(self.countdowns_file_path, self.countdowns)
-                            print("Deleted countdown (time is over): message #{0.id}".format(countdown_message))
-                            if "finishedMessage" in countdown and countdown["finishedMessage"] != "":
-                                await self.bot.send_message(countdown_channel, countdown["finishedMessage"])
-                    except Exception as e:
-                        print("Updating countdown failed: message #{0}, error: {1}".format(countdown["messageId"], e))
+                    del self.countdowns[str(key)]
+                    dataIO.save_json(self.countdowns_file_path, self.countdowns)
+                    print("Deleted countdown (message not found): message #{0}".format(countdown["messageId"]))
+                    continue
+                try:
+                    datetime_countdown = datetime.strptime(countdown["datetime"], "%Y-%m-%d %H:%M")
+                    datetime_now = datetime.utcnow()
+                    data = self._get_countdown_embed(datetime_countdown, countdown["description"])
+                    countdown_message = await self.bot.edit_message(countdown_message, embed=data)
+                    #print("Updated countdown: message #{0.id}".format(countdown_message))
+                    if datetime_now > datetime_countdown:
+                        del self.countdowns[str(key)]
+                        dataIO.save_json(self.countdowns_file_path, self.countdowns)
+                        print("Deleted countdown (time is over): message #{0.id}".format(countdown_message))
+                        if "finishedMessage" in countdown and countdown["finishedMessage"] != "":
+                            await self.bot.send_message(countdown_channel, countdown["finishedMessage"])
+                except Exception as e:
+                    print("Updating countdown failed: message #{0}, error: {1}".format(countdown["messageId"], e))
             del countdown_cache
             await asyncio.sleep(300)
 
