@@ -5,6 +5,11 @@ import os
 from __main__ import send_cmd_help
 from .utils import checks
 import re
+import aiohttp
+import json
+
+__author__ = "Sebastian Winkler"
+__version__ = "1.0.0"
 
 class Gallery:
     """Cog for gallery channels"""
@@ -128,8 +133,35 @@ class Gallery:
                         await self._send_link_to_target(link, author, sourceChannel, targetChannel)
 
     async def _send_link_to_target(self, link, author, source, target):
-        linkMessage = "**{1.name}** posted {0}".format(link, author, source, target)
-        return await self.bot.send_message(target, linkMessage)
+        linkMessage = "posted {0}".format(link, author, source, target)
+
+        headers = {"user-agent": "Red-cog-Gallery/"+__version__, "content-type": "application/json", "Authorization": "Bot " + self.bot.settings.token}
+        # create webhook
+        url = "https://discordapp.com/api/channels/{0.id}/webhooks".format(target)
+        payload = {"name": "gallery webhook - {0.name}".format(author)}
+        conn = aiohttp.TCPConnector(verify_ssl=False)
+        session = aiohttp.ClientSession(connector=conn)
+        async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+            resultWebhookObject = await r.json()
+        if "token" in resultWebhookObject and "id" in resultWebhookObject:
+            # use webhook
+            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+            payload = {"username": author.name, "avatar_url": author.avatar_url, "content": linkMessage}
+            async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+                await r.text()
+                #result = await r.json()
+            #print(result)
+            # delete webhook
+            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+            payload = {}
+            async with session.delete(url, data=json.dumps(payload), headers=headers) as r:
+                await r.text()
+                #result = await r.json()
+            #print(result)
+        else:
+            print("error creating webhook:", resultWebhookObject)
+
+        session.close()
 
     def _is_command(self, msg):
         for p in self.bot.settings.prefixes:
@@ -156,3 +188,4 @@ def setup(bot):
     n = Gallery(bot)
     bot.add_listener(n.check_link, "on_message")
     bot.add_cog(n)
+
