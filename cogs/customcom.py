@@ -88,9 +88,10 @@ class CustomCommands:
         else:
             await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
 
+    """
     @_commands.command(pass_context=True, no_pm=True, name="full-list")
     async def _full_list(self, ctx):
-        """Shows custom commands with their contents, can consume much traffic!"""
+        ""Shows custom commands with their contents, can consume much traffic!""
         server = ctx.message.server
         if server.id in self.c_commands:
             cmdlist = self.c_commands[server.id]
@@ -105,6 +106,7 @@ class CustomCommands:
                 await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
         else:
             await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+    """
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
     @checks.mod_or_permissions(administrator=True)
