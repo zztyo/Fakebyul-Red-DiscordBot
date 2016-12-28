@@ -64,16 +64,23 @@ class Bias:
         helpMessage += ".\n"
 
         if "EXTRA_ASSIGNABLE_ROLES" in orderedSettings[server.id] and len(orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items()) > 0:
+            extraRolesHandled = []
+            extraAliasToPrint = []
             helpMessage += "Additional roles available: "
-            i = 0
             for alias, role in orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items():
+                if role not in extraRolesHandled:
+                    extraRolesHandled.append(role)
+                    alias = str(alias).title()
+                    extraAliasToPrint.append(alias)
+            i = 0            
+            for role in extraAliasToPrint:
                 i += 1
                 if i == 1:
-                    helpMessage += "**`{0}`**".format(alias.title())
-                elif i < len(orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items()):
-                    helpMessage += ", **`{0}`**".format(alias.title())
+                    helpMessage += "**`{0}`**".format(role)
+                elif i < len(extraAliasToPrint):
+                    helpMessage += ", **`{0}`**".format(role)
                 else:
-                    helpMessage += " and **`{0}`**".format(alias.title())
+                    helpMessage += " and **`{0}`**".format(role)
             helpMessage += ".\n"
 
         helpMessage += example

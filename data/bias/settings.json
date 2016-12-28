@@ -29,7 +29,11 @@
         "EXTRA_ASSIGNABLE_ROLES" : {
             "overwatch" : "Overwatch",
             "dota" : "DOTA",
-            "league of legends" : "League of Legends"
+            "league of legends" : "League of Legends",
+            "ow" : "Overwatch",
+            "dota2" : "DOTA",
+            "lol" : "League of Legends",
+            "league" : "League of Legends"
         },
         "CHANNELS" : [
             "250220888077631489"
@@ -57,8 +61,12 @@
             "extra3" : "Extra3",
             "extra4" : "Extra4",
             "overwatch" : "Overwatch",
-            "DOTA" : "DOTA",
-            "League of Legends" : "League of Legends"
+            "dota" : "DOTA",
+            "league of legends" : "League of Legends",
+            "ow" : "Overwatch",
+            "dota2" : "DOTA",
+            "lol" : "League of Legends",
+            "league" : "League of Legends"
         },
         "CHANNELS" : [
             "252000620565889024"
