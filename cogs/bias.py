@@ -56,12 +56,26 @@ class Bias:
             i += 1
             if i == 1:
                 helpMessage += "**`{0}`**".format(role)
-                example = "\nExample: `+{0}` or `-{0}`".format(role)
+                example = "Example: `+{0}` or `-{0}`\n".format(role)
             elif i < len(aliasToPrint):
                 helpMessage += ", **`{0}`**".format(role)
             else:
                 helpMessage += " and **`{0}`**".format(role)
-        helpMessage += "."
+        helpMessage += ".\n"
+
+        if "EXTRA_ASSIGNABLE_ROLES" in orderedSettings[server.id] and len(orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items()) > 0:
+            helpMessage += "Additional roles available: "
+            i = 0
+            for alias, role in orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items():
+                i += 1
+                if i == 1:
+                    helpMessage += "**`{0}`**".format(alias.title())
+                elif i < len(orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items()):
+                    helpMessage += ", **`{0}`**".format(alias.title())
+                else:
+                    helpMessage += " and **`{0}`**".format(alias.title())
+            helpMessage += ".\n"
+
         helpMessage += example
 
         await self.bot.send_message(channel, helpMessage)
@@ -106,7 +120,10 @@ class Bias:
             return
 
         availableRoles = self.settings[server.id]["ASSIGNABLE_ROLES"]
-        if changingRoleAlias not in availableRoles:
+        availableExtraRoles = []
+        if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id]:
+            availableExtraRoles = self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]
+        if changingRoleAlias not in availableRoles and changingRoleAlias not in availableExtraRoles:
             successMessage = await self.bot.send_message(channel, "{} I can't find this bias role! :thinking:".format(author.mention))
 
             await asyncio.sleep(10)
@@ -121,7 +138,12 @@ class Bias:
         if "PRIMARY_ROLE_SUFFIX" in self.settings[server.id]:
             suffix = self.settings[server.id]["PRIMARY_ROLE_SUFFIX"]
 
-        changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
+        changingRole = None
+        if changingRoleAlias in availableRoles:
+            changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
+        elif changingRoleAlias in availableExtraRoles:
+            changingRole = self._role_from_string(server, availableExtraRoles[changingRoleAlias])
+
         if changingRole is None:
             print("role not found")
             somethingWentWrong = await self.bot.send_message(channel, "Something went wrong.")
@@ -130,7 +152,9 @@ class Bias:
             await self.bot.delete_message(somethingWentWrong)
             await self.bot.delete_message(message)
             return
-        changingPrimaryRole = self._role_from_string(server, prefix+availableRoles[changingRoleAlias]+suffix)
+        changingPrimaryRole = None
+        if changingRoleAlias in availableRoles:
+            changingPrimaryRole = self._role_from_string(server, prefix+availableRoles[changingRoleAlias]+suffix)
 
         if message.content[0] == "+":
             if changingRole in author.roles or (changingPrimaryRole != None and changingPrimaryRole in author.roles):
@@ -147,16 +171,17 @@ class Bias:
                 cleanedRoleName = cleanedRoleName.replace(suffix, "")
                 if cleanedRoleName in list(availableRoles.values()):
                     selfAssignableRoles += 1
-            if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
-                successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
+            if changingRoleAlias in availableRoles:
+                if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
+                    successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
 
-                await asyncio.sleep(10)
-                await self.bot.delete_message(successMessage)
-                await self.bot.delete_message(message)
-                return
+                    await asyncio.sleep(10)
+                    await self.bot.delete_message(successMessage)
+                    await self.bot.delete_message(message)
+                    return
 
         if message.content[0] == "-":
-            if changingRole not in author.roles and (changingPrimaryRole != None and changingPrimaryRole not in author.roles):
+            if changingRole not in author.roles and (changingPrimaryRole == None or changingPrimaryRole not in author.roles):
                 successMessage = await self.bot.send_message(channel, "{} you don't have this bias role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
@@ -261,6 +286,9 @@ def check_files():
     settings = {"YOUR_SERVER_ID": {
         "MAX_ROLES" : 3,
         "ASSIGNABLE_ROLES": {
+            "alias": "role"
+        },
+        "EXTRA_ASSIGNABLE_ROLES": {
             "alias": "role"
         },
         "CHANNELS": ["your channel"],
