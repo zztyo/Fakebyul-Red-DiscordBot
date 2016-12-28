@@ -139,7 +139,7 @@ class Gallery:
         else:
             linkMessage = "posted {0}".format(link, author, source, target)
             url = "https://discordapp.com/api/webhooks/{0[WEBHOOK_ID]}/{0[WEBHOOK_TOKEN]}".format(galleryData)
-            headers = {"user-agent": "Red-cog-Gallery/"+__version__, "content-type": "application/json", "Authorization": "Bot " + self.bot.settings.token}
+            headers = {"user-agent": "Red-cog-Gallery/"+__version__, "content-type": "application/json"}
             payload = {"username": author.name, "avatar_url": author.avatar_url, "content": linkMessage}
             conn = aiohttp.TCPConnector(verify_ssl=False)
             session = aiohttp.ClientSession(connector=conn)
