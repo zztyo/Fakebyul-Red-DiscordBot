@@ -33,7 +33,9 @@
             "ow" : "Overwatch",
             "dota2" : "DOTA",
             "lol" : "League of Legends",
-            "league" : "League of Legends"
+            "league" : "League of Legends",
+            "karaoke" : "Karaoke",
+            "norebang" : "Karaoke"
         },
         "CHANNELS" : [
             "250220888077631489"
@@ -66,7 +68,9 @@
             "ow" : "Overwatch",
             "dota2" : "DOTA",
             "lol" : "League of Legends",
-            "league" : "League of Legends"
+            "league" : "League of Legends",
+            "karaoke" : "Karaoke",
+            "norebang" : "Karaoke"
         },
         "CHANNELS" : [
             "252000620565889024"
