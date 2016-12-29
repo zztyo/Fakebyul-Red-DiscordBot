@@ -9,6 +9,8 @@ import os
 import re
 import logging
 import asyncio
+import aiohttp
+import json
 
 default_settings = {
     "ban_mention_spam" : False,
@@ -1097,6 +1099,64 @@ class Mod:
         else:
             await self.bot.say("That user doesn't have any recorded name or "
                                "nickname change.")
+
+    @commands.command(pass_context=True, no_pm=True, name="move")
+    @checks.mod_or_permissions(administrator=True)
+    async def _move(self, ctx, move_to_channel : discord.Channel, message_number=1):
+        """Moves a message to another channel
+
+        select the message by counting up the messages from the latest message to the message you want to move
+        latest message is 1"""
+        old_channel = ctx.message.channel
+        author = ctx.message.author
+        message_number += 1
+
+        old_message = None
+        i = 1
+        async for message in self.bot.logs_from(old_channel, limit=message_number):
+            if i == message_number:
+                old_message = message
+                break
+            i += 1
+
+        if old_message == None:
+            await self.bot.say("Message not found!")
+            return
+
+        await self._post_message_copy_in_channel(author, old_channel, old_message, move_to_channel)
+        # todo: delete message
+
+    async def _post_message_copy_in_channel(self, mover, source_channel, old_message, new_channel):
+        headers = {"user-agent": "Red-cog-Mod/1", "content-type": "application/json", "Authorization": "Bot " + self.bot.settings.token}
+        # create webhook
+        url = "https://discordapp.com/api/channels/{0.id}/webhooks".format(new_channel)
+        payload = {"name": "robyul/mod: move message webhook"}
+        conn = aiohttp.TCPConnector(verify_ssl=False)
+        session = aiohttp.ClientSession(connector=conn)
+        async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+            resultWebhookObject = await r.json()
+        if "token" in resultWebhookObject and "id" in resultWebhookObject:
+            # use webhook
+            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+            #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
+            embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
+            payload = {"username": old_message.author.name, "avatar_url": old_message.author.avatar_url, "content": old_message.content, "embeds": [embed]}
+            async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+                await r.text()
+                #result = await r.json()
+            #print(result)
+            await asyncio.sleep(2)
+            # delete webhook
+            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+            payload = {}
+            async with session.delete(url, data=json.dumps(payload), headers=headers) as r:
+                await r.text()
+                #result = await r.json()
+            #print(result)
+        else:
+            print("error creating webhook:", resultWebhookObject)
+
+        session.close()
 
     async def mass_purge(self, messages):
         while messages:
