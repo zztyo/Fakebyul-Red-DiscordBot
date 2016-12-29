@@ -1102,7 +1102,7 @@ class Mod:
 
     @commands.command(pass_context=True, no_pm=True, name="move")
     @checks.mod_or_permissions(administrator=True)
-    async def _move(self, ctx, move_to_channel : discord.Channel, message_number=1):
+    async def _move(self, ctx, move_to_channel : discord.Channel, message_number=1, messages_to_move=1):
         """Moves a message to another channel
 
         select the message by counting up the messages from the latest message to the message you want to move
@@ -1111,22 +1111,25 @@ class Mod:
         author = ctx.message.author
         message_number += 1
 
-        old_message = None
+        old_messages = []
         i = 1
         async for message in self.bot.logs_from(old_channel, limit=message_number):
-            if i == message_number:
-                old_message = message
-                break
+            if i <= message_number and i > (message_number-messages_to_move):
+                old_messages.append(message)
             i += 1
 
-        if old_message == None:
+        old_messages.reverse()
+
+        if len(old_messages) <= 0:
             await self.bot.say("Message not found!")
             return
 
-        await self._post_message_copy_in_channel(author, old_channel, old_message, move_to_channel)
-        # todo: delete message
+        await self._post_message_copies_in_channel(author, old_channel, old_messages, move_to_channel)
 
-    async def _post_message_copy_in_channel(self, mover, source_channel, old_message, new_channel):
+        for message in old_messages:
+            await self.bot.delete_message(message)
+
+    async def _post_message_copies_in_channel(self, mover, source_channel, old_messages, new_channel):
         headers = {"user-agent": "Red-cog-Mod/1", "content-type": "application/json", "Authorization": "Bot " + self.bot.settings.token}
         # create webhook
         url = "https://discordapp.com/api/channels/{0.id}/webhooks".format(new_channel)
@@ -1137,16 +1140,21 @@ class Mod:
             resultWebhookObject = await r.json()
         if "token" in resultWebhookObject and "id" in resultWebhookObject:
             # use webhook
-            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
-            #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
-            embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
-            payload = {"username": old_message.author.name, "avatar_url": old_message.author.avatar_url, "content": old_message.content, "embeds": [embed]}
-            async with session.post(url, data=json.dumps(payload), headers=headers) as r:
-                await r.text()
-                #result = await r.json()
-            #print(result)
-            await asyncio.sleep(2)
+
+            new_message_text = ""
+            for old_message in old_messages:
+                url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+                #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
+                embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
+                payload = {"username": old_message.author.name, "avatar_url": old_message.author.avatar_url, "content": old_message.content, "embeds": [embed]}
+                async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+                    await r.text()
+                    #result = await r.json()
+                #print(result)
+                await asyncio.sleep(0.1)
+
             # delete webhook
+            await asyncio.sleep(2)
             url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
             payload = {}
             async with session.delete(url, data=json.dumps(payload), headers=headers) as r:
