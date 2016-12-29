@@ -1148,10 +1148,11 @@ class Mod:
                 embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
                 payload = {"username": old_message.author.name, "avatar_url": old_message.author.avatar_url, "content": old_message.content, "embeds": [embed]}
                 async with session.post(url, data=json.dumps(payload), headers=headers) as r:
-                    await r.text()
-                    #result = await r.json()
-                #print(result)
-                await asyncio.sleep(1)
+                    #await r.text()
+                    result = await r.text()
+                if result != "":
+                    print(result)
+                await asyncio.sleep(2)
 
             # delete webhook
             await asyncio.sleep(2)
