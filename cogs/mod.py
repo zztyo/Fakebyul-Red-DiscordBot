@@ -1139,20 +1139,27 @@ class Mod:
         async with session.post(url, data=json.dumps(payload), headers=headers) as r:
             resultWebhookObject = await r.json()
         if "token" in resultWebhookObject and "id" in resultWebhookObject:
-            await asyncio.sleep(1)
             # use webhook
             new_message_text = ""
+            last_author = None
+            i = 1
             for old_message in old_messages:
-                url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
-                #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
-                embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
-                payload = {"username": old_message.author.name, "avatar_url": old_message.author.avatar_url, "content": old_message.content, "embeds": [embed]}
-                async with session.post(url, data=json.dumps(payload), headers=headers) as r:
-                    #await r.text()
-                    result = await r.text()
-                if result != "":
-                    print(result)
-                await asyncio.sleep(2)
+                new_message_text += old_message.content + "\n"
+                last_author = old_message.author
+                if len(old_messages) <= i or old_messages[i].author != last_author:
+                    if new_message_text != "":
+                        await asyncio.sleep(2)
+                        url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+                        #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
+                        embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
+                        payload = {"username": last_author.name, "avatar_url": last_author.avatar_url, "content": new_message_text, "embeds": [embed]}
+                        async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+                            #await r.text()
+                            result = await r.text()
+                        if result != "":
+                            print(result)
+                        new_message_text = ""
+                i += 1
 
             # delete webhook
             await asyncio.sleep(2)
