@@ -1118,7 +1118,7 @@ class Mod:
                 old_messages.append(message)
             i += 1
 
-        old_messages.reverse()
+        old_messages = list(reversed(old_messages))
 
         if len(old_messages) <= 0:
             await self.bot.say("Message not found!")
