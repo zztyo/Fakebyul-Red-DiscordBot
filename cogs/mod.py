@@ -1151,7 +1151,7 @@ class Mod:
                     await r.text()
                     #result = await r.json()
                 #print(result)
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.5)
 
             # delete webhook
             await asyncio.sleep(2)
