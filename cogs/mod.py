@@ -1139,8 +1139,8 @@ class Mod:
         async with session.post(url, data=json.dumps(payload), headers=headers) as r:
             resultWebhookObject = await r.json()
         if "token" in resultWebhookObject and "id" in resultWebhookObject:
+            await asyncio.sleep(1)
             # use webhook
-
             new_message_text = ""
             for old_message in old_messages:
                 url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
@@ -1151,7 +1151,7 @@ class Mod:
                     await r.text()
                     #result = await r.json()
                 #print(result)
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(1)
 
             # delete webhook
             await asyncio.sleep(2)
@@ -1162,7 +1162,7 @@ class Mod:
                 #result = await r.json()
             #print(result)
         else:
-            print("error creating webhook:", resultWebhookObject)
+            print("error creating webhook:", resultWebhookObject, ", payload:", json.dumps(payload))
 
         session.close()
 
