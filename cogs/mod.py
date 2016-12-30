@@ -4,7 +4,7 @@ from .utils.dataIO import dataIO
 from .utils import checks
 from __main__ import send_cmd_help, settings
 from collections import deque, defaultdict
-from cogs.utils.chat_formatting import escape_mass_mentions, box
+from cogs.utils.chat_formatting import escape_mass_mentions, box, pagify
 import os
 import re
 import logging
@@ -1173,6 +1173,21 @@ class Mod:
             print("error creating webhook:", resultWebhookObject, ", payload:", json.dumps(payload))
 
         session.close()
+
+    @commands.command(pass_context=True, no_pm=True, name="userlist")
+    @checks.mod_or_permissions(administrator=True)
+    async def _userlist(self, ctx):
+        server = ctx.message.server
+        all_members = sorted(server.members, key=lambda m: m.joined_at)
+        message = ""
+        for member in all_members:
+            name = str(member)
+            name = " ~ ".join((str(member), str(member.nick))) if member.nick else name
+            message += "#{0}: {1} (joined at {2})\n".format(all_members.index(member)+1, name, member.joined_at.strftime("%d %b %Y %H:%M"))
+
+        for page in pagify(message, ["\n"]):
+            if page != "":
+                await self.bot.say(box(page))
 
     async def mass_purge(self, messages):
         while messages:

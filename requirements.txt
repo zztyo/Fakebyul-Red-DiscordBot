@@ -4,3 +4,12 @@ youtube_dl
 imgurpython
 tweepy
 facebook-sdk
+google-api-python-client
+bs4
+feedparser
+psutil
+requests-toolbelt
+ftfy
+dota2py
+lxml
+tabulate
