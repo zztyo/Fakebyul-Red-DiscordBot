@@ -1,5 +1,5 @@
 # Robyul
-[![Build Status](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot.svg?branch=develop)](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot)
+[![Build Status](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot.svg?branch=develop)](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot) [<img src="https://discordapp.com/api/guilds/250216966436945920/widget.png?style=shield">](https://discord.gg/NWwv299)
 
 # Red - A fully customizable Discord bot
 #### *Music, admin, trivia, fun commands and much more!*

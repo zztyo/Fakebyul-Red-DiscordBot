@@ -398,7 +398,10 @@ class General:
         else:
             message = "**No custom emojis found!** :warning:"
 
-        await self.bot.say(message)
+
+        message = pagify(message, ["\n"])
+        for page in message:
+            await self.bot.say(page)
         #await self.bot.say(embed=data)
 
 class NewPoll():
