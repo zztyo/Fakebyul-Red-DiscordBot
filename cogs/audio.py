@@ -1294,7 +1294,7 @@ class Audio:
 
     @commands.command(pass_context=True, no_pm=True)
     async def pause(self, ctx):
-        """Pauses the current song, `[p]resume` to continue."""
+        """Pauses the current song, use `[p]pause` again to continue."""
         server = ctx.message.server
         if not self.voice_connected(server):
             await self.bot.say("Not voice connected in this server.")
@@ -1309,7 +1309,12 @@ class Audio:
             voice_client.audio_player.pause()
             await self.bot.say("Paused.")
         else:
-            await self.bot.say("Nothing playing, nothing to pause.")
+            if not voice_client.audio_player.is_done() and \
+                    not voice_client.audio_player.is_playing():
+                voice_client.audio_player.resume()
+                await self.bot.say("Resuming.")
+            else:
+                await self.bot.say("Nothing playing, nothing to pause.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, url_or_search_terms):
