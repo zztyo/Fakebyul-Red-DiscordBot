@@ -214,6 +214,16 @@ class Playlist:
             self.playlist.append(url)
             self.save()
 
+    def refresh(self, author, songlist):
+        if not self.can_edit(author):
+            raise UnauthorizedSave
+        else:
+            num_before = len(self.playlist)
+            self.playlist = songlist
+            num_after = len(self.playlist)
+            self.save()
+            return (num_after - num_before)
+
     def save(self):
         dataIO.save_json(self.path, self.to_json())
 
@@ -1466,6 +1476,29 @@ class Audio:
                                " playlist link. If you think this is in error"
                                " please let us know and we'll get it"
                                " fixed ASAP.")
+
+    @playlist.command(pass_context=True, no_pm=True, name="refresh")
+    async def playlist_refresh(self, ctx, name):
+        """Refreshes a playlist."""
+        server = ctx.message.server
+        author = ctx.message.author
+        if name not in self._list_playlists(server):
+            await self.bot.say("There is no playlist with that name.")
+            return
+        playlist = self._load_playlist(
+            server, name, local=self._playlist_exists_local(server, name))
+        try:
+            songlist = await self._parse_playlist(playlist.url)
+        except InvalidPlaylist:
+            await self.bot.say("That playlist URL is invalid.")
+            return
+        try:
+            change = playlist.refresh(author, songlist)
+            await self.bot.say("Playlist refreshed, songs change: {0}".format(change))
+        except UnauthorizedSave:
+            await self.bot.say("You're not the author of that playlist.")
+        else:
+            await self.bot.say("Done.")
 
     @playlist.command(pass_context=True, no_pm=True, name="append")
     async def playlist_append(self, ctx, name, url):
