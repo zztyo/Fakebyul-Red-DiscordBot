@@ -1494,11 +1494,10 @@ class Audio:
             return
         try:
             change = playlist.refresh(author, songlist)
-            await self.bot.say("Playlist refreshed, songs change: {0}".format(change))
         except UnauthorizedSave:
             await self.bot.say("You're not the author of that playlist.")
         else:
-            await self.bot.say("Done.")
+            await self.bot.say("Playlist refreshed, {0} song(s) added/removed".format(change))
 
     @playlist.command(pass_context=True, no_pm=True, name="append")
     async def playlist_append(self, ctx, name, url):
