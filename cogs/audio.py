@@ -178,20 +178,29 @@ class Playlist:
         if self.main_class._playlist_exists_global(self.name):
             return False
 
+        is_music_mod = False
+        serverSettings = self.main_class.get_server_settings(self.server)
+        if "MUSIC_MOD_ROLE" in serverSettings and serverSettings["MUSIC_MOD_ROLE"] != "":
+            is_music_mod = discord.utils.get(user.roles, name=serverSettings["MUSIC_MOD_ROLE"]) is not None
+
         admin_role = settings.get_server_admin(self.server)
         mod_role = settings.get_server_mod(self.server)
+        submod_role = settings.get_server_submod(self.server)
 
         is_playlist_author = self.is_author(user)
         is_bot_owner = user.id == settings.owner
         is_server_owner = self.server.owner.id == self.author
         is_admin = discord.utils.get(user.roles, name=admin_role) is not None
         is_mod = discord.utils.get(user.roles, name=mod_role) is not None
+        is_submod = discord.utils.get(user.roles, name=submod_role) is not None
 
         return any((is_playlist_author,
                     is_bot_owner,
                     is_server_owner,
                     is_admin,
-                    is_mod))
+                    is_mod,
+                    is_submod,
+                    is_music_mod))
 
 
     # def __del__() ?
