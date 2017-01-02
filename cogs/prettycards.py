@@ -128,6 +128,9 @@ class PrettyCards:
         data.add_field(name="Hobbies", value=str(profile["hobbies"]))
         data.add_field(name="Height", value=str(profile["height"]))
 
+        if "future" in profile and profile["future"] != "":
+            data.add_field(name="Future plans", value=str(profile["future"]), inline=False)
+            
         data.set_author(name=profile["name"], url=profile["picture"])
         data.set_thumbnail(url=profile["picture"])
 
