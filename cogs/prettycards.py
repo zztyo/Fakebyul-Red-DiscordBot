@@ -93,7 +93,7 @@ class PrettyCards:
 
         name = name.strip().lower()
 
-        if re.match(r"^([A-Za-z0-9]+)$", name) == None:
+        if re.match(r"^([A-Za-z0-9\-]+)$", name) == None:
             await self.bot.say("Invalid profile name :warning:")
             return
 
