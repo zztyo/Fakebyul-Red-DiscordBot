@@ -44,6 +44,22 @@
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 💎"
     },
+    "265559543272964097" : {
+        "ASSIGNABLE_ROLES" : {
+            "yoojung" : "Yoojung",
+            "doyeon" : "Doyeon",
+            "\ucd5c\uc720\uc815" : "Yoojung",
+            "\uae40\ub3c4\uc5f0" : "Doyeon"
+        },
+        "EXTRA_ASSIGNABLE_ROLES" : {
+        },
+        "CHANNELS" : [
+            "265566697065414672"
+        ],
+        "MAX_ROLES" : 2,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : " 💎"
+    },
     "208673735580844032": {
         "ASSIGNABLE_ROLES" : {
             "nayoung" : "Nayoung",

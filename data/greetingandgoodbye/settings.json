@@ -19,5 +19,12 @@
         "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#196560538069630976> and go to <#260794426488520704> to get your bias roles.",
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
+    },
+    "265559543272964097": {
+        "CHANNEL" : "265559543272964097",
+        "GOODBYE" : "Goodbye {0.name}! :wave:",
+        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#265560678524387329> and go to <#265566697065414672> to get your bias roles.",
+        "POST_GOODBYE" : true,
+        "POST_GREETING" : true
     }
 }
