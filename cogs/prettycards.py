@@ -53,13 +53,15 @@ class PrettyCards:
         data = discord.Embed(
             description=profile["description"],
             colour=discord.Colour(value=colour))
-        data.add_field(name="Groups", value=str(profile["groups"]))
+        if "groups" in profile and profile["groups"] != "":
+            data.add_field(name="Groups", value=str(profile["groups"]))
         data.add_field(name="Birthday", value=str(profile["birthday"]))
 
         data.add_field(name="Position in group", value=str(profile["position_in_group"]))
         data.add_field(name="Birthplace", value=str(profile["birthplace"]))
 
-        data.add_field(name="Company", value=str(profile["company"]))
+        if "company" in profile and profile["company"] != "":
+            data.add_field(name="Company", value=str(profile["company"]))
         data.add_field(name="Blood Type", value=str(profile["bloodtype"]))
 
         data.add_field(name="Languages", value=str(profile["languages"]))
@@ -67,6 +69,17 @@ class PrettyCards:
 
         data.add_field(name="Hobbies", value=str(profile["hobbies"]))
         data.add_field(name="Height", value=str(profile["height"]))
+
+        if "skills" in profile and profile["skills"] != "":
+            data.add_field(name="Skills", value=str(profile["skills"]))
+        if "training" in profile and profile["training"] != "":
+            data.add_field(name="Training time", value=str(profile["training"]))
+        if "education" in profile and profile["education"] != "":
+            data.add_field(name="Education", value=str(profile["education"]))
+        if "strengths" in profile and profile["strengths"] != "":
+            data.add_field(name="Strengths", value=str(profile["strengths"]), inline=False)
+        if "weaknesses" in profile and profile["weaknesses"] != "":
+            data.add_field(name="Weaknesses", value=str(profile["weaknesses"]), inline=False)
 
         if "future" in profile and profile["future"] != "":
             data.add_field(name="Future plans", value=str(profile["future"]), inline=False)
@@ -113,13 +126,15 @@ class PrettyCards:
         data = discord.Embed(
             description=profile["description"],
             colour=discord.Colour(value=colour))
-        data.add_field(name="Groups", value=str(profile["groups"]))
+        if "groups" in profile and profile["groups"] != "":
+            data.add_field(name="Groups", value=str(profile["groups"]))
         data.add_field(name="Birthday", value=str(profile["birthday"]))
 
         data.add_field(name="Position in group", value=str(profile["position_in_group"]))
         data.add_field(name="Birthplace", value=str(profile["birthplace"]))
 
-        data.add_field(name="Company", value=str(profile["company"]))
+        if "company" in profile and profile["company"] != "":
+            data.add_field(name="Company", value=str(profile["company"]))
         data.add_field(name="Blood Type", value=str(profile["bloodtype"]))
 
         data.add_field(name="Languages", value=str(profile["languages"]))
@@ -127,6 +142,17 @@ class PrettyCards:
 
         data.add_field(name="Hobbies", value=str(profile["hobbies"]))
         data.add_field(name="Height", value=str(profile["height"]))
+
+        if "skills" in profile and profile["skills"] != "":
+            data.add_field(name="Skills", value=str(profile["skills"]))
+        if "training" in profile and profile["training"] != "":
+            data.add_field(name="Training time", value=str(profile["training"]))
+        if "education" in profile and profile["education"] != "":
+            data.add_field(name="Education", value=str(profile["education"]))
+        if "strengths" in profile and profile["strengths"] != "":
+            data.add_field(name="Strengths", value=str(profile["strengths"]), inline=False)
+        if "weaknesses" in profile and profile["weaknesses"] != "":
+            data.add_field(name="Weaknesses", value=str(profile["weaknesses"]), inline=False)
 
         if "future" in profile and profile["future"] != "":
             data.add_field(name="Future plans", value=str(profile["future"]), inline=False)
