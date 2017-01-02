@@ -172,12 +172,15 @@ class Bias:
                 await self.bot.delete_message(message)
                 return
             selfAssignableRoles = 0
+            selfAssignablePrimaryRoles = 0
             for role in author.roles:
                 cleanedRoleName = role.name
                 cleanedRoleName = cleanedRoleName.replace(prefix, "")
                 cleanedRoleName = cleanedRoleName.replace(suffix, "")
                 if cleanedRoleName in list(availableRoles.values()):
                     selfAssignableRoles += 1
+                    if (prefix != "" and prefix in role.name) or (suffix != "" and suffix in role.name):
+                        selfAssignablePrimaryRoles += 1
             if changingRoleAlias in availableRoles:
                 if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
                     successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
@@ -200,7 +203,7 @@ class Bias:
             randomEmoji = ""
             if message.content[0] == "+":
                 randomEmoji = random.choice([":clap:", ":thumbsup:", ":blush:", ":sparkles:"])
-                if changingPrimaryRole != None and selfAssignableRoles <= 0:
+                if changingPrimaryRole != None and selfAssignablePrimaryRoles <= 0:
                     await self.bot.add_roles(author, changingPrimaryRole)
                 else:
                     await self.bot.add_roles(author, changingRole)
