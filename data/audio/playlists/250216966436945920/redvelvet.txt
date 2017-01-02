@@ -38,6 +38,7 @@
         "https://www.youtube.com/watch?v=7lrY3RQDYb4",
         "https://www.youtube.com/watch?v=gpYeJeURWvs",
         "https://www.youtube.com/watch?v=j8mzQngQqKc",
-        "https://www.youtube.com/watch?v=QYZZTGE6BGw"
+        "https://www.youtube.com/watch?v=QYZZTGE6BGw",
+        "https://www.youtube.com/watch?v=VjTV8Ll-u3g"
     ]
 }

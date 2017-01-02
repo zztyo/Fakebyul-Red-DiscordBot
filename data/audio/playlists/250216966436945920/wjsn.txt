@@ -7,7 +7,7 @@
         "https://www.youtube.com/watch?v=ydNdZLnX8WI",
         "https://www.youtube.com/watch?v=noyIVTszMUw",
         "https://www.youtube.com/watch?v=vEID1tgIsbQ",
-        "https://www.youtube.com/watch?v=LXve31ZWTkw",
+        "https://www.youtube.com/watch?v=_uJxJ7tSi1w",
         "https://www.youtube.com/watch?v=t7NvMFH9OnA",
         "https://www.youtube.com/watch?v=mTRH1YH36y4",
         "https://www.youtube.com/watch?v=L46_syguTak",
@@ -16,6 +16,7 @@
         "https://www.youtube.com/watch?v=MWjKJZ5DADM",
         "https://www.youtube.com/watch?v=0mGX2-4057g",
         "https://www.youtube.com/watch?v=IqeeYiAeSSs",
+        "https://www.youtube.com/watch?v=pYacZtMsIPM",
         "https://www.youtube.com/watch?v=42KRvy3ULyE"
     ]
 }
