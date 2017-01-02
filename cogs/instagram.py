@@ -9,13 +9,14 @@ from random import choice as randchoice
 from .utils import checks
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
-__version__ = "0.1"
+__version__ = "1.0"
 
 class Instagram:
     """Cog to get instagram feeds"""
 
-    def __init__(self, bot):
+    def __init__(self, bot, sleep):
         self.bot = bot
+        self.sleep = sleep
         self.file_path = "data/instagram/settings.json"
         self.settings = dataIO.load_json(self.file_path)
         self.feeds_file_path = "data/instagram/feeds.json"
@@ -104,7 +105,15 @@ class Instagram:
 
         await self._post_item(channel, self.instagramAPI.LastJson["items"][0])
 
-    async def check_feed_loop(self):
+    @_instagram.command(no_pm=True, name="refresh")
+    async def _refresh(self):
+        """Refreshes all instagram feeds manually"""
+        nb_cancelled = self.sleep.cancel_all()
+        await asyncio.wait(self.sleep.tasks)
+
+        await self.bot.say("Done :ok_hand:")
+
+    async def check_feed_loop(self, sleep, loop):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Instagram'):
             print("checking instagram feed...")
@@ -121,7 +130,7 @@ class Instagram:
                     if item["taken_at"] > feed["lastTimestamp"]:
                         self.feeds[self.feeds.index(feed)]["lastTimestamp"] = item["taken_at"]
                         dataIO.save_json(self.feeds_file_path, self.feeds)
-            await asyncio.sleep(600)
+            await loop.create_task(sleep(600))
 
     async def _post_item(self, channel, item):
         data = self.get_embed_for_item(item)
@@ -168,9 +177,27 @@ def check_files():
         print("Creating empty feeds.json...")
         dataIO.save_json("data/instagram/feeds.json", feeds)
 
+def make_sleep():
+    async def sleep(delay, result=None, *, loop=None):
+        coro = asyncio.sleep(delay, result=result, loop=loop)
+        task = asyncio.ensure_future(coro)
+        sleep.tasks.add(task)
+        try:
+            return await task
+        except asyncio.CancelledError:
+            return result
+        finally:
+            sleep.tasks.remove(task)
+
+    sleep.tasks = set()
+    sleep.cancel_all = lambda: sum(task.cancel() for task in sleep.tasks)
+    return sleep
+
 def setup(bot):
+    sleep = make_sleep()
+    loop = asyncio.get_event_loop()
     check_folders()
     check_files()
-    n = Instagram(bot)
+    n = Instagram(bot, sleep)
     bot.add_cog(n)
-    bot.loop.create_task(n.check_feed_loop())
+    bot.loop.create_task(n.check_feed_loop(sleep, loop))
