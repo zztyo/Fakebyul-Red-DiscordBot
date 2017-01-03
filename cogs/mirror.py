@@ -40,6 +40,9 @@ class Mirror:
         if author == self.bot.user:
             return
 
+        if author.bot == True:
+            return
+
         if self._is_command(message.content):
             return
 
