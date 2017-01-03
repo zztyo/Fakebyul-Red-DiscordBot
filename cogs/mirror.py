@@ -37,7 +37,7 @@ class Mirror:
         if message.channel.is_private:
             return
 
-        if author != self.bot.user and author.bot == True:
+        if author == self.bot.user:
             return
 
         if self._is_command(message.content):
@@ -107,7 +107,7 @@ def check_folders():
             os.makedirs(folder)
 
 def check_files():
-    mirrored_channels = {}
+    mirrored_channels = []
 
     if not os.path.isfile("data/mirror/mirrored_channels.json"):
         print("Creating empty mirrored_channels.json, please fill in details...")
