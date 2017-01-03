@@ -115,7 +115,6 @@ class Notifications:
             return
 
         toNotifyUserForList = {}
-        #messageList = message.content.lower().split()
         for keywordData in self.keywords[server.id]:
             if self._words_in_text(message.content.lower(), keywordData["keyword"]):
                 userToNotify = message.server.get_member(keywordData["userId"])
@@ -128,19 +127,6 @@ class Notifications:
 
                 userToNotifyPermissions = message.channel.permissions_for(userToNotify)
                 if userToNotifyPermissions.read_message_history == True:
-                    # I can't link to channels in embeds :(
-                    """
-                    colour = int("FFAC33", 16)
-
-                    data = discord.Embed(
-                        title=":bell: notification for the keyword \"{0[keyword]}\"".format(keywordData),
-                        url=message.author.default_avatar_url,
-                        description=message.content,
-                        colour=discord.Colour(value=colour))
-                    data.set_author(name="message by {0.author.name}".format(message), icon_url=message.author.avatar_url
-
-                    await self.bot.send_message(userToNotify, embed=data)
-                    """
                     if keywordData["keyword"] not in toNotifyUserForList:
                         toNotifyUserForList[keywordData["keyword"]] = {userToNotify}
                     else:
@@ -172,6 +158,12 @@ class Notifications:
         if haystack.find(" " + needle + ",") != -1:
             return True
         if haystack.find("," + needle + " ") != -1:
+            return True
+        if haystack.find("\"" + needle + " ") != -1:
+            return True
+        if haystack.find(" " + needle + "\"") != -1:
+            return True
+        if haystack.find("\"" + needle + "\"") != -1:
             return True
         return False
 
