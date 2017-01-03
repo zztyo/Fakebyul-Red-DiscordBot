@@ -144,7 +144,7 @@ class Notifications:
                     if keywordData["keyword"] not in toNotifyUserForList:
                         toNotifyUserForList[keywordData["keyword"]] = {userToNotify}
                     else:
-                        toNotifyUserForList[keywordData["keyword"]].append(userToNotify)
+                        toNotifyUserForList[keywordData["keyword"]].add(userToNotify)
         if len(toNotifyUserForList) > 0:
             keywordListText = ""
             i = 0
