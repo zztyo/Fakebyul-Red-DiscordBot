@@ -26,5 +26,12 @@
         "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#265560678524387329> and go to <#265566697065414672> to get your bias roles.",
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
+    },
+    "170399623859404800": {
+        "CHANNEL" : "170399623859404800",
+        "GOODBYE" : "Goodbye {0.name}, we miss you already~",
+        "GREETING" : "Welcome {0.mention}! Get your role in <#265860727372382208>.",
+        "POST_GOODBYE" : true,
+        "POST_GREETING" : true
     }
 }

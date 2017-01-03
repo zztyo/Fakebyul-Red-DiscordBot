@@ -60,6 +60,26 @@
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 💎"
     },
+    "170399623859404800" : {
+        "ASSIGNABLE_ROLES" : {
+            "lime" : "Lime",
+            "alice" : "Alice",
+            "nara" : "Nara",
+            "yooyoung" : "Yooyoung",
+            "yeoreum" : "Yeoreum",
+            "seoyoung" : "Seoyoung",
+            "yooara" : "YooAra",
+            "yoonjo" : "Yoonjo"
+        },
+        "EXTRA_ASSIGNABLE_ROLES" : {
+        },
+        "CHANNELS" : [
+            "265860727372382208"
+        ],
+        "MAX_ROLES" : 2,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : "²"
+    },
     "208673735580844032": {
         "ASSIGNABLE_ROLES" : {
             "nayoung" : "Nayoung",
