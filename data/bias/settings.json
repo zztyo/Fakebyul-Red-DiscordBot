@@ -62,11 +62,11 @@
     },
     "170399623859404800" : {
         "ASSIGNABLE_ROLES" : {
-            "lime" : "Lime",
-            "alice" : "Alice",
             "nara" : "Nara",
-            "yooyoung" : "Yooyoung",
+            "alice" : "Alice",
             "yeoreum" : "Yeoreum",
+            "yooyoung" : "Yooyoung",
+            "lime" : "Lime",
             "seoyoung" : "Seoyoung",
             "yooara" : "YooAra",
             "yoonjo" : "Yoonjo"
@@ -78,7 +78,7 @@
         ],
         "MAX_ROLES" : 2,
         "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : "²"
+        "PRIMARY_ROLE_SUFFIX" : " 💎"
     },
     "208673735580844032": {
         "ASSIGNABLE_ROLES" : {
