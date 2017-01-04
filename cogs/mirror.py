@@ -19,12 +19,27 @@ class Mirror:
         self.mirrored_channels_file_path = "data/mirror/mirrored_channels.json"
         self.mirrored_channels = dataIO.load_json(self.mirrored_channels_file_path)
 
-    # @commands.group(pass_context=True, no_pm=True, name="mirror")
-    # @checks.mod_or_permissions(administrator=True)
-    # async def _mirror(self, context):
-    #     """Manages mirrored channels"""
-    #     if context.invoked_subcommand is None:
-    #         await send_cmd_help(context)
+    @commands.group(pass_context=True, no_pm=True, name="mirror")
+    @checks.mod_or_permissions(administrator=True)
+    async def _mirror(self, context):
+        """Manages mirrored channels"""
+        if context.invoked_subcommand is None:
+            await send_cmd_help(context)
+
+    @_mirror.command(pass_context=True, name="list")
+    @checks.mod_or_permissions(administrator=True)
+    async def _list(self, context):
+        """List active channel mirrors"""
+        message = ""
+        i = 0
+        for mirrored_channel_entry in self.mirrored_channels:
+            message += ":satellite: `#{0}`: `mode={1[mode]}`, connected channels:\n".format(i, mirrored_channel_entry)
+            for channel_entry in mirrored_channel_entry["channels"]:
+                mirrored_channel = self.bot.get_channel(channel_entry["channel_id"])
+                message += "`#{1.name} ({1.id})` on `{1.server.name} ({1.server.id})` (`webhook {0[webhook_id]}`): {1.mention}\n".format(channel_entry, mirrored_channel)
+            i += 1
+        await self.bot.say(message)
+
 
     async def mirror_message(self, message):
         server = message.server
