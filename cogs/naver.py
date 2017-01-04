@@ -22,7 +22,9 @@ class Naver:
 
     @naver.command(pass_context=True, aliases=["ko"])
     async def korean(self, context, *text: str):
-        """Translates korean into english"""
+        """Translates korean into english
+
+        please remove all \" characters from your text"""
 
         text = ' '.join(text)
         await self.bot.type()
@@ -41,7 +43,9 @@ class Naver:
 
     @naver.command(pass_context=True, aliases=["en"])
     async def english(self, context, *text: str):
-        """Translates english into korean"""
+        """Translates english into korean
+
+        please remove all \" characters from your text"""
 
         text = ' '.join(text)
         await self.bot.type()
