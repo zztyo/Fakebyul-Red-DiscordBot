@@ -40,7 +40,6 @@ class Mirror:
             i += 1
         await self.bot.say(message)
 
-
     async def mirror_message(self, message):
         server = message.server
         author = message.author
