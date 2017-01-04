@@ -14,8 +14,9 @@ __version__ = "0.1"
 class Twitter:
     """Cog to get twitter feeds"""
 
-    def __init__(self, bot):
+    def __init__(self, bot, sleep):
         self.bot = bot
+        self.sleep = sleep
         self.file_path = "data/twitter/settings.json"
         self.settings = dataIO.load_json(self.file_path)
         self.feeds_file_path = "data/twitter/feeds.json"
@@ -130,7 +131,15 @@ class Twitter:
         data.set_footer(text="via twitter")
         return data
 
-    async def check_feed_loop(self):
+    @_twitter.command(no_pm=True, name="refresh")
+    async def _refresh(self):
+        """Refreshes all twitter feeds manually"""
+        nb_cancelled = self.sleep.cancel_all()
+        await asyncio.wait(self.sleep.tasks)
+
+        await self.bot.say("Done :ok_hand:")
+
+    async def check_feed_loop(self, sleep, loop):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Twitter'):
             print("checking twitter feed...")
@@ -155,7 +164,7 @@ class Twitter:
 
                 for item in twitterUserTimeline:
                     await self._post_item(channel, item)
-            await asyncio.sleep(600)
+            await loop.create_task(sleep(600))
 
 def check_folders():
     folders = ("data", "data/twitter/")
@@ -179,9 +188,27 @@ def check_files():
         print("Creating empty feeds.json...")
         dataIO.save_json("data/twitter/feeds.json", feeds)
 
+def make_sleep():
+    async def sleep(delay, result=None, *, loop=None):
+        coro = asyncio.sleep(delay, result=result, loop=loop)
+        task = asyncio.ensure_future(coro)
+        sleep.tasks.add(task)
+        try:
+            return await task
+        except asyncio.CancelledError:
+            return result
+        finally:
+            sleep.tasks.remove(task)
+
+    sleep.tasks = set()
+    sleep.cancel_all = lambda: sum(task.cancel() for task in sleep.tasks)
+    return sleep
+
 def setup(bot):
+    sleep = make_sleep()
+    loop = asyncio.get_event_loop()
     check_folders()
     check_files()
-    n = Twitter(bot)
+    n = Twitter(bot, sleep)
     bot.add_cog(n)
-    bot.loop.create_task(n.check_feed_loop())
+    bot.loop.create_task(n.check_feed_loop(sleep, loop))
