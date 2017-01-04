@@ -182,7 +182,7 @@ class Bias:
                     if (prefix != "" and prefix in role.name) or (suffix != "" and suffix in role.name):
                         selfAssignablePrimaryRoles += 1
             if changingRoleAlias in availableRoles:
-                if selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
+                if self.settings[server.id]["MAX_ROLES"] != 0 and selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
                     successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
 
                     await asyncio.sleep(10)
