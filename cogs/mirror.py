@@ -94,7 +94,7 @@ class Mirror:
                         for link in links:
                             target_channel = self.bot.get_channel(mirrored_channel["channel_id"])
                             if target_channel != None:
-                                message = "posted {0} in `#{1.name}` on the `{1.server.name}` discord ({1.mention})".format(link, channel)
+                                message = "posted {0} in `#{1.name}` on the `{1.server.name}` server ({1.mention})".format(link, channel)
                                 await self._post_mirrored_message(message, author, channel, target_channel_data["webhook_id"], target_channel_data["webhook_token"])
 
     async def _post_mirrored_message(self, message, author, source_channel, target_webhook_id, target_webhook_token):
