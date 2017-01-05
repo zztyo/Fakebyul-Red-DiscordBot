@@ -19,8 +19,9 @@ class PrettyCards:
 
     # documentation: https://github.com/Rapptz/discord.py/blob/master/discord/embeds.py
 
-    def __init__(self, bot):
+    def __init__(self, bot, sleep):
         self.bot = bot
+        self.sleep = sleep
         self.file_path = "data/prettycards/settings.json"
         self.settings = dataIO.load_json(self.file_path)
         self.countdowns_file_path = "data/prettycards/countdowns.json"
@@ -354,9 +355,18 @@ class PrettyCards:
             data.add_field(name="Minutes left", value=delta_minutes)
         return data
 
-    async def update_countdowns(self):
+    @_countdown.command(no_pm=True, name="refresh")
+    async def _refresh(self):
+        """Refreshes all countdowns manually"""
+        nb_cancelled = self.sleep.cancel_all()
+        await asyncio.wait(self.sleep.tasks)
+
+        await self.bot.say("Done :ok_hand:")
+
+    async def update_countdowns(self, sleep, loop):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('PrettyCards'):
+            print("refreshing countdowns...")
             countdown_cache = copy.deepcopy(self.countdowns)
             for key in countdown_cache:
                 countdown = countdown_cache[key]
@@ -390,7 +400,7 @@ class PrettyCards:
                 except Exception as e:
                     print("Updating countdown failed: message #{0}, error: {1}".format(countdown["messageId"], e))
             del countdown_cache
-            await asyncio.sleep(300)
+            await loop.create_task(sleep(300))
 
     async def _shorten_url_googl(self, longUrl):
         if "GOOGL_URL_SHORTENER_API_KEY" not in self.settings or self.settings["GOOGL_URL_SHORTENER_API_KEY"] == "":
@@ -432,11 +442,28 @@ def check_files():
         print("Creating default prettycards countdowns.json...")
         dataIO.save_json(f, countdowns)
 
+def make_sleep():
+    async def sleep(delay, result=None, *, loop=None):
+        coro = asyncio.sleep(delay, result=result, loop=loop)
+        task = asyncio.ensure_future(coro)
+        sleep.tasks.add(task)
+        try:
+            return await task
+        except asyncio.CancelledError:
+            return result
+        finally:
+            sleep.tasks.remove(task)
+
+    sleep.tasks = set()
+    sleep.cancel_all = lambda: sum(task.cancel() for task in sleep.tasks)
+    return sleep
 
 def setup(bot):
+    sleep = make_sleep()
+    loop = asyncio.get_event_loop()
     check_folders()
     check_files()
-    n = PrettyCards(bot)
-    bot.loop.create_task(n.update_countdowns())
+    n = PrettyCards(bot, sleep)
     bot.add_cog(n)
+    bot.loop.create_task(n.update_countdowns(sleep, loop))
 
