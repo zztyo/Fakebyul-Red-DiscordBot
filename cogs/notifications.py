@@ -3,6 +3,7 @@ from discord.ext import commands
 from __main__ import send_cmd_help
 import os
 from .utils.dataIO import dataIO
+from cogs.utils import checks
 
 class Notifications:
     """Get notifications for keywords"""
@@ -95,6 +96,93 @@ class Notifications:
         keywordsMessage += "."
         await self.bot.say("{0} {1}".format(author.mention, keywordsMessage))
 
+    @_notifications.group(pass_context=True, name="global")
+    @checks.is_owner()
+    async def _global(self, ctx):
+        """Global notifications"""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @_global.command(pass_context=True, no_pm=True, name="add")
+    @checks.is_owner()
+    async def _global_add(self, ctx, *, keyword):
+        """Adds a keyword to your global list"""
+        author = ctx.message.author
+        server = ctx.message.server
+
+        keyword = keyword.strip().lower()
+
+        if "global" not in self.keywords:
+            self.keywords["global"] = []
+
+        for keywordData in self.keywords["global"]:
+            if keywordData["userId"] == author.id and keywordData["keyword"] == keyword:
+                await self.bot.say("{0} The keyword `{1}` is already in your global list! :thinking:".format(author.mention, keyword))
+                return
+
+        keywordData = {"userId": author.id, "keyword": keyword}
+        self.keywords["global"].append(keywordData)
+
+        dataIO.save_json(self.keywords_file_path, self.keywords)
+
+        await self.bot.say("{0} Added keyword `{1}` to your global list! :ok_hand:".format(author.mention, keyword))
+
+    @_global.command(pass_context=True, no_pm=True, name="del")
+    @checks.is_owner()
+    async def _global_del(self, ctx, *, keyword):
+        """Removes a keyword from your global list"""
+        author = ctx.message.author
+        server = ctx.message.server
+
+        keyword = keyword.strip().lower()
+
+        if "global" not in self.keywords:
+            await self.bot.say("{0} Unable to find keyword `{1}` in your global list! :warning:".format(author.mention, keyword))
+            return
+
+        for keywordData in self.keywords["global"]:
+            if keywordData["userId"] == author.id and keywordData["keyword"] == keyword:
+                del(self.keywords["global"][self.keywords["global"].index(keywordData)])
+                dataIO.save_json(self.keywords_file_path, self.keywords)
+
+                await self.bot.say("{0} Removed keyword `{1}` from your global list! :ok_hand:".format(author.mention, keyword))
+                return
+
+        await self.bot.say("{0} Unable to find keyword `{1}` in your global list! :warning:".format(author.mention, keyword))
+
+    @_global.command(pass_context=True, no_pm=True, name="list")
+    @checks.is_owner()
+    async def _global_list(self, ctx):
+        """Shows all your global keywords"""
+        author = ctx.message.author
+        server = ctx.message.server
+
+        if "global" not in self.keywords:
+            await self.bot.say("{0} No keywords in your global list! :warning:".format(author.mention))
+            return
+
+        keywordsToPrint = []
+        for keywordData in self.keywords["global"]:
+            if keywordData["userId"] == author.id:
+                keywordsToPrint.append(keywordData)
+
+        if len(keywordsToPrint) <= 0:
+            await self.bot.say("{0} No keywords in your global list! :warning:".format(author.mention))
+            return
+
+        keywordsMessage = "I will notify you for: "
+        i = 0
+        for keyword in keywordsToPrint:
+            i += 1
+            if i == 1:
+                keywordsMessage += "`{0[keyword]}`".format(keyword)
+            elif i < len(keywordsToPrint):
+                keywordsMessage += ", `{0[keyword]}`".format(keyword)
+            else:
+                keywordsMessage += " and `{0[keyword]}`".format(keyword)
+        keywordsMessage += "."
+        await self.bot.say("{0} {1}".format(author.mention, keywordsMessage))
+
     async def check_keyword(self, message):
         server = message.server
         author = message.author
@@ -111,11 +199,17 @@ class Notifications:
         if self._is_command(message.content):
             return
 
-        if server.id not in self.keywords:
+        all_requested_keywords = []
+        if server.id in self.keywords:
+            all_requested_keywords += self.keywords[server.id]
+        if "global" in self.keywords:
+            all_requested_keywords += self.keywords["global"]
+
+        if len(all_requested_keywords) <= 0:
             return
 
         toNotifyUserForList = {}
-        for keywordData in self.keywords[server.id]:
+        for keywordData in all_requested_keywords:
             if self._words_in_text(message.content.lower(), keywordData["keyword"]):
                 userToNotify = message.server.get_member(keywordData["userId"])
                 if userToNotify == None:
