@@ -79,6 +79,7 @@ class Twitter:
     async def _del(self, feedId : int):
         """Deletes an twitter user from the database"""
 
+        # todo: check if it's on the server
         try:
             del(self.feeds[feedId])
         except IndexError:
