@@ -74,18 +74,22 @@ class Twitter:
 
         await self.bot.say("Found these users:\n{0}".format(listMessage))
 
-    @_twitter.command(no_pm=True, name="del")
+    @_twitter.command(pass_context=True, no_pm=True, name="del")
     @checks.mod_or_permissions(administrator=True)
-    async def _del(self, feedId : int):
+    async def _del(self, context, feedId : int):
         """Deletes an twitter user from the database"""
+        server = context.message.server
 
-        # todo: check if it's on the server
         try:
-            del(self.feeds[feedId])
+            if self.feeds[feedId]["serverId"] != server.id:
+                await self.bot.say("You can only delete entries from the server you are on!")
+                return
         except IndexError:
             await self.bot.say("Entry not found in database!")
             return
-
+        
+        del(self.feeds[feedId])
+        
         dataIO.save_json(self.feeds_file_path, self.feeds)
 
         await self.bot.say("User deleted from database")
