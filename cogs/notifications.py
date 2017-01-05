@@ -117,7 +117,7 @@ class Notifications:
 
         for keywordData in self.keywords["global"]:
             if keywordData["userId"] == author.id and keywordData["keyword"] == keyword:
-                await self.bot.say("{0} The keyword `{1}` is already in your global list! :thinking:".format(author.mention, keyword))
+                await self.bot.say("{0} The keyword `{1}` is already in your **global** list! :thinking:".format(author.mention, keyword))
                 return
 
         keywordData = {"userId": author.id, "keyword": keyword}
@@ -125,7 +125,7 @@ class Notifications:
 
         dataIO.save_json(self.keywords_file_path, self.keywords)
 
-        await self.bot.say("{0} Added keyword `{1}` to your global list! :ok_hand:".format(author.mention, keyword))
+        await self.bot.say("{0} Added keyword `{1}` to your **global** list! :ok_hand:".format(author.mention, keyword))
 
     @_global.command(pass_context=True, no_pm=True, name="del")
     @checks.is_owner()
@@ -137,7 +137,7 @@ class Notifications:
         keyword = keyword.strip().lower()
 
         if "global" not in self.keywords:
-            await self.bot.say("{0} Unable to find keyword `{1}` in your global list! :warning:".format(author.mention, keyword))
+            await self.bot.say("{0} Unable to find keyword `{1}` in your **global** list! :warning:".format(author.mention, keyword))
             return
 
         for keywordData in self.keywords["global"]:
@@ -145,10 +145,10 @@ class Notifications:
                 del(self.keywords["global"][self.keywords["global"].index(keywordData)])
                 dataIO.save_json(self.keywords_file_path, self.keywords)
 
-                await self.bot.say("{0} Removed keyword `{1}` from your global list! :ok_hand:".format(author.mention, keyword))
+                await self.bot.say("{0} Removed keyword `{1}` from your **global** list! :ok_hand:".format(author.mention, keyword))
                 return
 
-        await self.bot.say("{0} Unable to find keyword `{1}` in your global list! :warning:".format(author.mention, keyword))
+        await self.bot.say("{0} Unable to find keyword `{1}` in your **global** list! :warning:".format(author.mention, keyword))
 
     @_global.command(pass_context=True, no_pm=True, name="list")
     @checks.is_owner()
@@ -158,7 +158,7 @@ class Notifications:
         server = ctx.message.server
 
         if "global" not in self.keywords:
-            await self.bot.say("{0} No keywords in your global list! :warning:".format(author.mention))
+            await self.bot.say("{0} No keywords in your **global** list! :warning:".format(author.mention))
             return
 
         keywordsToPrint = []
@@ -167,10 +167,10 @@ class Notifications:
                 keywordsToPrint.append(keywordData)
 
         if len(keywordsToPrint) <= 0:
-            await self.bot.say("{0} No keywords in your global list! :warning:".format(author.mention))
+            await self.bot.say("{0} No keywords in your **global** list! :warning:".format(author.mention))
             return
 
-        keywordsMessage = "I will notify you for: "
+        keywordsMessage = "I will notify you **globally** for: "
         i = 0
         for keyword in keywordsToPrint:
             i += 1
@@ -237,7 +237,7 @@ class Notifications:
                 else:
                     keywordListText += " and `{0}`".format(keyword)
             for user in users:
-                notifyMessage = ":bell: User {0.author.name} ({0.author.mention}) mentioned {1} in {0.channel.mention}:\n```{0.content}```".format(message, keywordListText)
+                notifyMessage = ":bell: User {0.author.name} ({0.author.mention}) mentioned {1} in {0.channel.mention} on the `{0.server.name}` server:\n```{0.content}```".format(message, keywordListText)
                 await self.bot.send_message(user, notifyMessage)
 
     def _words_in_text(self, haystack, needle):
