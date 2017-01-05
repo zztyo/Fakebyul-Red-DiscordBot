@@ -845,7 +845,19 @@ class Owner:
             return
 
         if message.content.startswith(self.bot.user.mention):
-            message = "Follow me on twitter: https://twitter.com/s3kl_ :eyes:"
+            owner_set = self.bot.settings.owner is not None
+            owner = self.bot.settings.owner if owner_set else None
+            if owner:
+                owner = discord.utils.get(self.bot.get_all_members(), id=owner)
+                if not owner:
+                    try:
+                        owner = await self.bot.get_user_info(self.bot.settings.owner)
+                    except:
+                        owner = None
+            if not owner:
+                owner = "Unknown"
+
+            message = "**Hello!** If you have technical difficulties with the bot, contact me on Discord: `{0}`. If you are bored follow me on twitter: <https://twitter.com/s3kl_>. :eyes:".format(owner)
             await self.bot.send_message(channel, message)
 
     def get_bot_uptime(self, *, brief=False):
