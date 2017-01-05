@@ -121,7 +121,9 @@ class Facebook:
 
         itemUserFullname = profile["name"]
         itemUserProfilepicture = picture["url"]
-        itemCaption = item["message"]
+        itemCaption = ""
+        if "message" in item:
+            itemCaption = item["message"]
 
         postIdOnly = item["id"].replace("{0[from][id]}_".format(item), "")
         itemUrl = "https://www.facebook.com/{0[from][id]}/posts/{1}".format(item, postIdOnly)
