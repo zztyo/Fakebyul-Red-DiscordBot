@@ -7,6 +7,7 @@ from .utils import checks
 import re
 import aiohttp
 import json
+from .utils.chat_formatting import pagify
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "1.0"
@@ -38,8 +39,9 @@ class Mirror:
                 mirrored_channel = self.bot.get_channel(channel_entry["channel_id"])
                 message += "`#{1.name} ({1.id})` on `{1.server.name} ({1.server.id})` (`webhook {0[webhook_id]}`): {1.mention}\n".format(channel_entry, mirrored_channel)
             i += 1
-        await self.bot.say(message)
-
+        for page in pagify(message, delims=["\n"]):
+            await self.bot.say(page)
+            
     async def mirror_message(self, message):
         server = message.server
         author = message.author
