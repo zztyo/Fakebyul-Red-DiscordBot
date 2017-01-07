@@ -156,9 +156,9 @@ class Twitter:
                     continue
                 try:
                     if feed["lastId"] == 0:
-                        twitterUserTimeline = self.twitterAPI.user_timeline(screen_name=feed["userName"], include_rts=True)
+                        twitterUserTimeline = self.twitterAPI.user_timeline(screen_name=feed["userName"], include_rts=True, exclude_replies=True)
                     else:
-                        twitterUserTimeline = self.twitterAPI.user_timeline(screen_name=feed["userName"], include_rts=True, since_id=feed["lastId"])
+                        twitterUserTimeline = self.twitterAPI.user_timeline(screen_name=feed["userName"], include_rts=True, since_id=feed["lastId"], exclude_replies=True)
                 except Exception:
                     print("something went wrong fetching twitter account")
                     continue
