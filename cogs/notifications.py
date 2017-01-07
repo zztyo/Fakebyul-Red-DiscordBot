@@ -22,6 +22,7 @@ class Notifications:
     @_notifications.command(pass_context=True, no_pm=True, name="add")
     async def _add(self, ctx, *, keyword):
         """Adds a keyword to your list"""
+        message = ctx.message
         author = ctx.message.author
         server = ctx.message.server
 
@@ -32,7 +33,9 @@ class Notifications:
 
         for keywordData in self.keywords[server.id]:
             if keywordData["userId"] == author.id and keywordData["keyword"] == keyword:
-                await self.bot.say("{0} The keyword `{1}` is already in your list! :thinking:".format(author.mention, keyword))
+                await self.bot.delete_message(message)
+                await self.bot.say("{0} Please check your DMs".format(author.mention))
+                await self.bot.send_message(author, "The keyword `{1}` is already in your list on the `{2.name}` server! :thinking:".format(author.mention, keyword, server))
                 return
 
         keywordData = {"userId": author.id, "keyword": keyword}
@@ -40,18 +43,23 @@ class Notifications:
 
         dataIO.save_json(self.keywords_file_path, self.keywords)
 
-        await self.bot.say("{0} Added keyword `{1}` to your list! :ok_hand:".format(author.mention, keyword))
+        await self.bot.delete_message(message)
+        await self.bot.say("{0} Please check your DMs".format(author.mention))
+        await self.bot.send_message(author, "Added keyword `{1}` to your list on the `{2.name}` server! :ok_hand:".format(author.mention, keyword, server))
 
     @_notifications.command(pass_context=True, no_pm=True, name="del")
     async def _del(self, ctx, *, keyword):
         """Removes a keyword from your list"""
+        message = ctx.message
         author = ctx.message.author
         server = ctx.message.server
 
         keyword = keyword.strip().lower()
 
         if server.id not in self.keywords:
-            await self.bot.say("{0} Unable to find keyword `{1}` in your list! :warning:".format(author.mention, keyword))
+            await self.bot.delete_message(message)
+            await self.bot.say("{0} Please check your DMs".format(author.mention))
+            await self.bot.send_message(author, "Unable to find keyword `{1}` in your list on the `{2.name}` server! :warning:".format(author.mention, keyword, server))
             return
 
         for keywordData in self.keywords[server.id]:
@@ -59,10 +67,14 @@ class Notifications:
                 del(self.keywords[server.id][self.keywords[server.id].index(keywordData)])
                 dataIO.save_json(self.keywords_file_path, self.keywords)
 
-                await self.bot.say("{0} Removed keyword `{1}` from your list! :ok_hand:".format(author.mention, keyword))
+                await self.bot.delete_message(message)
+                await self.bot.say("{0} Please check your DMs".format(author.mention))
+                await self.bot.send_message(author, "Removed keyword `{1}` from your list on the `{2.name}` server! :ok_hand:".format(author.mention, keyword, server))
                 return
 
-        await self.bot.say("{0} Unable to find keyword `{1}` in your list! :warning:".format(author.mention, keyword))
+        await self.bot.delete_message(message)
+        await self.bot.say("{0} Please check your DMs".format(author.mention))
+        await self.bot.send_message(author, "Unable to find keyword `{1}` in your list on the `{2.name}` server! :warning:".format(author.mention, keyword, server))
 
     @_notifications.command(pass_context=True, no_pm=True, name="list")
     async def _list(self, ctx):
@@ -93,8 +105,10 @@ class Notifications:
                 keywordsMessage += ", `{0[keyword]}`".format(keyword)
             else:
                 keywordsMessage += " and `{0[keyword]}`".format(keyword)
-        keywordsMessage += "."
-        await self.bot.say("{0} {1}".format(author.mention, keywordsMessage))
+        keywordsMessage += "on the `{0.name}` server.".format(server)
+
+        await self.bot.say("{0} Please check your DMs".format(author.mention))
+        await self.bot.send_message(author, keywordsMessage)
 
     @_notifications.group(pass_context=True, name="global")
     @checks.is_owner()
@@ -107,6 +121,7 @@ class Notifications:
     @checks.is_owner()
     async def _global_add(self, ctx, *, keyword):
         """Adds a keyword to your global list"""
+        message = ctx.message
         author = ctx.message.author
         server = ctx.message.server
 
@@ -125,7 +140,9 @@ class Notifications:
 
         dataIO.save_json(self.keywords_file_path, self.keywords)
 
-        await self.bot.say("{0} Added keyword `{1}` to your **global** list! :ok_hand:".format(author.mention, keyword))
+        await self.bot.delete_message(message)
+        await self.bot.say("{0} Please check your DMs".format(author.mention))
+        await self.bot.send_message(author, "Added keyword `{1}` to your **global** list! :ok_hand:".format(author.mention, keyword))
 
     @_global.command(pass_context=True, no_pm=True, name="del")
     @checks.is_owner()
@@ -181,7 +198,9 @@ class Notifications:
             else:
                 keywordsMessage += " and `{0[keyword]}`".format(keyword)
         keywordsMessage += "."
-        await self.bot.say("{0} {1}".format(author.mention, keywordsMessage))
+
+        await self.bot.say("{0} Please check your DMs".format(author.mention))
+        await self.bot.send_message(author, keywordsMessage)
 
     async def check_keyword(self, message):
         server = message.server
