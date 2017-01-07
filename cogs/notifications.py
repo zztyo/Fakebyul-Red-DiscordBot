@@ -105,7 +105,7 @@ class Notifications:
                 keywordsMessage += ", `{0[keyword]}`".format(keyword)
             else:
                 keywordsMessage += " and `{0[keyword]}`".format(keyword)
-        keywordsMessage += "on the `{0.name}` server.".format(server)
+        keywordsMessage += " on the `{0.name}` server.".format(server)
 
         await self.bot.say("{0} Please check your DMs".format(author.mention))
         await self.bot.send_message(author, keywordsMessage)
