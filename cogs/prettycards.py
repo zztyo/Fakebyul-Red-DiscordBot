@@ -10,6 +10,7 @@ import aiohttp
 import json
 import copy
 from datetime import datetime
+from __main__ import send_cmd_help
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "1.1"
@@ -385,6 +386,10 @@ class PrettyCards:
                     dataIO.save_json(self.countdowns_file_path, self.countdowns)
                     print("Deleted countdown (message not found): message #{0}".format(countdown["messageId"]))
                     continue
+                except discord.errors.HTTPException:
+                    print("Updating countdown failed: getting message #{0} timeout".format(countdown["messageId"]))
+                    continue
+                    
                 try:
                     datetime_countdown = datetime.strptime(countdown["datetime"], "%Y-%m-%d %H:%M")
                     datetime_now = datetime.utcnow()
