@@ -1,4 +1,5 @@
 {
+    "cogs.RandomPictures" : false,
     "cogs.activitylog" : false,
     "cogs.advgoogle" : false,
     "cogs.alias" : true,
