@@ -22,7 +22,6 @@ class Instagram:
         self.feeds_file_path = "data/instagram/feeds.json"
         self.feeds = dataIO.load_json(self.feeds_file_path)
         self.instagramAPI = InstagramAPI(self.settings["USERNAME"], self.settings["PASSWORD"])
-        self.instagramAPI.login()
 
     @commands.group(pass_context=True, no_pm=True, name="instagram", aliases=["i"])
     async def _instagram(self, context):
@@ -35,13 +34,14 @@ class Instagram:
     async def _add(self, username : str, channel : discord.Channel):
         """Adds a new instagram user feed to a channel"""
 
-        if self.instagramAPI.searchUsername(username) == False:
+        await self.instagramAPI.login()
+        if await self.instagramAPI.searchUsername(username) == False:
             await self.bot.say("Something went wrong!")
             return
 
         userId = self.instagramAPI.LastJson["user"]["pk"]
 
-        if self.instagramAPI.getUserFeed(userId) == False:
+        if await self.instagramAPI.getUserFeed(userId) == False:
             await self.bot.say("Something went wrong!")
             return
 
@@ -98,13 +98,14 @@ class Instagram:
     async def _force(self, username : str, channel : discord.Channel):
         """Forces to print the latest instagram post"""
 
-        if self.instagramAPI.searchUsername(username) == False:
+        await self.instagramAPI.login()
+        if await self.instagramAPI.searchUsername(username) == False:
             await self.bot.say("Something went wrong!")
             return
 
         userId = self.instagramAPI.LastJson["user"]["pk"]
 
-        if self.instagramAPI.getUserFeed(userId) == False:
+        if await self.instagramAPI.getUserFeed(userId) == False:
             await self.bot.say("Something went wrong!")
             return
 
@@ -122,12 +123,13 @@ class Instagram:
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Instagram'):
             print("checking instagram feed...")
+            await self.instagramAPI.login()
             for feed in self.feeds:
                 channel = self.bot.get_channel(feed["channelId"])
                 if channel == None:
                     print("Channel not found")
                     continue
-                if self.instagramAPI.getUserFeed(feed["userId"], minTimestamp=feed["lastTimestamp"]) == False:
+                if await self.instagramAPI.getUserFeed(feed["userId"], minTimestamp=feed["lastTimestamp"]) == False:
                     print("Something went wrong fetching @{0}'s instagram feed!".format(feed["userName"]))
                     continue
                 for item in self.instagramAPI.LastJson["items"]:

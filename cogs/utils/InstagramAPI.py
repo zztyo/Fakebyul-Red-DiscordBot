@@ -12,6 +12,7 @@ import time
 import copy
 import math
 import sys
+import aiohttp
 
 #The urllib library was split into other modules from Python 2 to Python 3
 if sys.version_info.major == 3:
@@ -52,42 +53,47 @@ class InstagramAPI:
         self.setUser(username, password)
         self.isLoggedIn = False
         self.LastResponse = None
+        self.session = None
 
     def setUser(self, username, password):
         self.username = username
         self.password = password
         self.uuid = self.generateUUID(True)
 
-    def login(self, force = False):
+    async def login(self, force = False):
         if (not self.isLoggedIn or force):
-            self.s = requests.Session()
+            if self.session != None:
+                self.session.close()
+            self.conn = aiohttp.TCPConnector()
+            self.session = aiohttp.ClientSession(connector=self.conn)
             # if you need proxy make something like this:
             # self.s.proxies = {"https" : "http://proxyip:proxyport"}
-            if (self.SendRequest('si/fetch_headers/?challenge_type=signup&guid=' + self.generateUUID(False), None, True)):
-
+            result = await self.SendRequest('si/fetch_headers/?challenge_type=signup&guid=' + self.generateUUID(False), None, True)
+            if result:
                 data = {'phone_id'   : self.generateUUID(True),
-                        '_csrftoken' : self.LastResponse.cookies['csrftoken'],
+                        '_csrftoken' : self.session.cookie_jar.filter_cookies('https://i.instagram.com/')['csrftoken'],
                         'username'   : self.username,
                         'guid'       : self.uuid,
                         'device_id'  : self.device_id,
                         'password'   : self.password,
                         'login_attempt_count' : '0'}
 
-                if (self.SendRequest('accounts/login/', self.generateSignature(json.dumps(data)), True)):
+                result = await self.SendRequest('accounts/login/', self.generateSignature(json.dumps(data)), True)
+                if result:
                     self.isLoggedIn = True
                     self.username_id = self.LastJson["logged_in_user"]["pk"]
                     self.rank_token = "%s_%s" % (self.username_id, self.uuid)
-                    self.token = self.LastResponse.cookies["csrftoken"]
+                    self.token = self.session.cookie_jar.filter_cookies('https://i.instagram.com/')['csrftoken']
 
-                    self.syncFeatures()
-                    self.autoCompleteUserList()
-                    self.timelineFeed()
-                    self.getv2Inbox()
-                    self.getRecentActivity()
+                    await self.syncFeatures()
+                    await self.autoCompleteUserList()
+                    await self.timelineFeed()
+                    await self.getv2Inbox()
+                    await self.getRecentActivity()
                     print ("Login success!\n")
                     return True;
 
-    def syncFeatures(self):
+    async def syncFeatures(self):
         data = json.dumps({
         '_uuid'         : self.uuid,
         '_uid'          : self.username_id,
@@ -95,16 +101,16 @@ class InstagramAPI:
         '_csrftoken'    : self.token,
         'experiments'   : self.EXPERIMENTS
         })
-        return self.SendRequest('qe/sync/', self.generateSignature(data))
+        return await self.SendRequest('qe/sync/', self.generateSignature(data))
 
-    def autoCompleteUserList(self):
-        return self.SendRequest('friendships/autocomplete_user_list/')
+    async def autoCompleteUserList(self):
+        return await self.SendRequest('friendships/autocomplete_user_list/')
 
-    def timelineFeed(self):
-        return self.SendRequest('feed/timeline/')
+    async def timelineFeed(self):
+        return await self.SendRequest('feed/timeline/')
 
-    def megaphoneLog(self):
-        return self.SendRequest('megaphone/log/')
+    async def megaphoneLog(self):
+        return await self.SendRequest('megaphone/log/')
 
     def expose(self):
         data = json.dumps({
@@ -382,16 +388,16 @@ class InstagramAPI:
     def getSelfUsernameInfo(self):
         return self.getUsernameInfo(self.username_id)
 
-    def getRecentActivity(self):
-        activity = self.SendRequest('news/inbox/?')
+    async def getRecentActivity(self):
+        activity = await self.SendRequest('news/inbox/?')
         return activity
 
     def getFollowingRecentActivity(self):
         activity = self.SendRequest('news/?')
         return activity
 
-    def getv2Inbox(self):
-        inbox = self.SendRequest('direct_v2/inbox/?')
+    async def getv2Inbox(self):
+        inbox = await self.SendRequest('direct_v2/inbox/?')
         return inbox
 
     def getUserTags(self, usernameId):
@@ -425,8 +431,8 @@ class InstagramAPI:
                 +'&is_typeahead=true&query='+ str(query) +'&rank_token='+ str(self.rank_token))
         return query
 
-    def searchUsername(self, usernameName):
-        query = self.SendRequest('users/'+ str(usernameName) +'/usernameinfo/')
+    async def searchUsername(self, usernameName):
+        query = await self.SendRequest('users/'+ str(usernameName) +'/usernameinfo/')
         return query
 
     def syncFromAdressBook(self, contacts):
@@ -440,8 +446,8 @@ class InstagramAPI:
         query = self.SendRequest('feed/timeline/?rank_token='+ str(self.rank_token) +'&ranked_content=true&')
         return query
 
-    def getUserFeed(self, usernameId, maxid = '', minTimestamp = None):
-        query = self.SendRequest('feed/user/' + str(usernameId) + '/?max_id=' + str(maxid) + '&min_timestamp=' + str(minTimestamp)
+    async def getUserFeed(self, usernameId, maxid = '', minTimestamp = None):
+        query = await self.SendRequest('feed/user/' + str(usernameId) + '/?max_id=' + str(maxid) + '&min_timestamp=' + str(minTimestamp)
             + '&rank_token='+ str(self.rank_token) +'&ranked_content=true')
         return query
 
@@ -596,23 +602,35 @@ class InstagramAPI:
         # TODO Instagram.php 1620-1645
         return False
 
-    def SendRequest(self, endpoint, post = None, login = False):
+    async def SendRequest(self, endpoint, post = None, login = False):
         if (not self.isLoggedIn and not login):
             raise Exception("Not logged in!\n")
             return;
 
-        self.s.headers.update ({'Connection' : 'close',
+        headers = {'Connection' : 'close',
                                 'Accept' : '*/*',
                                 'Content-type' : 'application/x-www-form-urlencoded; charset=UTF-8',
                                 'Cookie2' : '$Version=1',
                                 'Accept-Language' : 'en-US',
-                                'User-Agent' : self.USER_AGENT})
+                                'User-Agent' : self.USER_AGENT}
 
-        if (post != None): # POST
-            response = self.s.post(self.API_URL + endpoint, data=post) # , verify=False
-        else: # GET
-            response = self.s.get(self.API_URL + endpoint) # , verify=False
+        try:
+            if post != None:
+                async with self.session.post(self.API_URL + endpoint, data=post, headers=headers) as r:
+                    self.LastResponse = await r.text()
+                    self.LastJson = await r.json()
+                    return True
+            else:
+                async with self.session.get(self.API_URL + endpoint, headers=headers) as r:
+                    self.LastResponse = await r.text()
+                    self.LastJson = await r.json()
+                    return True
+        except Exception as e:
+            print("translation api error: {0}".format(e))
+            return False
 
+        # TODO: implement error handling
+        """
         if response.status_code == 200:
             self.LastResponse = response
             self.LastJson = json.loads(response.text)
@@ -625,7 +643,7 @@ class InstagramAPI:
                 self.LastJson = json.loads(response.text)
             except:
                 pass
-            return False
+            return False"""
             
     def getTotalFollowers(self,usernameId):
         followers = []
