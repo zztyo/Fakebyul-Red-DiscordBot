@@ -23,6 +23,7 @@
     "cogs.mod" : true,
     "cogs.naver" : true,
     "cogs.notifications" : true,
+    "cogs.oweather" : true,
     "cogs.owner" : true,
     "cogs.prettycards" : true,
     "cogs.reactionpolls" : true,
