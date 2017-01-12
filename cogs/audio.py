@@ -103,6 +103,12 @@ class InvalidSong(InvalidURL):
 class InvalidPlaylist(InvalidSong):
     pass
 
+class QueueNotAllowed(Exception):
+    pass
+
+class QueueTooManyPeople(Exception):
+    pass
+
 
 class deque(collections.deque):
     def __init__(self, *args, **kwargs):
@@ -1270,6 +1276,15 @@ class Audio:
             if self.voice_client(server).channel != voice_channel:
                 pass  # TODO: Perms
 
+        try:
+            self.has_queue_perm(author, server)
+        except QueueNotAllowed:
+            await self.bot.say("You don't have permissions to queue.")
+            return
+        except QueueTooManyPeople:
+            await self.bot.say("You are not allowed to queue while other people are listening.")
+            return
+
         # Checking if playing in current server
 
         if self.is_playing(server):
@@ -1355,6 +1370,15 @@ class Audio:
         except UnauthorizedSpeak:
             await self.bot.say("I don't have permissions to speak in your"
                                " voice channel.")
+            return
+
+        try:
+            self.has_queue_perm(author, server)
+        except QueueNotAllowed:
+            await self.bot.say("You don't have permissions to queue.")
+            return
+        except QueueTooManyPeople:
+            await self.bot.say("You are not allowed to queue while other people are listening.")
             return
 
         if not self.voice_connected(server):
@@ -1651,6 +1675,16 @@ class Audio:
                     return
                 else:
                     await self._join_voice_channel(voice_channel)
+
+            try:
+                self.has_queue_perm(author, server)
+            except QueueNotAllowed:
+                await self.bot.say("You don't have permissions to queue.")
+                return
+            except QueueTooManyPeople:
+                await self.bot.say("You are not allowed to queue while other people are listening.")
+                return
+
             self._clear_queue(server)
             playlist = self._load_playlist(server, name,
                                            local=self._playlist_exists_local(
@@ -1676,6 +1710,18 @@ class Audio:
             added to the song loop (if running). If you use `queue` when a
             playlist is running, it will temporarily be played next and will
             NOT stay in the playlist loop."""
+        server = ctx.message.server
+        author = ctx.message.author
+
+        try:
+            self.has_queue_perm(author, server)
+        except QueueNotAllowed:
+            await self.bot.say("You don't have permissions to queue.")
+            return
+        except QueueTooManyPeople:
+            await self.bot.say("You are not allowed to queue while other people are listening.")
+            return
+
         if url is None:
             return await self._queue_list(ctx)
         server = ctx.message.server
@@ -1849,6 +1895,15 @@ class Audio:
         except UnauthorizedSpeak:
             await self.bot.say("I don't have permissions to speak in your"
                                " voice channel.")
+            return
+
+        try:
+            self.has_queue_perm(author, server)
+        except QueueNotAllowed:
+            await self.bot.say("You don't have permissions to queue.")
+            return
+        except QueueTooManyPeople:
+            await self.bot.say("You are not allowed to queue while other people are listening.")
             return
 
         if not self.voice_connected(server):
@@ -2168,6 +2223,33 @@ class Audio:
             raise UnauthorizedConnect
         elif channel.permissions_for(server.me).speak is False:
             raise UnauthorizedSpeak
+        else:
+            return True
+        return False
+
+    def has_queue_perm(self, author, server):
+        serverSettings = self.get_server_settings(server)
+        is_music_banned = False
+        is_music_restricted = False
+        music_restricted_people_threshold = 0
+
+        if "MUSIC_BAN_ROLE" in serverSettings and serverSettings["MUSIC_BAN_ROLE"] != "":
+            is_music_banned = discord.utils.get(author.roles, name=serverSettings["MUSIC_BAN_ROLE"]) is not None
+        if "MUSIC_RESTRICTED_ROLE" in serverSettings and serverSettings["MUSIC_RESTRICTED_ROLE"] != "":
+            is_music_restricted = discord.utils.get(author.roles, name=serverSettings["MUSIC_RESTRICTED_ROLE"]) is not None
+        if "MUSIC_RESTRICTED_PEOPLE_THRESHOLD" in serverSettings and serverSettings["MUSIC_RESTRICTED_PEOPLE_THRESHOLD"] != "":
+            music_restricted_people_threshold = int(serverSettings["MUSIC_RESTRICTED_PEOPLE_THRESHOLD"])
+
+        if is_music_banned:
+            raise QueueNotAllowed
+        elif is_music_restricted:
+            vchan = server.me.voice_channel
+            if vchan == None:
+                vchan = author.voice_channel
+
+            num_members = sum(not (m.bot) for m in vchan.voice_members)-1
+            if num_members >= music_restricted_people_threshold:
+                raise QueueTooManyPeople
         else:
             return True
         return False
