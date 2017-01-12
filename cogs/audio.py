@@ -1895,23 +1895,32 @@ class Audio:
             await asyncio.sleep(1)
 
         await self.bot.say("Uhh... I will think about your score :thinking:")
+        await self.bot.say("https://gfycat.com/AdmirableHandsomeHippopotamus")
         await self.bot.type()
         await asyncio.sleep(4)
 
         score = random.randint(70, 100)
-        message = "{0} points!".format(score)
+        score_text = str(score)
+
+        score_emotes = {"0": ":zero:", "1": ":one:", "2": ":two:",
+        "3": ":three:", "4": ":four:", "5": ":five:", "6": ":six:",
+        "7": ":seven:", "8": ":eight:", "9": ":nine:"}
+        for short_number, long_number in score_emotes.items():
+            score_text = score_text.replace(short_number, long_number)
+
+        message = "{1} points!".format(score, score_text)
         if score >= 100:
-            message = random.choice([":confetti_ball: You hit daebak! :100: points! :trophy: :confetti_ball:"])
+            message = random.choice([":confetti_ball: You hit daebak! :100: points! :trophy: :confetti_ball:"].format(score, score_text))
         elif score >= 95:
-            message = random.choice(["That was awesome! {0} points! :heart_eyes:".format(score)])
+            message = random.choice(["That was awesome! {1} points! :heart_eyes:".format(score, score_text)])
         elif score >= 90:
-            message = random.choice(["Not bad! {0} points! :blush:".format(score)])
+            message = random.choice(["Not bad! {1} points! :blush:".format(score, score_text)])
         elif score >= 80:
-            message = random.choice(["Please try again! {0} points! :unamused:".format(score)])
+            message = random.choice(["Please try again! {1} points! :unamused:".format(score, score_text)])
         elif score >= 71:
-            message = random.choice(["That was terrible! {0} points! :angry:".format(score)])
+            message = random.choice(["That was terrible! {1} points! :angry:".format(score, score_text)])
         elif score >= 70:
-            message = random.choice([":hear_no_evil: Robyul doesn't want to hear that again! {0} points! :confounded:".format(score)])
+            message = random.choice([":hear_no_evil: Robyul doesn't want to hear that again! {1} points! :confounded:".format(score, score_text)])
         await self.bot.say(message)
         # todo: block vc queue?
         # todo: translate score to emojis! (71 => :seven: :one:)
