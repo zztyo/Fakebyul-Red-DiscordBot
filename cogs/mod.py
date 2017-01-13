@@ -1148,11 +1148,12 @@ class Mod:
                 last_author = old_message.author
                 if len(old_messages) <= i or old_messages[i].author != last_author:
                     if new_message_text != "":
+                        new_message_text = "_Messages moved from {0.mention} to {1.mention} by {2.name}_\n".format(source_channel, new_channel, mover) + new_message_text
                         await asyncio.sleep(2)
                         url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
                         #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
-                        embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
-                        payload = {"username": last_author.name, "avatar_url": last_author.avatar_url, "content": new_message_text, "embeds": [embed]}
+                        #embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
+                        payload = {"username": last_author.name, "avatar_url": last_author.avatar_url, "content": new_message_text}#, "embeds": [embed]}
                         async with session.post(url, data=json.dumps(payload), headers=headers) as r:
                             #await r.text()
                             result = await r.text()
