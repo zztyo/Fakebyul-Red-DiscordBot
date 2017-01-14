@@ -8,6 +8,7 @@ import re
 import aiohttp
 import json
 from .utils.chat_formatting import pagify
+import asyncio
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "1.0"
@@ -107,10 +108,15 @@ class Mirror:
         url = "https://discordapp.com/api/webhooks/{0}/{1}".format(target_webhook_id, target_webhook_token)
         payload = {"username": author.name, "avatar_url": author.avatar_url, "content": message}
         async with session.post(url, data=json.dumps(payload), headers=headers) as r:
-            result = await r.text()
-        if result != "":
-            print("mirroring message webhook unexpected result:", result)
+            result = await r.json()
         session.close()
+        if result != None:
+            print("mirroring message webhook unexpected result:", result)
+            if "retry_after" in result and result["retry_after"] != "":
+                retry_delay = int(result["retry_after"])
+                print("Will retry in", retry_delay, "seconds")
+                await asyncio.sleep(retry_delay)
+                await self._post_mirrored_message(message, author, source_channel, target_webhook_id, target_webhook_token)
 
     def _is_command(self, msg):
         for p in self.bot.settings.prefixes:
