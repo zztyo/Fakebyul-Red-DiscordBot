@@ -1,14 +1,13 @@
 import discord
 from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
-from httplib2 import Http
-from apiclient.discovery import build
 import random
 import io
 import aiohttp
 from __main__ import send_cmd_help
 from .utils.chat_formatting import pagify
 import datetime
+from .utils import checks
 
 __author__ = "Sebastian Winkler"
 __version__ = "0.1"
@@ -20,7 +19,21 @@ class RandomPictures:
         self.bot = bot
         self.google_credentials_json = "data/randompictures/google_credentials.json"
         self.picture_download_base_url = "https://www.googleapis.com/drive/v3/files/{0}?alt=media"
-        self.database = [{"folder_ids": ["0BwVumX-VvI_SaU1taDlXZmhZXzQ"]}]
+        self.database = [
+        {"folder_ids": ["0BwVumX-VvI_SaU1taDlXZmhZXzQ"]}, #Nayoung
+        {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc",
+        "0BwVumX-VvI_SZERaVXFPRUJWQWM",
+        "0BwVumX-VvI_SVktfVzM1ZFV6bE0",
+        "0BwVumX-VvI_SWEZQMXNRc2phaFk",
+        "0BwVumX-VvI_SM3J0SWhJdzVLY28",
+        "0BwVumX-VvI_SS2Y2NVB2V292R3c",
+        "0BwVumX-VvI_SVG5HeEgzQ1lHNnc",
+        "0BwVumX-VvI_SQnpBU1NqbEcyLVk",
+        "0BwVumX-VvI_SSWdETXpCUTJNclk",
+        "0BwVumX-VvI_SNzNpTGtCYXVsU1E",
+        "0BwVumX-VvI_SMVNCTWZoaEpRZVk",
+        "0BwVumX-VvI_SaU1taDlXZmhZXzQ"]} # I.O.I
+        ]
         self.picture_database = {}
 
     @commands.group(pass_context=True, no_pm=True, name="randompictures", aliases=["rapi"])
@@ -55,32 +68,37 @@ class RandomPictures:
             await self.bot.say(page)
 
     @_randompictures.command(pass_context=True, no_pm=True, name="refresh")
+    @checks.mod_or_permissions(administrator=True)
     async def _randompictures_refresh(self, context, num: int):
         """Refreshes the picture DB from the google drive folder(s)"""
         # TODO: Way to refresh all
         self.picture_database[num] = {"pictures_cache": []}
 
         credentials = self._get_credentials()
-        http_auth = credentials.authorize(Http())
-        service = build('drive', 'v3', http=http_auth)
+        headers = {"user-agent": "Red-cog-RandomPictures/"+__version__, "Authorization": "Bearer {0.access_token}".format(credentials.get_access_token())}
+        url = "https://www.googleapis.com/drive/v3/files"
 
-        for folder_id in self.database[num]["folder_ids"]:
-            search_string = '"{0}" in parents and (mimeType = "image/gif" or mimeType = "image/jpeg" or mimeType = "image/png")'.format(folder_id)
-            page_token = None
-            while True:
-                print("Exectuing:", search_string, ", page_token:", page_token)
-                param = {}
-                if page_token:
-                    param['pageToken'] = page_token
-                param['q'] = search_string
-                param['fields'] = 'nextPageToken, files(id, name)'
-                param['pageSize'] = 1000
-                files = service.files().list(**param).execute()
+        conn = aiohttp.TCPConnector(verify_ssl=False)
+        with aiohttp.ClientSession(connector=conn) as session:
+            for folder_id in self.database[num]["folder_ids"]:
+                search_string = '"{0}" in parents and (mimeType = "image/gif" or mimeType = "image/jpeg" or mimeType = "image/png")'.format(folder_id)
+                page_token = None
+                while True:
+                    print("Executing:", search_string, ", page_token:", page_token)
+                    param = {}
+                    if page_token:
+                        param['pageToken'] = page_token
+                    param['q'] = search_string
+                    param['fields'] = 'nextPageToken, files(id, name)'
+                    param['pageSize'] = 1000
 
-                self.picture_database[num]["pictures_cache"].extend(files['files'])
-                page_token = files.get('nextPageToken')
-                if not page_token:
-                    break
+                    async with session.get(url, params=param, headers=headers) as r:
+                        files = await r.json()
+
+                        self.picture_database[num]["pictures_cache"].extend(files['files'])
+                        page_token = files.get('nextPageToken')
+                        if not page_token:
+                            break
 
         self.picture_database[num]["last_pictures_cache_refresh"] = datetime.datetime.utcnow()
         await self.bot.say("Found {0} pictures!".format(len(self.picture_database[num]["pictures_cache"])))
