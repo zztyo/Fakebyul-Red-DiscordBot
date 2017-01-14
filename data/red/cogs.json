@@ -1,5 +1,5 @@
 {
-    "cogs.RandomPictures" : false,
+    "cogs.RandomPictures" : true,
     "cogs.activitylog" : false,
     "cogs.advgoogle" : false,
     "cogs.alias" : true,
