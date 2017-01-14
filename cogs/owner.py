@@ -289,6 +289,26 @@ class Owner:
                              args=(ctx.message.author,))
         t.start()
 
+    @_set.command()
+    @checks.is_owner()
+    async def defaultmodrole(self, *, role_name: str):
+        """Sets the default mod role name
+
+           This is used if a server-specific role is not set"""
+        self.bot.settings.default_mod = role_name
+        self.bot.settings.save_settings()
+        await self.bot.say("The default mod role name has been set.")
+
+    @_set.command()
+    @checks.is_owner()
+    async def defaultadminrole(self, *, role_name: str):
+        """Sets the default admin role name
+
+           This is used if a server-specific role is not set"""
+        self.bot.settings.default_admin = role_name
+        self.bot.settings.save_settings()
+        await self.bot.say("The default admin role name has been set.")
+
     @_set.command(pass_context=True)
     @checks.is_owner()
     async def prefix(self, ctx, *prefixes):
@@ -490,9 +510,31 @@ class Owner:
 
     @commands.command()
     @checks.is_owner()
-    async def shutdown(self):
-        """Shuts down Robyul"""
-        await self.bot.logout()
+    async def shutdown(self, silently : bool=False):
+        """Shuts down Red"""
+        wave = "\N{WAVING HAND SIGN}"
+        skin = "\N{EMOJI MODIFIER FITZPATRICK TYPE-3}"
+        try: # We don't want missing perms to stop our shutdown
+            if not silently:
+                await self.bot.say("Shutting down... " + wave + skin)
+        except:
+            pass
+        await self.bot.shutdown()
+
+    @commands.command()
+    @checks.is_owner()
+    async def restart(self, silently : bool=False):
+        """Attempts to restart Red
+
+        Makes Red quit with exit code 26
+        The restart is not guaranteed: it must be dealt
+        with by the process manager in use"""
+        try:
+            if not silently:
+                await self.bot.say("Restarting...")
+        except:
+            pass
+        await self.bot.shutdown(restart=True)
 
     @commands.group(name="command", pass_context=True)
     @checks.is_owner()
@@ -690,7 +732,7 @@ class Owner:
         python_url = "https://www.python.org/"
         fork_repo = "https://github.com/Seklfreak/Robyul-Red-DiscordBot"
         since = datetime.datetime(2016, 1, 2, 0, 0)
-        days_since = (datetime.datetime.now() - since).days
+        days_since = (datetime.datetime.utcnow() - since).days
         dpy_version = "[{}]({})".format(discord.__version__, dpy_repo)
         py_version = "[{}.{}.{}]({})".format(*os.sys.version_info[:3],
                                              python_url)
