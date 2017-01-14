@@ -12,7 +12,7 @@
         "https://www.youtube.com/watch?v=Y-mIUVi02-0",
         "https://www.youtube.com/watch?v=rdyy7I8JaWE",
         "https://www.youtube.com/watch?v=RUa1OFWAO9s",
-        "https://www.youtube.com/watch?v=6uH7dkH3-aw",
+        "https://www.youtube.com/watch?v=fylcIeMvcFo",
         "https://www.youtube.com/watch?v=FkPw4P3juP8",
         "https://www.youtube.com/watch?v=yMsqedOobp8",
         "https://www.youtube.com/watch?v=s9slxAgGRWg",
@@ -20,6 +20,9 @@
         "https://www.youtube.com/watch?v=ww9JH9dZFls",
         "https://www.youtube.com/watch?v=RKLKDJ1QsLs",
         "https://www.youtube.com/watch?v=ZS5DYg2_qeA",
-        "https://www.youtube.com/watch?v=zLsTY46vRVs"
+        "https://www.youtube.com/watch?v=zLsTY46vRVs",
+        "https://www.youtube.com/watch?v=EmjhISspkyY",
+        "https://www.youtube.com/watch?v=cPetPsxQBP8",
+        "https://www.youtube.com/watch?v=SH4SKmhp0rA"
     ]
 }
