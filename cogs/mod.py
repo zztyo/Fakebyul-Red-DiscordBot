@@ -11,6 +11,8 @@ import logging
 import asyncio
 import aiohttp
 import json
+import base64
+from aiohttp.helpers import FormData
 
 default_settings = {
     "ban_mention_spam" : False,
@@ -1141,25 +1143,44 @@ class Mod:
         if "token" in resultWebhookObject and "id" in resultWebhookObject:
             # use webhook
             new_message_text = ""
+            new_media_attachements = []
             last_author = None
             i = 1
             for old_message in old_messages:
-                new_message_text += old_message.content + "\n"
+                if old_message.content != "":
+                    new_message_text += old_message.content + "\n"
+                if len(old_message.attachments) > 0:
+                    for attachment in old_message.attachments:
+                        new_media_attachements.append(attachment)
                 last_author = old_message.author
                 if len(old_messages) <= i or old_messages[i].author != last_author:
+                    url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+                    new_message_prefix = "_Message moved from {0.mention} to {1.mention} by {2.name}_\n".format(source_channel, new_channel, mover)
                     if new_message_text != "":
-                        new_message_text = "_Messages moved from {0.mention} to {1.mention} by {2.name}_\n".format(source_channel, new_channel, mover) + new_message_text
                         await asyncio.sleep(2)
-                        url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
-                        #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
-                        #embed = {"title": "message moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover)}
-                        payload = {"username": last_author.name, "avatar_url": last_author.avatar_url, "content": new_message_text}#, "embeds": [embed]}
+                        new_message_text = new_message_prefix + new_message_text
+                        payload = {"username": last_author.name, "avatar_url": last_author.avatar_url, "content": new_message_text}
                         async with session.post(url, data=json.dumps(payload), headers=headers) as r:
-                            #await r.text()
                             result = await r.text()
                         if result != "":
                             print(result)
                         new_message_text = ""
+                    if len(new_media_attachements) > 0:
+                        await asyncio.sleep(2)
+                        for attachment in new_media_attachements:
+                            async with await session.get(attachment["url"]) as resp:
+                                payload = FormData()
+                                payload.add_field("file",
+                                               await resp.read(),
+                                               filename=attachment["filename"])
+                                payload.add_field("username", last_author.name)
+                                payload.add_field("avatar_url", last_author.avatar_url)
+                                payload.add_field("content", new_message_prefix)
+                                async with session.post(url, data=payload, headers=headers) as r:
+                                    result = await r.text()
+                                #if result != "":
+                                #   print(result)
+                        new_media_attachements = []
                 i += 1
 
             # delete webhook
