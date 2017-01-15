@@ -38,7 +38,7 @@ class RandomPictures:
         #"post_to_channels": ["253541413948489728"],
         "label": "아이오아이"}
         ]
-        self.settings = {"post_interval": 60}
+        self.settings = {"post_interval": 3600}
         self.picture_database = {}
         self.refresh_in_progress = False
 

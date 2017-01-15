@@ -548,7 +548,7 @@ class Mod:
             await self.slow_deletion(to_delete)
 
     @cleanup.command(pass_context=True, no_pm=True)
-    async def after(self, ctx, message_id : int):
+    async def after(self, ctx, message_id : int, before_message_id : str="0"):
         """Deletes all messages after specified message
 
         To get a message id, enable developer mode in Discord's
@@ -580,8 +580,14 @@ class Mod:
             await self.bot.say("Message not found.")
             return
 
-        async for message in self.bot.logs_from(channel, limit=2000,
-                                                after=after):
+        messages_to_delete = []
+        if before_message_id == "0":
+            messages_to_delete = self.bot.logs_from(channel, limit=2000, after=after)
+        else:
+            before = await self.bot.get_message(channel, before_message_id)
+            messages_to_delete = self.bot.logs_from(channel, limit=2000, after=after, before=before)
+
+        async for message in messages_to_delete:
             to_delete.append(message)
 
         logger.info("{}({}) deleted {} messages in channel {}"
