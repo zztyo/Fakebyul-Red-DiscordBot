@@ -162,7 +162,10 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                     except KeyError:
                         nowplaying = ''
                     print(track['artist'])
-                    artist = track['artist']['#text']
+                    if '#text' in track['artist']:
+                        artist = track['artist']['#text']
+                    else:
+                        artist = track['artist']['name']
                     song = track['name']
                     embedData.add_field(name="{0}".format(str(i).ljust(4)), value="{2}{0} by {1}".format(song, artist, nowplaying), inline=False)
                     #message += '{} {}{} - {}\n'.format(str(i).ljust(4), nowplaying, artist, song)
@@ -314,6 +317,7 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 async with session.get(url, params=payload, headers=headers) as r:
                     data = await r.json()
                 session.close()
+                print(data)
             except Exception as e:
                 message = 'Something went terribly wrong! [{}]'.format(e)
             if 'error' in data:
