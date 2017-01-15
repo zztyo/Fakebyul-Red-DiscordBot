@@ -9,6 +9,7 @@ from .utils.chat_formatting import pagify
 import datetime
 from .utils import checks
 import asyncio
+import math
 
 __author__ = "Sebastian Winkler"
 __version__ = "0.1"
@@ -144,11 +145,38 @@ class RandomPictures:
         with aiohttp.ClientSession(connector=conn) as session:
             headers = {"user-agent": "Red-cog-RandomPictures/"+__version__, "Authorization": "Bearer {0.access_token}".format(credentials.get_access_token())}
 
+            modified_time = datetime.datetime.strptime(random_choice["modifiedTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+            taken_time = None
+            cameraModel = ""
+            if "imageMediaMetadata" in random_choice and len(random_choice["imageMediaMetadata"]) > 0:
+                if "time" in random_choice["imageMediaMetadata"] and random_choice["imageMediaMetadata"]["time"] != "":
+                    taken_time = datetime.datetime.strptime(random_choice["imageMediaMetadata"]["time"], '%Y:%m:%d %H:%M:%S')
+                if "cameraModel" in random_choice["imageMediaMetadata"] and random_choice["imageMediaMetadata"]["cameraModel"] != "":
+                    camera_model = random_choice["imageMediaMetadata"]["cameraModel"]
+
+            message = ""
+            if taken_time != None:
+                if camera_model != "":
+                    camera_model = " (`{0}`)".format(camera_model)
+                message += "taken at: `{0}`{1}, ".format(taken_time.replace(tzinfo=datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), camera_model)
+            message += "uploaded on: `{0}`".format(modified_time.replace(tzinfo=datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"))
+            message += ", size: `{0}`".format(self.convert_size(int(random_choice["size"])))
+
             async with await session.get(random_picture_download_url, headers=headers) as resp:
                 image = await resp.read()
 
                 with io.BytesIO(image) as file_obj:
-                    await self.bot.send_file(channel, file_obj, filename=random_choice["name"])
+                    await self.bot.send_file(channel, file_obj, filename=random_choice["name"], content=message)
+
+    # http://stackoverflow.com/a/14822210
+    def convert_size(self, size_bytes):
+       if (size_bytes == 0):
+           return '0B'
+       size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+       i = int(math.floor(math.log(size_bytes, 1024)))
+       p = math.pow(1024, i)
+       s = round(size_bytes/p, 2)
+       return '%s %s' % (s, size_name[i])
 
     async def _refresh_cache_num(self, num, folder_id):
         self.refresh_in_progress = True
@@ -165,7 +193,7 @@ class RandomPictures:
                 if page_token:
                     param['pageToken'] = page_token
                 param['q'] = search_string
-                param['fields'] = 'nextPageToken, files(id, name, size)'
+                param['fields'] = 'nextPageToken, files(id, name, size, modifiedTime, imageMediaMetadata)'
                 param['pageSize'] = 1000
 
                 async with session.get(url, params=param, headers=headers) as r:
