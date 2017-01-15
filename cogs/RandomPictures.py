@@ -147,10 +147,11 @@ class RandomPictures:
 
             modified_time = datetime.datetime.strptime(random_choice["modifiedTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
             taken_time = None
-            cameraModel = ""
+            camera_model = ""
             if "imageMediaMetadata" in random_choice and len(random_choice["imageMediaMetadata"]) > 0:
                 if "time" in random_choice["imageMediaMetadata"] and random_choice["imageMediaMetadata"]["time"] != "":
-                    taken_time = datetime.datetime.strptime(random_choice["imageMediaMetadata"]["time"], '%Y:%m:%d %H:%M:%S')
+                    print("picture taken at:", random_choice["imageMediaMetadata"]["time"])
+                    taken_time = datetime.datetime.strptime(random_choice["imageMediaMetadata"]["time"], '%Y:%m:%d %H:%M:%S') # Convert timezone somehow
                 if "cameraModel" in random_choice["imageMediaMetadata"] and random_choice["imageMediaMetadata"]["cameraModel"] != "":
                     camera_model = random_choice["imageMediaMetadata"]["cameraModel"]
 
