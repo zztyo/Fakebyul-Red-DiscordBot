@@ -655,29 +655,41 @@ class Owner:
         else:
             await self.bot.say("Ok I'll stay here then.")
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True, name="messagestats")
     @checks.is_owner()
-    async def servers(self, ctx):
-        """Lists and allows to leave servers"""
-        owner = ctx.message.author
-        servers = sorted(list(self.bot.servers),
-                         key=lambda s: s.name.lower())
-        msg = ""
-        for i, server in enumerate(servers):
-            msg += "{}: {}\n".format(i, server.name)
-        msg += "\nTo leave a server just type its number."
+    async def _messagestats(self, context):
+        """Shows server stats"""
+        server = context.message.server
+        author = context.message.author
+        everyone_role = None
+        for role in server.roles:
+            if role.name == "@everyone":
+                everyone_role = role
+        result_message = "{0.mention}:\n".format(author)
+        await self.bot.say("gathering stats, this will take a long time...")
+        global_total_messages = 0
+        for channel in sorted(server.channels, key=lambda m: m.position):
+            if channel.type == discord.ChannelType.text and channel.overwrites_for(everyone_role).read_messages != False:
+                total_messages = 0
+                logs_before = None
+                total_messages_before = -1
+                while True:
+                    if total_messages_before == total_messages:
+                        break
+                    else:
+                        total_messages_before = total_messages
 
-        for page in pagify(msg, ['\n']):
+                    async for message in self.bot.logs_from(channel, limit=100, before=logs_before):
+                        logs_before = message
+                        total_messages += 1
+
+                result_message += "{0.mention}: `{1}` messages\n".format(channel, total_messages)
+                global_total_messages += total_messages
+
+        result_message += "in total `{0}` messages on this server\n".format(global_total_messages)
+
+        for page in pagify(result_message, ["\n"]):
             await self.bot.say(page)
-
-        while msg is not None:
-            msg = await self.bot.wait_for_message(author=owner, timeout=15)
-            try:
-                msg = int(msg.content)
-                await self.leave_confirmation(servers[msg], owner, ctx)
-                break
-            except (IndexError, ValueError, AttributeError):
-                pass
 
     async def leave_confirmation(self, server, owner, ctx):
         await self.bot.say("Are you sure you want me "
@@ -693,6 +705,11 @@ class Owner:
                 await self.bot.say("Done.")
         else:
             await self.bot.say("Alright then.")
+
+    @commands.command(pass_context=True)
+    @checks.is_owner()
+    async def servers(self, ctx):
+        """Lists and allows to leave servers"""
 
     @commands.command(pass_context=True)
     async def contact(self, ctx, *, message : str):
