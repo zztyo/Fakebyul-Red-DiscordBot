@@ -24,7 +24,8 @@
             "\uc784\ub098\uc601" : "Nayoung",
             "\uc804\uc18c\ubbf8" : "Somi",
             "\uc815\ucc44\uc5f0" : "Chaeyeon",
-            "\ucd5c\uc720\uc815" : "Yoojung"
+            "\ucd5c\uc720\uc815" : "Yoojung",
+            "dodaeng": "DoDaeng"
         },
         "EXTRA_ASSIGNABLE_ROLES" : {
             "overwatch" : "Overwatch",
