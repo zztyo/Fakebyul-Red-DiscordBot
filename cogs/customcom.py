@@ -179,6 +179,7 @@ class CustomCommands:
     async def customcommands(self, ctx):
         """Shows custom commands list"""
         server = ctx.message.server
+        author = ctx.message.author
         if server.id in self.c_commands:
             cmdlist = self.c_commands[server.id]
             if cmdlist:
@@ -194,6 +195,7 @@ class CustomCommands:
                 msg[i] += "```"
                 for cmds in msg:
                     await self.bot.whisper(cmds)
+                await self.bot.say("{0} Please check your DMs".format(author.mention))
             else:
                 await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
         else:
