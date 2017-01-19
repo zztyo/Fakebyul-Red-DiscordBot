@@ -1,4 +1,18 @@
 {
+    "170045482264035328" : {
+        "CHANNEL" : "170045482264035328",
+        "GOODBYE" : "Goodbye {0.name}! :wave:",
+        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#196560538069630976> and go to <#260794426488520704> to get your bias roles.",
+        "POST_GOODBYE" : true,
+        "POST_GREETING" : true
+    },
+    "170399623859404800" : {
+        "CHANNEL" : "170399623859404800",
+        "GOODBYE" : "Goodbye {0.name}, we miss you already~",
+        "GREETING" : "Welcome {0.mention}! Get your role in <#265860727372382208>.",
+        "POST_GOODBYE" : true,
+        "POST_GREETING" : true
+    },
     "208673735580844032" : {
         "CHANNEL" : "208673735580844032",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
@@ -13,24 +27,10 @@
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
     },
-    "170045482264035328" : {
-        "CHANNEL" : "170045482264035328",
-        "GOODBYE" : "Goodbye {0.name}! :wave:",
-        "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#196560538069630976> and go to <#260794426488520704> to get your bias roles.",
-        "POST_GOODBYE" : true,
-        "POST_GREETING" : true
-    },
-    "265559543272964097": {
+    "265559543272964097" : {
         "CHANNEL" : "265559543272964097",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
         "GREETING" : "Welcome {0.mention}! :clap:\nCheck out <#265560678524387329> and go to <#265566697065414672> to get your bias roles.",
-        "POST_GOODBYE" : true,
-        "POST_GREETING" : true
-    },
-    "170399623859404800": {
-        "CHANNEL" : "170399623859404800",
-        "GOODBYE" : "Goodbye {0.name}, we miss you already~",
-        "GREETING" : "Welcome {0.mention}! Get your role in <#265860727372382208>.",
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
     }

@@ -7,6 +7,9 @@
         "https://www.youtube.com/watch?v=s6dT17m9eBE",
         "https://www.youtube.com/watch?v=pKybkK2gj1U",
         "https://www.youtube.com/watch?v=6a4BWpBJppI",
-        "https://www.youtube.com/watch?v=WX-lpEnIQQk"
+        "https://www.youtube.com/watch?v=WX-lpEnIQQk",
+        "https://www.youtube.com/watch?v=thpTOAS1Vgg",
+        "https://www.youtube.com/watch?v=dExPEASqXbQ",
+        "https://www.youtube.com/watch?v=SRxUIlFCe_4"
     ]
 }
