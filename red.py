@@ -182,6 +182,10 @@ class Bot(commands.Bot):
 
                 if message.channel.id in mod.ignore_list["CHANNELS"]:
                     return False
+
+            if mod.check_slowmode(message):
+                return False
+
             return True
         else:
             return True

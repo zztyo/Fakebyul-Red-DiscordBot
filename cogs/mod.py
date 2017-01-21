@@ -13,6 +13,7 @@ import aiohttp
 import json
 import base64
 from aiohttp.helpers import FormData
+import time
 
 default_settings = {
     "ban_mention_spam" : False,
@@ -56,6 +57,7 @@ class Mod:
         self._tmp_banned_cache = []
         perms_cache = dataIO.load_json("data/mod/perms_cache.json")
         self._perms_cache = defaultdict(dict, perms_cache)
+        self.slowmode_channels = []
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(administrator=True)
@@ -1428,6 +1430,8 @@ class Mod:
             deleted = await self.check_duplicates(message)
         if not deleted:
             deleted = await self.check_mention_spam(message)
+        if not deleted:
+            deleted = await self.delete_slowmode(message)
 
     async def on_member_ban(self, member):
         if member not in self._tmp_banned_cache:
@@ -1468,6 +1472,80 @@ class Mod:
         original = [p for p in iter(overwrites)]
         empty = [p for p in iter(discord.PermissionOverwrite())]
         return original == empty
+
+    async def delete_slowmode(self, message):
+        if self.check_slowmode(message, append=True) == True:
+            await self.bot.delete_message(message)
+            return True
+        return False
+
+    def check_slowmode(self, message, append=False):
+        author = message.author
+        channel = message.channel
+
+        if message.server is None:
+            return
+
+        if message.channel.is_private:
+            return
+
+        if author == self.bot.user:
+            return
+
+        should_delete_message = False
+        for slowmode_channel in self.slowmode_channels:
+            if "channel_id" in slowmode_channel and slowmode_channel["channel_id"] != "" \
+            and "interval" in slowmode_channel and slowmode_channel["interval"] != "" \
+            and "slowmode_users" in slowmode_channel:
+                if slowmode_channel["channel_id"] == channel.id:
+                    # channel is in slowmode
+                    add_user_to_slowmode_list = True
+                    timestamp_now = int(time.time())
+
+                    for slowmode_user in slowmode_channel["slowmode_users"]:
+                        if "user_id" in slowmode_user and slowmode_user["user_id"] != "" and slowmode_user["user_id"] == author.id:
+                            add_user_to_slowmode_list = False
+                            if "last_message_timestamp" in slowmode_user and slowmode_user["last_message_timestamp"] != "":
+                                if (int(slowmode_user["last_message_timestamp"]) + int(slowmode_channel["interval"])) > timestamp_now:
+                                    # Delete message
+                                    should_delete_message = True
+                                elif append == True:
+                                    slowmode_user["last_message_timestamp"] = timestamp_now
+
+                    if append == True:
+                        if add_user_to_slowmode_list == True:
+                            slowmode_channel["slowmode_users"].append({"user_id": author.id, "last_message_timestamp": timestamp_now})
+        return should_delete_message
+
+    @commands.command(pass_context=True, no_pm=True, name="slowmode")
+    @checks.mod_or_permissions(administrator=True)
+    async def _slowmode(self, context, interval=0):
+        """Toggles slowmode, specify the interval in seconds to enable slowmode"""
+        
+        channel = context.message.channel
+        if int(interval) == 0:
+            # disable slowmode
+            for slowmode_channel in self.slowmode_channels:
+                if "channel_id" in slowmode_channel and slowmode_channel["channel_id"] != "" \
+                and "interval" in slowmode_channel and slowmode_channel["interval"] != "" \
+                and "slowmode_users" in slowmode_channel:
+                    if slowmode_channel["channel_id"] == channel.id:
+                        self.slowmode_channels.remove(slowmode_channel)
+                        await self.bot.say(":runner: Slowmode disabled in this channel!")
+                        return
+            await self.bot.say(":warning: Slowmode is not enabled in this channel!")
+        else:
+            # enable slowmode
+            for slowmode_channel in self.slowmode_channels:
+                if "channel_id" in slowmode_channel and slowmode_channel["channel_id"] != "" \
+                and "interval" in slowmode_channel and slowmode_channel["interval"] != "" \
+                and "slowmode_users" in slowmode_channel:
+                    if slowmode_channel["channel_id"] == channel.id:
+                        slowmode_channel["interval"] = int(interval)
+                        await self.bot.say(":snail: Slowmode interval changed to {0} seconds!".format(int(interval)))
+                        return
+            self.slowmode_channels.append({"channel_id": channel.id, "interval": int(interval), "slowmode_users": []})
+            await self.bot.say(":snail: Slowmode enabled! (interval: {0} seconds)".format(int(interval)))
 
 
 def check_folders():
