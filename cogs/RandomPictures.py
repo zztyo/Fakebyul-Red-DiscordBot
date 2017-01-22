@@ -36,10 +36,10 @@ class RandomPictures:
         "0BwVumX-VvI_SNzNpTGtCYXVsU1E",
         "0BwVumX-VvI_SMVNCTWZoaEpRZVk",
         "0BwVumX-VvI_SaU1taDlXZmhZXzQ"],
-        #"post_to_channels": ["253541413948489728"],
+        "post_to_channels": ["250216966436945920"],
         "label": "아이오아이"}
         ]
-        self.settings = {"post_interval": 3600}
+        self.settings = {"post_interval": 5400} # 1.5 hours
         self.picture_database = {}
         self.refresh_in_progress = False
 
