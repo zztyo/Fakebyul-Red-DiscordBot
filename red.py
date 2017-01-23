@@ -161,7 +161,8 @@ class Bot(commands.Bot):
             if not message.channel.is_private:
                 server = message.server
                 names = (self.settings.get_server_admin(
-                    server), self.settings.get_server_mod(server))
+                    server), self.settings.get_server_mod(server),
+                self.settings.get_server_submod(server))
                 results = map(
                     lambda name: discord.utils.get(author.roles, name=name),
                     names)

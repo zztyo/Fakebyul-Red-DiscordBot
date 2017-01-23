@@ -1241,12 +1241,15 @@ class Mod:
         server = message.server
         admin_role = settings.get_server_admin(server)
         mod_role = settings.get_server_mod(server)
+        submod_role = settings.get_server_submod(server)
 
         if user.id == settings.owner:
             return True
         elif discord.utils.get(user.roles, name=admin_role):
             return True
         elif discord.utils.get(user.roles, name=mod_role):
+            return True
+        elif discord.utils.get(user.roles, name=submod_role):
             return True
         else:
             return False
