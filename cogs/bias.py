@@ -39,18 +39,20 @@ class Bias:
         helpMessage = "Use **`+name` to add** or **`-name` to remove** a bias role."
         if self.settings[server.id]["MAX_ROLES"] > 1:
             helpMessage += " You can have up to **{0} {1}**.".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+        #if "MAX_GROUP_ROLES" in self.settings[server.id] and self.settings[server.id]["MAX_GROUP_ROLES"] > 1:
+        #    helpMessage += " You can have up to **{0} {1}** roles.".format(self._num_to_words(self.settings[server.id]["MAX_GROUP_ROLES"]), "group")
+        #if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id] and len(self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]) > 1:
+        #    helpMessage += " You can have **unlimited extra** roles.".format(self._num_to_words(self.settings[server.id]["MAX_GROUP_ROLES"]), "group")
 
         if ("PRIMARY_ROLE_PREFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_PREFIX"] != "") or ("PRIMARY_ROLE_SUFFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_SUFFIX"] != ""):
-            helpMessage += "\nThe role you assign **first** will be your **primary role** and **appear above the others**. "
+            helpMessage += "\nThe bias role you assign **first** will be your **primary role** and **appear above the others**. "
         helpMessage += "\nAvailable biases: "
         example = ""
         for alias, role in orderedSettings[server.id]["ASSIGNABLE_ROLES"].items():
             if role not in rolesHandled:
                 rolesHandled.append(role)
                 alias = str(alias).title()
-                if re.match(r"^Ot[0-9]+$", alias):
-                    alias = alias.replace("Ot", "OT")
-                aliasToPrint.append(alias)
+                aliasToPrint.append(role)
         i = 0
         for role in aliasToPrint:
             i += 1
@@ -63,6 +65,26 @@ class Bias:
                 helpMessage += " and **`{0}`**".format(role)
         helpMessage += ".\n"
 
+        if "GROUP_ASSIGNABLE_ROLES" in orderedSettings[server.id] and len(orderedSettings[server.id]["GROUP_ASSIGNABLE_ROLES"].items()) > 0:
+            groupRolesHandled = []
+            groupAliasToPrint = []
+            helpMessage += "Group roles available: "
+            for alias, role in orderedSettings[server.id]["GROUP_ASSIGNABLE_ROLES"].items():
+                if role not in groupRolesHandled:
+                    groupRolesHandled.append(role)
+                    alias = str(alias).title()
+                    groupAliasToPrint.append(role)
+            i = 0            
+            for role in groupAliasToPrint:
+                i += 1
+                if i == 1:
+                    helpMessage += "**`{0}`**".format(role)
+                elif i < len(groupAliasToPrint):
+                    helpMessage += ", **`{0}`**".format(role)
+                else:
+                    helpMessage += " and **`{0}`**".format(role)
+            helpMessage += ".\n"
+
         if "EXTRA_ASSIGNABLE_ROLES" in orderedSettings[server.id] and len(orderedSettings[server.id]["EXTRA_ASSIGNABLE_ROLES"].items()) > 0:
             extraRolesHandled = []
             extraAliasToPrint = []
@@ -71,7 +93,7 @@ class Bias:
                 if role not in extraRolesHandled:
                     extraRolesHandled.append(role)
                     alias = str(alias).title()
-                    extraAliasToPrint.append(alias)
+                    extraAliasToPrint.append(role)
             i = 0            
             for role in extraAliasToPrint:
                 i += 1
@@ -127,10 +149,13 @@ class Bias:
             return
 
         availableRoles = self.settings[server.id]["ASSIGNABLE_ROLES"]
+        availableGroupRoles = []
         availableExtraRoles = []
+        if "GROUP_ASSIGNABLE_ROLES" in self.settings[server.id]:
+            availableGroupRoles = self.settings[server.id]["GROUP_ASSIGNABLE_ROLES"]
         if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id]:
             availableExtraRoles = self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]
-        if changingRoleAlias not in availableRoles and changingRoleAlias not in availableExtraRoles:
+        if changingRoleAlias not in availableRoles and changingRoleAlias not in availableGroupRoles and changingRoleAlias not in availableExtraRoles:
             successMessage = await self.bot.send_message(channel, "{} I can't find this bias role! :thinking:".format(author.mention))
 
             await asyncio.sleep(10)
@@ -148,6 +173,8 @@ class Bias:
         changingRole = None
         if changingRoleAlias in availableRoles:
             changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
+        elif changingRoleAlias in availableGroupRoles:
+            changingRole = self._role_from_string(server, availableGroupRoles[changingRoleAlias])
         elif changingRoleAlias in availableExtraRoles:
             changingRole = self._role_from_string(server, availableExtraRoles[changingRoleAlias])
 
@@ -173,6 +200,7 @@ class Bias:
                 return
             selfAssignableRoles = 0
             selfAssignablePrimaryRoles = 0
+            selfAssignableGroupRoles = 0
             for role in author.roles:
                 cleanedRoleName = role.name
                 cleanedRoleName = cleanedRoleName.replace(prefix, "")
@@ -181,9 +209,19 @@ class Bias:
                     selfAssignableRoles += 1
                     if (prefix != "" and prefix in role.name) or (suffix != "" and suffix in role.name):
                         selfAssignablePrimaryRoles += 1
+                if cleanedRoleName in list(availableGroupRoles.values()):
+                    selfAssignableGroupRoles += 1
             if changingRoleAlias in availableRoles:
                 if self.settings[server.id]["MAX_ROLES"] != 0 and selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
                     successMessage = await self.bot.send_message(channel, "{} you already have enough bias roles! :warning:".format(author.mention))
+
+                    await asyncio.sleep(10)
+                    await self.bot.delete_message(successMessage)
+                    await self.bot.delete_message(message)
+                    return
+            if changingRoleAlias in availableGroupRoles:
+                if "MAX_GROUP_ROLES" in self.settings[server.id] and self.settings[server.id]["MAX_GROUP_ROLES"] != 0 and selfAssignableGroupRoles > self.settings[server.id]["MAX_GROUP_ROLES"]-1:
+                    successMessage = await self.bot.send_message(channel, "{} you already have enough group roles! :warning:".format(author.mention))
 
                     await asyncio.sleep(10)
                     await self.bot.delete_message(successMessage)

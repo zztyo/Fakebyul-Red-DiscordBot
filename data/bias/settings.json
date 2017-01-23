@@ -27,6 +27,17 @@
             "\ucd5c\uc720\uc815" : "Yoojung",
             "dodaeng": "DoDaeng"
         },
+        "GROUP_ASSIGNABLE_ROLES" : {
+            "dia" : "DIA",
+            "gugudan" : "Gugudan",
+            "iteen" : "iTeen",
+            "jyp" : "JYP",
+            "m&h" : "M&H",
+            "pristin" : "Pristin",
+            "s&p" : "S&P",
+            "wjsn" : "WJSN",
+            "cosmic girls" : "WJSN"
+        },
         "EXTRA_ASSIGNABLE_ROLES" : {
             "overwatch" : "Overwatch",
             "dota" : "DOTA",
@@ -42,6 +53,7 @@
             "250220888077631489"
         ],
         "MAX_ROLES" : 3,
+        "MAX_GROUP_ROLES" : 1,
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 💎"
     },
@@ -94,6 +106,17 @@
             "\ucd5c\uc720\uc815" : "Yoojung",
             "\uae40\ucc2c\ubbf8" : "Chungha"
         },
+        "GROUP_ASSIGNABLE_ROLES" : {
+            "dia" : "DIA",
+            "gugudan" : "Gugudan",
+            "iteen" : "iTeen",
+            "jyp" : "JYP",
+            "m&h" : "M&H",
+            "pristin" : "Pristin",
+            "s&p" : "S&P",
+            "wjsn" : "WJSN",
+            "cosmic girls" : "WJSN"
+        },
         "EXTRA_ASSIGNABLE_ROLES" : {
             "extra1" : "Extra1",
             "extra2" : "Extra2",
@@ -113,6 +136,7 @@
             "252000620565889024"
         ],
         "MAX_ROLES" : 2,
+        "MAX_GROUP_ROLES" : 2,
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 💎"
     }
