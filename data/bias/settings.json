@@ -136,7 +136,7 @@
             "252000620565889024"
         ],
         "MAX_ROLES" : 2,
-        "MAX_GROUP_ROLES" : 2,
+        "MAX_GROUP_ROLES" : 1,
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 💎"
     }

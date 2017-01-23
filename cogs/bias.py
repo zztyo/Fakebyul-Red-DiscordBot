@@ -37,12 +37,34 @@ class Bias:
         with open(self.file_path, encoding='utf-8', mode="r") as f:
             orderedSettings = json.load(f, object_pairs_hook=OrderedDict)
         helpMessage = "Use **`+name` to add** or **`-name` to remove** a bias role."
+        notices_left = 0
         if self.settings[server.id]["MAX_ROLES"] > 1:
-            helpMessage += " You can have up to **{0} {1}**.".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
-        #if "MAX_GROUP_ROLES" in self.settings[server.id] and self.settings[server.id]["MAX_GROUP_ROLES"] > 1:
-        #    helpMessage += " You can have up to **{0} {1}** roles.".format(self._num_to_words(self.settings[server.id]["MAX_GROUP_ROLES"]), "group")
-        #if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id] and len(self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]) > 1:
-        #    helpMessage += " You can have **unlimited extra** roles.".format(self._num_to_words(self.settings[server.id]["MAX_GROUP_ROLES"]), "group")
+            notices_left += 1
+        if "MAX_GROUP_ROLES" in self.settings[server.id] and self.settings[server.id]["MAX_GROUP_ROLES"] > 0:
+            notices_left += 1
+        if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id] and len(self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]) > 1:
+            notices_left += 1
+        if self.settings[server.id]["MAX_ROLES"] > 1:
+            notices_left -= 1
+            helpMessage += " You can have up to **{0} {1}**".format(self._num_to_words(self.settings[server.id]["MAX_ROLES"]), "biases" if self.settings[server.id]["MAX_ROLES"] > 1 else "bias")
+            if notices_left > 0:
+                helpMessage += " and "
+            else:
+                helpMessage += "."
+        if "MAX_GROUP_ROLES" in self.settings[server.id] and self.settings[server.id]["MAX_GROUP_ROLES"] > 0:
+            notices_left -= 1
+            helpMessage += "up to **{0} group** {1}".format(self._num_to_words(self.settings[server.id]["MAX_GROUP_ROLES"]), "roles" if self.settings[server.id]["MAX_GROUP_ROLES"] > 1 else "role")
+            if notices_left > 0:
+                helpMessage += " and "
+            else:
+                helpMessage += "."
+        if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id] and len(self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]) > 1:
+            notices_left -= 1
+            helpMessage += "**unlimited additional** roles".format(self._num_to_words(self.settings[server.id]["MAX_GROUP_ROLES"]), "group")
+            if notices_left > 0:
+                helpMessage += " and "
+            else:
+                helpMessage += "."
 
         if ("PRIMARY_ROLE_PREFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_PREFIX"] != "") or ("PRIMARY_ROLE_SUFFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_SUFFIX"] != ""):
             helpMessage += "\nThe bias role you assign **first** will be your **primary role** and **appear above the others**. "
