@@ -1112,21 +1112,24 @@ class Mod:
 
     @commands.command(pass_context=True, no_pm=True, name="move")
     @checks.mod_or_permissions(administrator=True)
-    async def _move(self, ctx, move_to_channel : discord.Channel, message_number=1, messages_to_move=1):
-        """Moves a message to another channel
+    async def _move(self, ctx, move_to_channel : discord.Channel, message_id : int, until_message_id : str="0"):
+        """Moves the message to another channel
 
-        select the message by counting up the messages from the latest message to the message you want to move
-        latest message is 1"""
+        if until_message_id is set it will move all messages starting from message_id until until_message_id (included the until_message_id message)"""
         old_channel = ctx.message.channel
         author = ctx.message.author
-        message_number += 1
 
         old_messages = []
-        i = 1
-        async for message in self.bot.logs_from(old_channel, limit=message_number):
-            if i <= message_number and i > (message_number-messages_to_move):
-                old_messages.append(message)
-            i += 1
+        first_message = await self.bot.get_message(old_channel, message_id)
+        if until_message_id != "0":
+            last_message = await self.bot.get_message(old_channel, until_message_id)
+            old_messages.append(last_message)
+            before = await self.bot.get_message(old_channel, until_message_id)
+            async for message in self.bot.logs_from(old_channel, limit=100, after=first_message, before=before):
+                if not discord.utils.find(lambda m: m.id == message.id, old_messages):
+                    old_messages.append(message)
+        if not discord.utils.find(lambda m: m.id == first_message.id, old_messages):
+            old_messages.append(first_message)
 
         old_messages = list(reversed(old_messages))
 
