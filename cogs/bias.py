@@ -231,7 +231,7 @@ class Bias:
                     selfAssignableRoles += 1
                     if (prefix != "" and prefix in role.name) or (suffix != "" and suffix in role.name):
                         selfAssignablePrimaryRoles += 1
-                if cleanedRoleName in list(availableGroupRoles.values()):
+                if len(availableGroupRoles) > 0 and cleanedRoleName in list(availableGroupRoles.values()):
                     selfAssignableGroupRoles += 1
             if changingRoleAlias in availableRoles:
                 if self.settings[server.id]["MAX_ROLES"] != 0 and selfAssignableRoles > self.settings[server.id]["MAX_ROLES"]-1:
