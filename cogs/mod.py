@@ -489,6 +489,11 @@ class Mod:
                 tmp = message
             tries_left -= 1
 
+
+        if len(to_delete) > 10:
+            if await self._yes_or_no_reaction("{1.mention} Are you sure you want to delete **{0}** messages?".format(len(to_delete)-1, author), author) == False:
+                return
+
         logger.info("{}({}) deleted {} messages "
                     " containing '{}' in channel {}".format(author.name,
                     author.id, len(to_delete), text, channel.id))
@@ -537,6 +542,10 @@ class Mod:
                     to_delete.append(message)
                 tmp = message
             tries_left -= 1
+
+        if len(to_delete) > 10:
+            if await self._yes_or_no_reaction("{1.mention} Are you sure you want to delete **{0}** messages?".format(len(to_delete)-1, author), author) == False:
+                return
 
         logger.info("{}({}) deleted {} messages "
                     " made by {}({}) in channel {}"
@@ -592,6 +601,10 @@ class Mod:
         async for message in messages_to_delete:
             to_delete.append(message)
 
+        if len(to_delete) > 10:
+            if await self._yes_or_no_reaction("{1.mention} Are you sure you want to delete **{0}** messages?".format(len(to_delete)-1, author), author) == False:
+                return
+
         logger.info("{}({}) deleted {} messages in channel {}"
                     "".format(author.name, author.id,
                               len(to_delete), channel.name))
@@ -619,6 +632,10 @@ class Mod:
 
         async for message in self.bot.logs_from(channel, limit=number+1):
             to_delete.append(message)
+
+        if len(to_delete) > 10:
+            if await self._yes_or_no_reaction("{1.mention} Are you sure you want to delete **{0}** messages?".format(len(to_delete)-1, author), author) == False:
+                return
 
         logger.info("{}({}) deleted {} messages in channel {}"
                     "".format(author.name, author.id,
@@ -1552,6 +1569,28 @@ class Mod:
                         return
             self.slowmode_channels.append({"channel_id": channel.id, "interval": int(interval), "slowmode_users": []})
             await self.bot.say(":snail: Slowmode enabled! (interval: {0} seconds)".format(int(interval)))
+
+    async def _yes_or_no_reaction(self, message, user):
+
+        data = discord.Embed(description=message)
+        data.set_author(name=self.bot.user.name, url=self.bot.user.avatar_url)
+
+        try:
+            ask_message = await self.bot.say(embed=data)
+        except discord.HTTPException:
+            ask_message = await self.bot.say(message)
+
+        await self.bot.add_reaction(ask_message, "✅")
+        await self.bot.add_reaction(ask_message, "🚫")
+
+        result = await self.bot.wait_for_reaction(emoji=["✅", "🚫"], user=user, timeout=60, message=ask_message)
+
+        await self.bot.delete_message(ask_message)
+
+        if result != None and result.reaction.emoji == "✅":
+            return True
+
+        return False
 
 
 def check_folders():
