@@ -139,5 +139,29 @@
         "MAX_GROUP_ROLES" : 1,
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 💎"
+    },
+    "272744019119964160": {
+        "ASSIGNABLE_ROLES" : {
+            "ftisland" : "FTISLAND",
+            "cnblue" : "CNBLUE",
+            "juniel" : "Juniel",
+            "aoa" : "AOA",
+            "n.flying" : "N.Flying",
+            "innovator" : "InnoVator",
+            "sf9" : "SF9",
+            "honeyst" : "HONEYST",
+            "neoz school" : "NEOZ SCHOOL",
+            "trainee" : "Trainee"
+        },
+        "GROUP_ASSIGNABLE_ROLES" : {
+        },
+        "EXTRA_ASSIGNABLE_ROLES" : {
+        },
+        "CHANNELS" : [
+            "272773260469600266"
+        ],
+        "MAX_ROLES" : 0,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : " 🎵"
     }
 }
