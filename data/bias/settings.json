@@ -163,5 +163,36 @@
         "MAX_ROLES" : 0,
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : " 🎵"
+    },
+    "202869425353785344": {
+        "ASSIGNABLE_ROLES" : {
+            "nct" : "NCT",
+            "red velvet" : "Red Velvet",
+            "girls generation" : "Girls Generation",
+            "super junior" : "Super Junior",
+            "f(x)" : "f(x)",
+            "exo" : "EXO",
+            "boa" : "BoA",
+            "shinee" : "SHINee",
+            "tvxq" : "TVXQ",
+            "fly to the sky" : "Fly to the Sky",
+            "trax" : "TRAX",
+            "the grace" : "The Grace",
+            "hitchhiker" : "Hitchhiker",
+            "kim min-jong" : "Kim Min-Jong",
+            "sm the ballad" : "SM The Ballad",
+            "snsd" : "Girls Generation",
+            "kim minjong" : "Kim Min-Jong"
+        },
+        "GROUP_ASSIGNABLE_ROLES" : {
+        },
+        "EXTRA_ASSIGNABLE_ROLES" : {
+        },
+        "CHANNELS" : [
+            "215230282154901506"
+        ],
+        "MAX_ROLES" : 4,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : ""
     }
 }
