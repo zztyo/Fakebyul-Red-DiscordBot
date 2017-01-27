@@ -23,7 +23,17 @@ class RandomPictures:
         self.google_credentials_json = "data/randompictures/google_credentials.json"
         self.picture_download_base_url = "https://www.googleapis.com/drive/v3/files/{0}?alt=media"
         self.database = [
-        {"folder_ids": ["0BwVumX-VvI_SaU1taDlXZmhZXzQ"], "label": "임나영"}, #Nayoung
+        {"folder_ids": ["0BwVumX-VvI_SQnpBU1NqbEcyLVk"], "labels": ["전소미", "Somi"]},
+        {"folder_ids": ["0BwVumX-VvI_SWEZQMXNRc2phaFk"], "labels": ["김세정", "Sejeong"]},
+        {"folder_ids": ["0BwVumX-VvI_SVG5HeEgzQ1lHNnc"], "labels": ["최유정", "Yoojung"]},
+        {"folder_ids": ["0BwVumX-VvI_SNzNpTGtCYXVsU1E"], "labels": ["김청하", "Chungha"]},
+        {"folder_ids": ["0BwVumX-VvI_SM3J0SWhJdzVLY28"], "labels": ["김소혜", "Sohye"]},
+        {"folder_ids": ["0BwVumX-VvI_SMVNCTWZoaEpRZVk"], "labels": ["周洁琼", "Jieqiong"]},
+        {"folder_ids": ["0BwVumX-VvI_SVktfVzM1ZFV6bE0"], "labels": ["정채연", "Chaeyeon"]},
+        {"folder_ids": ["0BwVumX-VvI_SS2Y2NVB2V292R3c"], "labels": ["김도연", "Doyeon"]},
+        {"folder_ids": ["0BwVumX-VvI_SSWdETXpCUTJNclk"], "labels": ["강미나", "Mina"]},
+        {"folder_ids": ["0BwVumX-VvI_SaU1taDlXZmhZXzQ"], "labels": ["임나영", "Nayoung"]},
+        {"folder_ids": ["0BwVumX-VvI_SZERaVXFPRUJWQWM"], "labels": ["유연정", "Yeonjung"]},
         {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc",
         "0BwVumX-VvI_SZERaVXFPRUJWQWM",
         "0BwVumX-VvI_SVktfVzM1ZFV6bE0",
@@ -37,17 +47,25 @@ class RandomPictures:
         "0BwVumX-VvI_SMVNCTWZoaEpRZVk",
         "0BwVumX-VvI_SaU1taDlXZmhZXzQ"],
         "post_to_channels": ["250216966436945920"],
-        "label": "아이오아이"}
+        "labels": ["아이오아이", "I.O.I"]}
         ]
+        self.aliases = [{}]
         self.settings = {"post_interval": 5400} # 1.5 hours
         self.picture_database = {}
         self.refresh_in_progress = False
 
-    @commands.group(pass_context=True, no_pm=True, name="randompictures", aliases=["rapi"])
+    @commands.group(pass_context=True, no_pm=True, name="randompictures", aliases=["rapi", "pics", "pic"])
     async def _randompictures(self, context):
-        """Manages RandomPictures entries"""
+        """Get a random picture"""
+        channel = context.message.channel
+        server = context.message.server
+        author = context.message.author
+
         if context.invoked_subcommand is None:
-            await send_cmd_help(context)
+            for role in sorted(author.roles, key=lambda k: k.position, reverse=True):
+                if await self._post_random_picture_by_alias(role.name, channel, verbose=False) == True:
+                    return
+            await self.bot.say("I couldn't find out your bias or pictures of your bias :thinking:")
 
     @_randompictures.command(pass_context=True, no_pm=True, name="stats")
     async def _randompictures_stats(self, context):
@@ -61,16 +79,21 @@ class RandomPictures:
             num = self.database.index(entry)
             total_pictures = 0
             last_pictures_cache_refresh = "Never"
-            label = ""
+            label_text = ""
             if num in self.picture_database:
                 if "last_pictures_cache_refresh" in self.picture_database[num]:
                     last_pictures_cache_refresh = self.picture_database[num]["last_pictures_cache_refresh"].strftime("%Y-%m-%d %H:%M UTC")
                 if "pictures_cache" in self.picture_database[num]:
                     total_pictures = len(self.picture_database[num]["pictures_cache"])
-            if "label" in entry and entry["label"] != "":
-                label = " (**{0}**) ".format(entry["label"])
+            if "labels" in entry and len(entry["labels"]) > 0:
+                label_text += " ("
+                i = 0
+                for label in entry["labels"]:
+                    i += 1
+                    label_text += "{0}{1}".format(label, "" if len(entry["labels"]) == i else ", ")
+                label_text += ") "
 
-            message += "`#{0}`{4}: `{2}` pictures in cache, last refresh: `{3}`, folder(s):\n".format(num, entry, total_pictures, last_pictures_cache_refresh, label)
+            message += "`#{0}`{4}: `{2}` pictures in cache, last refresh: `{3}`, folder(s):\n".format(num, entry, total_pictures, last_pictures_cache_refresh, label_text)
             for folder_id in entry["folder_ids"]:
                 message += "<https://drive.google.com/drive/folders/{0}>\n".format(folder_id)
             if "post_to_channels" in entry and entry["post_to_channels"] != "" and len(entry["post_to_channels"]) > 0:
@@ -97,32 +120,14 @@ class RandomPictures:
         await self.bot.say("Found {0} pictures!".format(len(self.picture_database[num]["pictures_cache"])))
 
     @_randompictures.command(pass_context=True, no_pm=True, name="force")
-    async def _randompictures_force(self, context, num: int):
+    async def _randompictures_force(self, context, alias_search: str):
         """Posts a random picture from the specified folders"""
         channel = context.message.channel
 
-        if len(self.database) < num+1:
-            await self.bot.say("Entry not found in database")
-            return
-
-        if num not in self.picture_database:
-            self.picture_database[num] = {"pictures_cache": []}
-        elif "pictures_cache" not in self.picture_database[num]:
-            self.picture_database[num] = {"pictures_cache": []}
-
-        if len(self.picture_database[num]["pictures_cache"]) <= 0:
-            await self.bot.say("Refreshing database...")
-            if self.refresh_in_progress == False:
-                await self._randompictures_refresh.callback(self=self, context=context, num=num)
-            else:
-                await self.bot.say("Refreshing already in progress!")
-                return
-
-        if len(self.picture_database[num]["pictures_cache"]) <= 0:
-            await self.bot.say("No pictures found in this entry")
-            return
-
-        await self._post_random_picture(num, channel)
+        if alias_search != "":
+            await self._post_random_picture_by_alias(alias_search, channel)
+        else:
+            await self.bot.say("Alias not found :thinking:")
 
     def _get_credentials(self):
         scopes = ['https://www.googleapis.com/auth/drive']
@@ -130,7 +135,42 @@ class RandomPictures:
             self.google_credentials_json, scopes=scopes)
         return credentials
 
-    async def _post_random_picture(self, num, channel):
+    async def _post_random_picture_by_alias(self, alias_search, channel, verbose=True):
+        if len(self.database) <= 0:
+            if verbose == True:
+                await self.bot.send_message(channel, "Entry not found in database")
+            return False
+
+        for entry in self.database:
+            for alias in entry["labels"]:
+                if alias.lower() in alias_search.lower():
+                    num = self.database.index(entry)
+                    if num not in self.picture_database:
+                        self.picture_database[num] = {"pictures_cache": []}
+                    elif "pictures_cache" not in self.picture_database[num]:
+                        self.picture_database[num] = {"pictures_cache": []}
+
+                    if len(self.picture_database[num]["pictures_cache"]) <= 0:
+                        await self.bot.send_message(channel, "Refreshing database...")
+                        if self.refresh_in_progress == False:
+                            await self._randompictures_refresh.callback(self=self, context=context, num=num)
+                        else:
+                            if verbose == True:
+                                await self.bot.send_message(channel, "Refreshing already in progress!")
+                            return False
+
+                    if len(self.picture_database[num]["pictures_cache"]) <= 0:
+                        if verbose == True:
+                            await self.bot.send_message(channel, "No pictures found in this entry")
+                        return False
+
+                    return await self._post_random_picture_by_id(num, channel)
+
+        if verbose == True:
+            await self.bot.send_message(channel, "Entry not found in database")
+        return False
+
+    async def _post_random_picture_by_id(self, num, channel):
         while True:
             random_choice = random.choice(self.picture_database[num]["pictures_cache"])
             if not "size" in random_choice or random_choice["size"] == "" or int(random_choice["size"]) >= 8e+6: # discord 8 mb file limit
@@ -168,6 +208,7 @@ class RandomPictures:
 
                 with io.BytesIO(image) as file_obj:
                     await self.bot.send_file(channel, file_obj, filename=random_choice["name"], content=message)
+        return True
 
     # http://stackoverflow.com/a/14822210
     def convert_size(self, size_bytes):
@@ -189,7 +230,7 @@ class RandomPictures:
             search_string = '"{0}" in parents and (mimeType = "image/gif" or mimeType = "image/jpeg" or mimeType = "image/png")'.format(folder_id)
             page_token = None
             while True:
-                print("Executing:", search_string, ", page_token:", page_token)
+                print("Executing:", search_string, ", page_token:", "Yes" if page_token != None else "No")
                 param = {}
                 if page_token:
                     param['pageToken'] = page_token
@@ -237,7 +278,7 @@ class RandomPictures:
                         for channel_id in entry["post_to_channels"]:
                             channel = self.bot.get_channel(channel_id)
                             if channel != None:
-                                await self._post_random_picture(num, channel)
+                                await self._post_random_picture_by_id(num, channel)
 
 def make_sleep():
     async def sleep(delay, result=None, *, loop=None):
