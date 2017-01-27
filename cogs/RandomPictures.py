@@ -34,6 +34,7 @@ class RandomPictures:
         {"folder_ids": ["0BwVumX-VvI_SSWdETXpCUTJNclk"], "labels": ["강미나", "Mina"]},
         {"folder_ids": ["0BwVumX-VvI_SaU1taDlXZmhZXzQ"], "labels": ["임나영", "Nayoung"]},
         {"folder_ids": ["0BwVumX-VvI_SZERaVXFPRUJWQWM"], "labels": ["유연정", "Yeonjung"]},
+        {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc"], "labels": ["아이오아이", "I.O.I", "IOI"]},
         {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc",
         "0BwVumX-VvI_SZERaVXFPRUJWQWM",
         "0BwVumX-VvI_SVktfVzM1ZFV6bE0",
@@ -47,7 +48,7 @@ class RandomPictures:
         "0BwVumX-VvI_SMVNCTWZoaEpRZVk",
         "0BwVumX-VvI_SaU1taDlXZmhZXzQ"],
         "post_to_channels": ["250216966436945920"],
-        "labels": ["아이오아이", "I.O.I"]}
+        "labels": ["아이오아이-all", "I.O.I-all", "IOI-all"]}
         ]
         self.aliases = [{}]
         self.settings = {"post_interval": 5400} # 1.5 hours
