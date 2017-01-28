@@ -666,7 +666,9 @@ class Owner:
             if role.name == "@everyone":
                 everyone_role = role
         result_message = "{0.mention}:\n".format(author)
+        result_message += "**channel stats**:\n"
         await self.bot.say("gathering stats, this will take a long time...")
+        global_emote_usage = []
         global_total_messages = 0
         for channel in sorted(server.channels, key=lambda m: m.position):
             if channel.type == discord.ChannelType.text and channel.overwrites_for(everyone_role).read_messages != False:
@@ -680,13 +682,28 @@ class Owner:
                         total_messages_before = total_messages
 
                     async for message in self.bot.logs_from(channel, limit=100, before=logs_before):
+                        for emote in server.emojis:
+                            emote_string = "{1}{0.name}{1}".format(emote, ":" if emote.require_colons else "")
+                            if str(emote) in str(message.content):
+                                added = False
+                                for global_emote in global_emote_usage:
+                                    if global_emote["str"] == str(emote):
+                                        global_emote["usage"] += 1
+                                        added = True
+
+                                if added == False:
+                                    global_emote_usage.append({"usage": 1, "str": str(emote), "friendly_name": emote_string})
                         logs_before = message
                         total_messages += 1
 
                 result_message += "{0.mention}: `{1}` messages\n".format(channel, total_messages)
                 global_total_messages += total_messages
 
-        result_message += "in total `{0}` messages on this server\n".format(global_total_messages)
+        result_message += "**emote stats**:\n"
+        for entry in sorted(global_emote_usage, key=lambda k: k["usage"], reverse=True):
+            result_message += "{0[str]} (`{0[friendly_name]}`): `{0[usage]}` times used\n".format(entry)
+
+        result_message += "**in total `{0}` messages on this server**\n".format(global_total_messages)
 
         for page in pagify(result_message, ["\n"]):
             await self.bot.say(page)
