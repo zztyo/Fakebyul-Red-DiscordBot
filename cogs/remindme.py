@@ -26,7 +26,8 @@ class RemindMe:
         s = ""
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
-            s = "s"
+            if quantity !=1:
+                s = "s"
         if not time_unit in self.units:
             await self.bot.say("Invalid time unit. Choose minutes/hours/days/weeks/month")
             return
