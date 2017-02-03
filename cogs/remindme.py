@@ -61,6 +61,39 @@ class RemindMe:
         else:
             await self.bot.say("You don't have any upcoming notification.")
 
+    @commands.command(pass_context=True)
+    async def reminderlist(self, ctx):
+        author=ctx.message.author
+        reminders = []
+        for reminder in self.reminders:
+            if reminder["ID"] == author.id:
+                reminders.append(reminder)
+
+        if not reminders == []:
+            i=0
+            msg=["```Reminders: \n"]
+            for reminder in reminders:
+                s=reminder["FUTURE"]-int(time.time())
+                m,s = divmod(s,60)
+                h,m = divmod(m,60)
+                d,h = divmod(h,24)
+
+                nextreminder="{:>4} days, {:>2} hours, {:>2} minutes, {:>2} seconds:  {}\n".format(d,h,m,s,reminder["TEXT"])
+                """nextreminder=" {}: {}\n".format(time.ctime(reminder["FUTURE"]), reminder["TEXT"])"""
+                if len(msg[i]) + len(ctx.prefix) + len(reminder) + 5 > 2000:
+                    msg[i] += "```"
+                    i += 1
+                    msg.append("```"+nextreminder)
+                else:
+                    msg[i]+=nextreminder
+            msg[i]+="```"
+            for reminder in msg:
+                await self.bot.send_message(author, reminder)
+            await self.bot.say("{0} Please check your DMs".format(author.mention))
+        else:
+            await self.bot.say("You don't have any upcoming notification.")
+
+            
     async def check_reminders(self):
         while self is self.bot.get_cog("RemindMe"):
             to_remove = []
