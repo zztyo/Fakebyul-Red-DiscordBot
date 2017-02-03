@@ -683,7 +683,7 @@ class Audio:
                              if f.endswith(".txt")]
         else:
             new_playlists = []
-        return list(set(old_playlists + new_playlists))
+        return sorted(set(old_playlists + new_playlists), key=lambda s: s.lower())
 
     def _load_playlist(self, server, name, local=True):
         try:
