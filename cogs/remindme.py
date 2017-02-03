@@ -72,7 +72,7 @@ class RemindMe:
         if not reminders == []:
             i=0
             msg=["```Reminders: \n"]
-            for reminder in reminders:
+            for reminder in sorted(reminders, key=lambda k: k['FUTURE']) :
                 s=reminder["FUTURE"]-int(time.time())
                 m,s = divmod(s,60)
                 h,m = divmod(m,60)
