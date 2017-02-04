@@ -194,5 +194,24 @@
         "MAX_ROLES" : 4,
         "PRIMARY_ROLE_PREFIX" : "",
         "PRIMARY_ROLE_SUFFIX" : ""
+    },
+    "275365003643715584": {
+        "ASSIGNABLE_ROLES" : {
+            "after school" : "After School",
+            "orange caramel" : "Orange Caramel",
+            "nu'est" : "NU'EST",
+            "seventeen" : "SEVENTEEN",
+            "nuest" : "NU'EST"
+        },
+        "GROUP_ASSIGNABLE_ROLES" : {
+        },
+        "EXTRA_ASSIGNABLE_ROLES" : {
+        },
+        "CHANNELS" : [
+            "275682637383729161"
+        ],
+        "MAX_ROLES" : 0,
+        "PRIMARY_ROLE_PREFIX" : "",
+        "PRIMARY_ROLE_SUFFIX" : " 🎵"
     }
 }
