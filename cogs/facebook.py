@@ -161,18 +161,21 @@ class Facebook:
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Facebook'):
             print("checking facebook feed...")
-            self.authenticate()
+            try:
+                self.authenticate()
+            except Exception as e:
+                print("something went wrong authenticating to facebook:", e)
+                await sleep(60)
+                continue
+
             for feed in self.feeds:
-                profile = self.graph.get_object(id=feed["userId"], fields="id,name")
-                picture = self.graph.get_connections(profile["id"], "picture", fields="url")
-                channel = self.bot.get_channel(feed["channelId"])
-                if channel == None:
-                    print("Channel not found")
-                    continue
                 try:
+                    profile = self.graph.get_object(id=feed["userId"], fields="id,name")
+                    picture = self.graph.get_connections(profile["id"], "picture", fields="url")
+                    channel = self.bot.get_channel(feed["channelId"])
                     posts = self.graph.get_connections(profile["id"], 'posts', fields="message,from,picture,id,actions,child_attachments")
-                except Exception:
-                    print("something went wrong fetching facebook account")
+                except Exception as e:
+                    print("something went wrong fetching facebook account:", e)
                     continue
 
                 if len(posts["data"]) > 0:
