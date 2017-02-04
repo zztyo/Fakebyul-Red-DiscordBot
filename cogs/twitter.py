@@ -7,6 +7,7 @@ import asyncio
 from random import choice as randchoice
 from .utils import checks
 import tweepy
+from .utils.chat_formatting import pagify
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -74,6 +75,25 @@ class Twitter:
 
         await self.bot.say("Found these users:\n{0}".format(listMessage))
 
+    @checks.is_owner()
+    @_twitter.command(pass_context=True, no_pm=True, name="globallist")
+    async def _globallist(self, ctx):
+        """Lists all facebook users in the database"""
+        server = ctx.message.server
+
+        listMessage = ""
+        for feed in self.feeds:
+            feed_server = self.bot.get_server(feed["serverId"])
+            listMessage += "#{1}: `@{0[userName]}` posting to <#{0[channelId]}> in `{2.name}`\n".format(feed, self.feeds.index(feed), feed_server)
+
+        if listMessage == "":
+            await self.bot.say("No user in database!")
+            return
+
+        for page in pagify("Found these users:\n{0}**Users total: {1}**".format(listMessage, len(self.feeds)), ["\n"]):
+            if page != "":
+                await self.bot.say(page)
+                
     @_twitter.command(pass_context=True, no_pm=True, name="del")
     @checks.mod_or_permissions(administrator=True)
     async def _del(self, context, feedId : int):
