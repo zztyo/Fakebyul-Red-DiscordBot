@@ -26,8 +26,6 @@ class RemindMe:
         s = ""
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
-            if quantity !=1:
-                s = "s"
         if not time_unit in self.units:
             await self.bot.say("Invalid time unit. Choose minutes/hours/days/weeks/month")
             return
@@ -37,6 +35,8 @@ class RemindMe:
         if len(text) > 1960:
             await self.bot.say("Text is too long.")
             return
+        if quantity !=1:
+            s = "s"
         seconds = self.units[time_unit] * quantity
         future = int(time.time()+seconds)
         self.reminders.append({"ID" : author.id, "FUTURE" : future, "TEXT" : text})
