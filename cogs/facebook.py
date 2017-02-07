@@ -184,7 +184,7 @@ class Facebook:
             try:
                 self.authenticate()
             except Exception as e:
-                print("something went wrong authenticating to facebook:", e)
+                self.bot.logger.error("something went wrong authenticating to facebook", exc_info=True)
                 await sleep(60)
                 continue
 
@@ -195,7 +195,7 @@ class Facebook:
                     channel = self.bot.get_channel(feed["channelId"])
                     posts = self.graph.get_connections(profile["id"], 'posts', fields="message,from,picture,id,actions,child_attachments")
                 except Exception as e:
-                    print("something went wrong fetching facebook account:", e)
+                    self.bot.logger.error("something went wrong fetching facebook account", exc_info=True)
                     continue
 
                 if len(posts["data"]) > 0:
@@ -203,7 +203,10 @@ class Facebook:
                         if feed["lastId"] == item["id"]:
                             break
 
-                        await self._post_item(channel, profile, picture, item)
+                        try:
+                            await self._post_item(channel, profile, picture, item)
+                        except Exception as e:
+                            self.bot.logger.error("Something went wrong posting facebook post", exc_info=True)
 
                     if posts["data"][0]["id"] != self.feeds[self.feeds.index(feed)]["lastId"]:
                         self.feeds[self.feeds.index(feed)]["lastId"] = posts["data"][0]["id"]
