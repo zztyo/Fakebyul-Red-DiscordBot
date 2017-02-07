@@ -463,7 +463,8 @@ def set_raven(self):
         client = raven.Client(dsn=self.settings.sentry_dsn, include_paths=[__name__.split('.', 1)[0]], release=raven.fetch_git_sha(os.path.dirname(__file__)))
         handler = SentryHandler(client)
         setup_logging(handler)
-    return client
+        return client
+    return None
 
 def set_logger(bot):
     logger = logging.getLogger("red")
