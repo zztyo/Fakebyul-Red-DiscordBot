@@ -7,6 +7,9 @@ import logging.handlers
 import traceback
 import datetime
 import subprocess
+import raven
+from raven.conf import setup_logging
+from raven.handlers.logging import SentryHandler
 
 try:
     assert sys.version_info >= (3, 5)
@@ -68,6 +71,7 @@ class Bot(commands.Bot):
         self._intro_displayed = False
         self._restart_requested = False
         self.logger = set_logger(self)
+        self.raven = set_raven(self)
         if 'self_bot' in kwargs:
             self.settings.self_bot = kwargs['self_bot']
         else:
@@ -309,7 +313,7 @@ def initialize(bot_class=Bot, formatter_class=Formatter):
         owner = await set_bot_owner()
 
         print("-----------------")
-        print("Red - Discord Bot")
+        print("Robyul - Discord Bot")
         print("-----------------")
         print(str(bot.user))
         print("\nConnected to:")
@@ -453,6 +457,13 @@ def interactive_setup(settings):
               "Press enter to continue")
         input("\n")
 
+def set_raven(self):
+    if self.settings.sentry_dsn != None:
+        print("setting up sentry client")
+        client = raven.Client(dsn=self.settings.sentry_dsn, include_paths=[__name__.split('.', 1)[0]], release=raven.fetch_git_sha(os.path.dirname(__file__)))
+        handler = SentryHandler(client)
+        setup_logging(handler)
+    return client
 
 def set_logger(bot):
     logger = logging.getLogger("red")

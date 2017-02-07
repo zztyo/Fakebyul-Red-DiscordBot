@@ -13,3 +13,4 @@ ftfy
 dota2py
 lxml
 tabulate
+raven

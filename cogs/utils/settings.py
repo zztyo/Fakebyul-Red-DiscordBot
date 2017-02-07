@@ -242,6 +242,13 @@ class Settings:
             ret.update({server: self.bot_settings[server]})
         return ret
 
+    @property
+    def sentry_dsn(self):
+        if "SENTRY_DSN" in self.bot_settings:
+            return self.bot_settings["SENTRY_DSN"]
+        else:
+            return None
+
     def get_server(self, server):
         if server is None:
             return self.bot_settings["default"].copy()
