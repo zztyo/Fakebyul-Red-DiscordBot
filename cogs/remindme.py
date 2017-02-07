@@ -64,6 +64,7 @@ class RemindMe:
     @commands.command(pass_context=True)
     async def reminderlist(self, ctx):
         author=ctx.message.author
+        channel=ctx.message.channel
         reminders = []
         for reminder in self.reminders:
             if reminder["ID"] == author.id:
@@ -89,7 +90,8 @@ class RemindMe:
             msg[i]+="```"
             for reminder in msg:
                 await self.bot.send_message(author, reminder)
-            await self.bot.say("{0} Please check your DMs".format(author.mention))
+            if not channel.is_private:
+                await self.bot.say("{0} Please check your DMs".format(author.mention))
         else:
             await self.bot.say("You don't have any upcoming notification.")
 
