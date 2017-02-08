@@ -47,7 +47,7 @@ class Instagram:
             return
 
         lastItemTimestamp = 0
-        if len(self.instagramAPI.LastJson["items"]) > 0:
+        if "items" in self.instagramAPI.LastJson and len(self.instagramAPI.LastJson["items"]) > 0:
             lastItemTimestamp = self.instagramAPI.LastJson["items"][0]["taken_at"]
 
         self.feeds.append({"userId": userId,
@@ -129,7 +129,10 @@ class Instagram:
             await self.bot.say("Something went wrong!")
             return
 
-        await self._post_item(channel, self.instagramAPI.LastJson["items"][0])
+        if "items" in self.instagramAPI.LastJson and len(self.instagramAPI.LastJson["items"]) > 0:
+            await self._post_item(channel, self.instagramAPI.LastJson["items"][0])
+        else:
+            await self.bot.say("User has no posts")
 
     @_instagram.command(no_pm=True, name="refresh")
     async def _refresh(self):
@@ -152,11 +155,12 @@ class Instagram:
                 if await self.instagramAPI.getUserFeed(feed["userId"], minTimestamp=feed["lastTimestamp"]) == False:
                     print("Something went wrong fetching @{0}'s instagram feed!".format(feed["userName"]))
                     continue
-                for item in self.instagramAPI.LastJson["items"]:
-                    await self._post_item(channel, item)
-                    if item["taken_at"] > feed["lastTimestamp"]:
-                        self.feeds[self.feeds.index(feed)]["lastTimestamp"] = item["taken_at"]
-                        dataIO.save_json(self.feeds_file_path, self.feeds)
+                if "items" in self.instagramAPI.LastJson:
+                    for item in self.instagramAPI.LastJson["items"]:
+                        await self._post_item(channel, item)
+                        if item["taken_at"] > feed["lastTimestamp"]:
+                            self.feeds[self.feeds.index(feed)]["lastTimestamp"] = item["taken_at"]
+                            dataIO.save_json(self.feeds_file_path, self.feeds)
             await loop.create_task(sleep(600))
 
     async def _post_item(self, channel, item):
