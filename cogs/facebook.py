@@ -211,7 +211,7 @@ class Facebook:
                     if posts["data"][0]["id"] != self.feeds[self.feeds.index(feed)]["lastId"]:
                         self.feeds[self.feeds.index(feed)]["lastId"] = posts["data"][0]["id"]
                         dataIO.save_json(self.feeds_file_path, self.feeds)
-            await loop.create_task(sleep(600))
+            await loop.create_task(sleep(1800))
 
 def check_folders():
     folders = ("data", "data/facebook/")
