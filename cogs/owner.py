@@ -761,7 +761,7 @@ class Owner:
         """Shows info about Robyul"""
         author_repo = "https://github.com/Twentysix26"
         red_repo = author_repo + "/Red-DiscordBot"
-        server_url = "https://discord.me/Red-DiscordBot"
+        server_url = "https://discord.gg/red"
         dpy_repo = "https://github.com/Rapptz/discord.py"
         python_url = "https://www.python.org/"
         fork_repo = "https://github.com/Seklfreak/Robyul-Red-DiscordBot"

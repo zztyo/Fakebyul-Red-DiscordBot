@@ -69,13 +69,15 @@ class Bot(commands.Bot):
         self._message_modifiers = []
         self.settings = Settings()
         self._intro_displayed = False
-        self._restart_requested = False
+        self._shutdown_mode = None
         self.logger = set_logger(self)
         self.raven = set_raven(self)
         if 'self_bot' in kwargs:
             self.settings.self_bot = kwargs['self_bot']
         else:
             kwargs['self_bot'] = self.settings.self_bot
+            if self.settings.self_bot:
+                kwargs['pm_help'] = False
         super().__init__(*args, command_prefix=prefix_manager, **kwargs)
 
     async def send_message(self, *args, **kwargs):
@@ -103,8 +105,7 @@ class Bot(commands.Bot):
 
         If restart is True, the exit code will be 26 instead
         The launcher automatically restarts Red when that happens"""
-        if restart:
-            self._restart_requested = True
+        self._shutdown_mode = not restart
         await self.logout()
 
     def add_message_modifier(self, func):
@@ -224,6 +225,7 @@ class Bot(commands.Bot):
 
         def install():
             code = subprocess.call(args)
+            sys.path_importer_cache = {}
             return not bool(code)
 
         response = self.loop.run_in_executor(None, install)
@@ -335,7 +337,7 @@ def initialize(bot_class=Bot, formatter_class=Formatter):
             bot.oauth_url = url
             print(url)
 
-        print("\nOfficial server: https://discord.me/Red-DiscordBot")
+        print("\nOfficial server: https://discord.gg/red")
 
         print("Make sure to keep your bot updated. Select the 'Update' "
               "option from the launcher.")
@@ -588,6 +590,7 @@ def main(bot):
 
     if bot.settings._dry_run:
         print("Quitting: dry run")
+        bot._shutdown_mode = True
         exit(0)
 
     print("Logging into Discord...")
@@ -608,12 +611,10 @@ if __name__ == '__main__':
     #                           errors="replace",
     #                           line_buffering=True)
     bot = initialize()
-    error = False
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(main(bot))
     except discord.LoginFailure:
-        error = True
         bot.logger.error(traceback.format_exc())
         if not bot.settings.no_prompt:
             choice = input("Invalid login credentials. If they worked before "
@@ -630,13 +631,14 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         loop.run_until_complete(bot.logout())
     except Exception as e:
-        error = True
         bot.logger.exception("Fatal exception, attempting graceful logout",
                              exc_info=e)
         loop.run_until_complete(bot.logout())
     finally:
         loop.close()
-        if error:
+        if bot._shutdown_mode is True:
+            exit(0)
+        elif bot._shutdown_mode is False:
+            exit(26) # Restart
+        else:
             exit(1)
-        if bot._restart_requested:
-            exit(26)
