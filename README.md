@@ -1,5 +1,5 @@
 # Robyul
-[![Build Status](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot.svg?branch=develop)](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot) [<img src="https://discordapp.com/api/guilds/250216966436945920/widget.png?style=shield">](https://discord.gg/NWwv299)
+[<img src="https://img.shields.io/badge/Support-me!-orange.svg">](https://www.paypal.me/swk) [![Build Status](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot.svg?branch=develop)](https://travis-ci.org/Seklfreak/Robyul-Red-DiscordBot) [<img src="https://discordapp.com/api/guilds/250216966436945920/widget.png?style=shield">](https://discord.gg/NWwv299)
 
 ![intro](http://i.imgur.com/RgGlNpQ.jpg)
 
