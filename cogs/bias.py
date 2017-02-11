@@ -214,7 +214,7 @@ class Bias:
 
         if message.content[0] == "+":
             if changingRole in author.roles or (changingPrimaryRole != None and changingPrimaryRole in author.roles):
-                successMessage = await self.bot.send_message(channel, "{} you already got this bias role! :thinking:".format(author.mention))
+                successMessage = await self.bot.send_message(channel, "{} you already got this role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
                 await self.bot.delete_message(successMessage)
@@ -252,7 +252,7 @@ class Bias:
 
         if message.content[0] == "-":
             if changingRole not in author.roles and (changingPrimaryRole == None or changingPrimaryRole not in author.roles):
-                successMessage = await self.bot.send_message(channel, "{} you don't have this bias role! :thinking:".format(author.mention))
+                successMessage = await self.bot.send_message(channel, "{} you don't have this role! :thinking:".format(author.mention))
 
                 await asyncio.sleep(10)
                 await self.bot.delete_message(successMessage)
