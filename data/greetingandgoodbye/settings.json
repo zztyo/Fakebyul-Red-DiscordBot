@@ -40,5 +40,19 @@
         "GREETING" : "Welcome {0.mention}! :clap:",
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
+    },
+    "275365003643715584" : {
+        "CHANNEL" : "275365003643715584",
+        "GOODBYE" : "Goodbye {0.name}! :wave:",
+        "GREETING" : "Welcome {0.mention}! :smiley_cat:\nCheck out <#272766650133250049> and go to <#272773260469600266> to get your bias roles.",
+        "POST_GOODBYE" : false,
+        "POST_GREETING" : true
+    },
+    "272744019119964160" : {
+        "CHANNEL" : "272744019119964160",
+        "GOODBYE" : "Goodbye {0.name}! :wave:",
+        "GREETING" : "Welcome {0.mention}! :fnc:\nCheck out <#275681973232467978> and go to <#275682637383729161> to get your bias roles.",
+        "POST_GOODBYE" : false,
+        "POST_GREETING" : true
     }
 }
