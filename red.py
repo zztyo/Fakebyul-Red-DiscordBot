@@ -3,6 +3,7 @@ import os
 import sys
 sys.path.insert(0, "lib")
 import logging
+import logging.config
 import logging.handlers
 import traceback
 import datetime
@@ -465,6 +466,45 @@ def set_raven(self):
         client = raven.Client(dsn=self.settings.sentry_dsn, include_paths=[__name__.split('.', 1)[0]], release=raven.fetch_git_sha(os.path.dirname(__file__)))
         handler = SentryHandler(client)
         setup_logging(handler)
+        LOGGING = {
+            'version': 1,
+            'disable_existing_loggers': True,
+
+        'formatters': {
+            'console': {
+                'format': '[%(asctime)s][%(levelname)s] %(name)s '
+                          '%(filename)s:%(funcName)s:%(lineno)d | %(message)s',
+                'datefmt': '%H:%M:%S',
+                },
+            },
+
+            'handlers': {
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'console'
+                    },
+                'sentry': {
+                    'level': 'ERROR',
+                    'class': 'raven.handlers.logging.SentryHandler',
+                    'dsn': self.settings.sentry_dsn,
+                    },
+                },
+
+            'loggers': {
+                '': {
+                    'handlers': ['console', 'sentry'],
+                    'level': 'DEBUG',
+                    'propagate': False,
+                    },
+                'red': {
+                    'handlers': ['console', 'sentry'],
+                    'level': 'DEBUG',
+                    'propagate': False,
+                },
+            }
+        }
+        logging.config.dictConfig(LOGGING)
         return client
     return None
 
