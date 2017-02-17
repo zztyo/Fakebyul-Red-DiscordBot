@@ -36,29 +36,33 @@ class Vlive:
 
         await self.bot.type()
 
+        # search for channel
         channel_id = await self.get_channel_id_from_channel_name(channel_search_name)
-        if channel_id == None:
-            await self.bot.say("{0} Unable to find channel.".format(author.mention))
-            return
-        channel_information = await self.get_channel_information_from_channel_id(channel_id)
-        if channel_information == None:
-            await self.bot.say("{0} Unable to find channel.".format(author.mention))
+        if channel_id != None:
+            channel_information = await self.get_channel_information_from_channel_id(channel_id)
+            if channel_information != None:
+                await self.bot.say("<{0}>".format(channel_information["channel_url"]), embed=self.get_channel_card_from_channel_information(channel_information))
+                return
+        # channel_search_name is channel_id instead?
+        channel_information = await self.get_channel_information_from_channel_id(channel_search_name)
+        if channel_information != None:
+            await self.bot.say("<{0}>".format(channel_information["channel_url"]), embed=self.get_channel_card_from_channel_information(channel_information))
             return
 
-        await self.bot.say("<{0}>".format(channel_information["channel_url"]), embed=self.get_channel_card_from_channel_information(channel_information))
+        await self.bot.say("{0} Unable to find channel (CHANNEL+ channels get ignored).".format(author.mention))
 
     def get_channel_card_from_channel_information(self, channel_information):
         embedData = discord.Embed(
             title="{0} V LIVE Channel".format(channel_information["name"]),
             url=channel_information["channel_url"],
             colour=discord.Colour(value=int(channel_information["color"].replace("#", ""), 16)))
-        embedData.add_field(name="Followers", value=str(channel_information["followers"]))
-        embedData.add_field(name="Videos", value=str(channel_information["total_videos"]))
+        embedData.add_field(name="Followers", value="{0:,}".format(channel_information["followers"]))
+        embedData.add_field(name="Videos", value="{0:,}".format(channel_information["total_videos"]))
         embedData.set_thumbnail(url=str(channel_information["profile_img"]))
         embedData.set_footer(text="via vlive.tv")
 
         if channel_information["last_video"]["title"] != "":
-            embedData.add_field(inline=False, name="Last Video", value="**{0}**\n**Plays** {1}\n**Likes** {2}\n{3}".format(channel_information["last_video"]["title"], channel_information["last_video"]["plays"], channel_information["last_video"]["likes"], channel_information["last_video"]["url"]))
+            embedData.add_field(inline=False, name="Last Video", value="**{0}**\n**Plays** {1:,}\n**Likes** {2:,}\n{3}".format(channel_information["last_video"]["title"], channel_information["last_video"]["plays"], channel_information["last_video"]["likes"], channel_information["last_video"]["url"]))
             embedData.set_image(url=channel_information["last_video"]["thumbnail"])
         return embedData
 
@@ -75,6 +79,10 @@ class Vlive:
             session = aiohttp.ClientSession(connector=conn)
             async with session.get(channel_api_url, headers=self.headers) as r:
                 result = await r.json()
+
+            if "error" in result:
+                session.close()
+                return None
 
             channel_data["name"] = result["channel_name"]
             channel_data["followers"] = result["fan_count"]
@@ -127,8 +135,11 @@ class Vlive:
                 soup_object = BeautifulSoup(await response.text(), "html.parser")
             channels = soup_object.find_all(class_="ct_box")
             if channels != None and len(channels) > 0:
-                for channel in channels:
+                for channel in channels: # skip plus channel
                     if not channel.find(class_="name").get_text().endswith(" +"):
+                        break
+                for channel in channels: # channel with the exact name?
+                    if channel.find(class_="name").get_text().lower() == channel_search_name.lower():
                         break
                 channel_url = channel.get("href")
                 match = re.match(self.channel_id_regex, channel_url)
