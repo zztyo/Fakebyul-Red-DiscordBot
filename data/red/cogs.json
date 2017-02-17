@@ -34,6 +34,7 @@
     "cogs.translated" : true,
     "cogs.trivia" : true,
     "cogs.twitter" : true,
+    "cogs.vlive" : true,
     "cogs.welcome" : false,
     "cogs.wolfram" : true,
     "cogs.youtube" : false

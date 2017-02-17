@@ -502,6 +502,11 @@ def set_raven(self):
                     'level': 'DEBUG',
                     'propagate': False,
                 },
+                'discord': {
+                    'handlers': ['console', 'sentry'],
+                    'level': 'DEBUG',
+                    'propagate': False,
+                },
             }
         }
         logging.config.dictConfig(LOGGING)
@@ -510,7 +515,6 @@ def set_raven(self):
 
 def set_logger(bot):
     logger = logging.getLogger("red")
-    logger.setLevel(logging.INFO)
 
     red_format = logging.Formatter(
         '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
@@ -519,12 +523,9 @@ def set_logger(bot):
 
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setFormatter(red_format)
-    if bot.settings.debug:
-        stdout_handler.setLevel(logging.DEBUG)
-        logger.setLevel(logging.DEBUG)
-    else:
-        stdout_handler.setLevel(logging.INFO)
-        logger.setLevel(logging.INFO)
+
+    stdout_handler.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
 
     fhandler = logging.handlers.RotatingFileHandler(
         filename='data/red/red.log', encoding='utf-8', mode='a',
@@ -535,10 +536,7 @@ def set_logger(bot):
     logger.addHandler(stdout_handler)
 
     dpy_logger = logging.getLogger("discord")
-    if bot.settings.debug:
-        dpy_logger.setLevel(logging.DEBUG)
-    else:
-        dpy_logger.setLevel(logging.WARNING)
+    dpy_logger.setLevel(logging.DEBUG)
     handler = logging.FileHandler(
         filename='data/red/discord.log', encoding='utf-8', mode='a')
     handler.setFormatter(logging.Formatter(
