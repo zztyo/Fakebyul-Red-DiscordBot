@@ -61,8 +61,11 @@ class Vlive:
         embedData.set_thumbnail(url=str(channel_information["profile_img"]))
         embedData.set_footer(text="via vlive.tv")
 
+        if channel_information["next_upcoming_video"]["title"] != "":
+            embedData.add_field(inline=False, name="Next Upcoming Video {0} KST".format(channel_information["next_upcoming_video"]["date"]), value="**{0}**\n**Likes** {1:,}\n{2}".format(channel_information["next_upcoming_video"]["title"], channel_information["next_upcoming_video"]["likes"], channel_information["next_upcoming_video"]["url"]))
+
         if channel_information["last_video"]["title"] != "":
-            embedData.add_field(inline=False, name="Last Video", value="**{0}**\n**Plays** {1:,}\n**Likes** {2:,}\n{3}".format(channel_information["last_video"]["title"], channel_information["last_video"]["plays"], channel_information["last_video"]["likes"], channel_information["last_video"]["url"]))
+            embedData.add_field(inline=False, name="Last Video on {0} KST".format(channel_information["last_video"]["date"]), value="**{0}**\n**Plays** {1:,}\n**Likes** {2:,}\n{3}".format(channel_information["last_video"]["title"], channel_information["last_video"]["plays"], channel_information["last_video"]["likes"], channel_information["last_video"]["url"]))
             embedData.set_image(url=channel_information["last_video"]["thumbnail"])
         return embedData
 
@@ -71,8 +74,11 @@ class Vlive:
 
         channel_api_url = self.api_base_url.format("channel.{0}".format(channel_seq), self.settings["VLIVE_APP_ID"], "fields=channel_name,fan_count,channel_cover_img,channel_profile_img,representative_color")
         channel_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getChannelVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
+        channel_upcoming_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getUpcomingVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
 
-        channel_data = {"name": "", "followers": 0, "cover_img": "", "profile_img": "", "color": "", "total_videos": 0, "last_video": {"seq": "", "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": ""}}
+        channel_data = {"name": "", "followers": 0, "cover_img": "", "profile_img": "", "color": "", "total_videos": 0,
+        "last_video": {"seq": "", "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": ""},
+        "next_upcoming_video": {"seq": "", "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": ""}}
 
         try:
             conn = aiohttp.TCPConnector()
@@ -96,7 +102,7 @@ class Vlive:
 
             channel_data["total_videos"] = result["result"]["totalVideoCount"]
 
-            if result["result"]["videoList"] != None and len(result["result"]["videoList"]) > 0:
+            if "videoList" in result["result"] and result["result"]["videoList"] != None and len(result["result"]["videoList"]) > 0:
                 last_video = result["result"]["videoList"][0]
                 channel_data["last_video"]["seq"] = last_video["videoSeq"]
                 channel_data["last_video"]["title"] = last_video["title"]
@@ -105,6 +111,18 @@ class Vlive:
                 channel_data["last_video"]["thumbnail"] = last_video["thumbnail"]
                 channel_data["last_video"]["date"] = last_video["onAirStartAt"]
                 channel_data["last_video"]["url"] = self.main_base_url.format("video/{0}".format(last_video["videoSeq"]))
+
+            async with session.get(channel_upcoming_video_list_api_url, headers=self.headers) as r:
+                result = await r.json()
+
+            if "videoList" in result["result"] and result["result"]["videoList"] != None and len(result["result"]["videoList"]) > 0:
+                next_upcoming_video = result["result"]["videoList"][0]
+                channel_data["next_upcoming_video"]["seq"] = next_upcoming_video["videoSeq"]
+                channel_data["next_upcoming_video"]["title"] = next_upcoming_video["title"]
+                channel_data["next_upcoming_video"]["likes"] = next_upcoming_video["likeCount"]
+                channel_data["next_upcoming_video"]["thumbnail"] = next_upcoming_video["thumbnail"]
+                channel_data["next_upcoming_video"]["date"] = next_upcoming_video["onAirStartAt"]
+                channel_data["next_upcoming_video"]["url"] = self.main_base_url.format("video/{0}".format(next_upcoming_video["videoSeq"]))
 
             session.close()
 
