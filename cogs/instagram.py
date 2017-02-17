@@ -135,6 +135,7 @@ class Instagram:
             await self.bot.say("User has no posts")
 
     @_instagram.command(no_pm=True, name="refresh")
+    @checks.mod_or_permissions(administrator=True)
     async def _refresh(self):
         """Refreshes all instagram feeds manually"""
         nb_cancelled = self.sleep.cancel_all()

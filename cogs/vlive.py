@@ -6,6 +6,9 @@ import aiohttp
 import re
 import os
 from .utils.dataIO import dataIO
+import asyncio
+from .utils import checks
+from .utils.chat_formatting import pagify
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -13,10 +16,13 @@ __version__ = "0.1"
 class Vlive:
     """Get VLive notifications and more"""
 
-    def __init__(self, bot):
+    def __init__(self, bot, sleep):
         self.bot = bot
+        self.sleep = sleep
         self.file_path = "data/vlive/settings.json"
         self.settings = dataIO.load_json(self.file_path)
+        self.channels_file_path = "data/vlive/channels.json"
+        self.channels = dataIO.load_json(self.channels_file_path)
         self.main_base_url = "http://www.vlive.tv/{0}"
         self.channel_base_url = "http://channels.vlive.tv/{0}/video"
         self.api_base_url = "http://api.vfan.vlive.tv/{0}?app_id={1}&{2}"
@@ -50,6 +56,95 @@ class Vlive:
             return
 
         await self.bot.say("{0} Unable to find channel (CHANNEL+ channels get ignored).".format(author.mention))
+
+    @_vlive.command(pass_context=True, no_pm=True, name="add")
+    @checks.mod_or_permissions(administrator=True)
+    async def _add(self, context, channel_search_name : str, channel : discord.Channel):
+        """Adds a new vlive channel to a channel"""
+        author = context.message.author
+        channel = context.message.channel
+
+        await self.bot.type()
+
+        # search for channel
+        channel_id = await self.get_channel_id_from_channel_name(channel_search_name)
+        if channel_id != None:
+            channel_information = await self.get_channel_information_from_channel_id(channel_id)
+            if channel_information == None or channel_information["name"] == "":
+                channel_id = None
+        # channel_search_name is channel_id instead?
+        if channel_id == None:
+            channel_information = await self.get_channel_information_from_channel_id(channel_search_name)
+            if channel_information != None:
+                channel_id = channel_search_name
+
+        if channel_id == None or channel_information == None or channel_information["name"] == "":
+            await self.bot.say("{0} Unable to find channel (CHANNEL+ channels get ignored).".format(author.mention))
+            return
+
+        self.channels.append({"vliveChannelId": channel_id,
+            "vliveChannelName": channel_information["name"],
+            "isLive" : False,
+            "channelId" : channel.id,
+            "serverId" : channel.server.id})
+        dataIO.save_json(self.channels_file_path, self.channels)
+
+        await self.bot.say("{0} Added channel \"{1}\" (`{2}`) to database!".format(author.mention, channel_information["name"], channel_id))
+
+    @_vlive.command(pass_context=True, no_pm=True, name="list")
+    async def _list(self, ctx):
+        """Lists all vlive channels in the database on this server"""
+        server = ctx.message.server
+
+        listMessage = ""
+        for channel in self.channels:
+            if channel["serverId"] == server.id:
+                listMessage += "#{1}: `{0[vliveChannelName]} ({0[vliveChannelId]})` posting to <#{0[channelId]}>\n".format(channel, self.channels.index(channel))
+
+        if listMessage == "":
+            await self.bot.say("No channels in database!")
+            return
+
+        await self.bot.say("Found these channels:\n{0}".format(listMessage))
+
+    @checks.is_owner()
+    @_vlive.command(pass_context=True, no_pm=True, name="globallist")
+    async def _globallist(self, ctx):
+        """Lists all vlive channels in the database"""
+        server = ctx.message.server
+
+        listMessage = ""
+        for channel in self.channels:
+            channel_server = self.bot.get_server(channel["serverId"])
+            listMessage += "#{1}: `{0[vliveChannelName]} ({0[vliveChannelId]})` posting to <#{0[channelId]}> in `{2.name}`\n".format(channel, self.channels.index(channel), channel_server)
+
+        if listMessage == "":
+            await self.bot.say("No channels in database!")
+            return
+
+        for page in pagify("Found these channels:\n{0}**Channels total: {1}**".format(listMessage, len(self.channels)), ["\n"]):
+            if page != "":
+                await self.bot.say(page)
+
+    @_vlive.command(pass_context=True, no_pm=True, name="del")
+    @checks.mod_or_permissions(administrator=True)
+    async def _del(self, context, channelId : int):
+        """Deletes an vlive channel from the database"""
+        server = context.message.server
+
+        try:
+            if self.channels[channelId]["serverId"] != server.id:
+                await self.bot.say("You can only delete entries from the server you are on!")
+                return
+        except IndexError:
+            await self.bot.say("Entry not found in database!")
+            return
+        
+        del(self.channels[channelId])
+
+        dataIO.save_json(self.channels_file_path, self.channels)
+
+        await self.bot.say("Channel deleted from database")
 
     def get_channel_card_from_channel_information(self, channel_information):
         embedData = discord.Embed(
@@ -176,6 +271,32 @@ class Vlive:
         except ValueError:
             return False
 
+    @_vlive.command(no_pm=True, name="refresh")
+    async def _refresh(self):
+        """Refreshes all vlive channels manually"""
+        nb_cancelled = self.sleep.cancel_all()
+        await asyncio.wait(self.sleep.tasks)
+
+        await self.bot.say("Done :ok_hand:")
+
+    async def check_feed_loop(self, sleep, loop):
+        await self.bot.wait_until_ready()
+        while self == self.bot.get_cog('Vlive'):
+            print("checking vlive channels...")
+            for vlive_channel in self.channels:
+                channel = self.bot.get_channel(vlive_channel["channelId"])
+                if channel == None:
+                    print("Channel not found")
+                    continue
+                channel_information = await self.get_channel_information_from_channel_id(vlive_channel["vliveChannelId"])
+                print(channel_information["name"])
+
+                #self.channels[self.channel.index(channel)]["isLive"] = 
+                #dataIO.save_json(self.channels_file_path, self.channels)
+
+                #await self._post_item(channel, channel_information)
+            await loop.create_task(sleep(90))
+
 def check_folders():
     folders = ("data", "data/vlive/")
     for folder in folders:
@@ -185,13 +306,36 @@ def check_folders():
 
 def check_files():
     settings = {"VLIVE_APP_ID": "yourvliveappid",}
-    feeds = []
+    channels = []
 
     if not os.path.isfile("data/vlive/settings.json"):
         print("Creating empty settings.json, please fill in details...")
         dataIO.save_json("data/vlive/settings.json", settings)
+    if not os.path.isfile("data/vlive/channels.json"):
+        print("Creating empty channels.json...")
+        dataIO.save_json("data/vlive/channels.json", channels)
+
+def make_sleep():
+    async def sleep(delay, result=None, *, loop=None):
+        coro = asyncio.sleep(delay, result=result, loop=loop)
+        task = asyncio.ensure_future(coro)
+        sleep.tasks.add(task)
+        try:
+            return await task
+        except asyncio.CancelledError:
+            return result
+        finally:
+            sleep.tasks.remove(task)
+
+    sleep.tasks = set()
+    sleep.cancel_all = lambda: sum(task.cancel() for task in sleep.tasks)
+    return sleep
 
 def setup(bot):
+    sleep = make_sleep()
+    loop = asyncio.get_event_loop()
     check_folders()
     check_files()
-    bot.add_cog(Vlive(bot))
+    n = Vlive(bot, sleep)
+    bot.add_cog(n)
+    bot.loop.create_task(n.check_feed_loop(sleep, loop))
