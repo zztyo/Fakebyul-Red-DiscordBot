@@ -60,6 +60,52 @@ class RemindMe:
             await self.bot.say("All your notifications have been removed.")
         else:
             await self.bot.say("You don't have any upcoming notification.")
+    
+    @commands.command(pass_context=True)
+    async def deleteme(self,ctx, idx : int):
+        """Removes reminder number <idx> from your list of reminders"""
+        author=ctx.message.author
+        channel=ctx.message.channel
+        reminders = []
+        for reminder in self.reminders:
+            if reminder["ID"] == author.id:
+                reminders.append(reminder)
+        reminders=sorted(reminders, key=lambda k: k['FUTURE'])
+        if idx == 0:
+            await self.bot.say("Invalid Input! idx has to be greather than 0")
+        elif len(reminders) >= idx:
+            #self.reminders.remove(reminders[idx-1])
+            reminder=reminders[idx-1]
+            s=reminder["FUTURE"]-int(time.time())
+            m,s = divmod(s,60)
+            h,m = divmod(m,60)
+            d,h = divmod(h,24)
+            timeString="";
+            previous=0
+            if d:
+                timeString+=("{} days".format(d),"1 day") [d == 1]
+                previous = 1
+            if h:
+                if previous:
+                    timeString+=", "
+                timeString+=("{} hours".format(h),"1 hour") [h == 1]
+                previous = 1
+            if m:
+                if previous:
+                    timeString+=", "
+                timeString+=("{} minutes".format(m), " 1 minute") [m == 1]
+                previous = 1
+            if s:
+                if previous:
+                    timeString+=", "
+                timeString+=("{} seconds".format(m), " 1 second") [s == 1]
+            nextreminder="Removed reminder for `{1}` in `{0}`\n".format(timeString,reminder["TEXT"])
+            await self.bot.send_message(author,nextreminder)
+            self.reminders.remove(reminders[idx-1])
+            if not channel.is_private:
+                await self.bot.say("{0} Please check your DMs".format(author.mention))
+        else:
+            await self.bot.say("You don't have that many upcoming notifications.")
 
     @commands.command(pass_context=True)
     async def reminderlist(self, ctx):
@@ -73,14 +119,33 @@ class RemindMe:
         if not reminders == []:
             i=0
             msg=["```Reminders: \n"]
-            for reminder in sorted(reminders, key=lambda k: k['FUTURE']) :
+            for counter,reminder in enumerate(sorted(reminders, key=lambda k: k['FUTURE']) ):
                 s=reminder["FUTURE"]-int(time.time())
                 m,s = divmod(s,60)
                 h,m = divmod(m,60)
                 d,h = divmod(h,24)
-
-                nextreminder="{:>4} days, {:>2} hours, {:>2} minutes, {:>2} seconds:  {}\n".format(d,h,m,s,reminder["TEXT"])
-                """nextreminder=" {}: {}\n".format(time.ctime(reminder["FUTURE"]), reminder["TEXT"])"""
+                
+                timeString=""
+                previous = 0
+                if d:
+                    timeString+=("{} days".format(d),"1 day") [d == 1]
+                    previous = 1
+                if h:
+                    if previous:
+                        timeString+=","
+                    timeString+=(" {} hours".format(h),"1 hour") [h == 1]
+                    previous = 1
+                if m:
+                    if previous:
+                        timeString+=","
+                    timeString+=(" {} minutes".format(m), " 1 minute") [m == 1]
+                    previous = 1
+                if s:
+                    if previous:
+                        timeString+=","
+                    timeString+=(" {} seconds".format(m), " 1 second") [s == 1]
+                nextreminder="{2}. {0}:\n\t{1}\n".format(timeString,reminder["TEXT"],counter+1)
+               
                 if len(msg[i]) + len(ctx.prefix) + len(reminder) + 5 > 2000:
                     msg[i] += "```"
                     i += 1
