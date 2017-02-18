@@ -84,7 +84,7 @@ class Vlive:
 
         self.channels.append({"vliveChannelId": channel_id,
             "vliveChannelName": channel_information["name"],
-            "isLive" : False,
+            "lastVideoSeq" : 0,
             "channelId" : post_channel.id,
             "serverId" : post_channel.server.id})
         dataIO.save_json(self.channels_file_path, self.channels)
@@ -286,14 +286,28 @@ class Vlive:
 
         await self.bot.say("Done :ok_hand:")
 
-    async def _post_live_item(self, channel, channel_information):
+    async def _post_regular_item(self, channel, channel_information):
         embed_data = discord.Embed(
-            title=":mega: {0} V LIVE Channel just went Live!".format(channel_information["name"]),
+            title=":film_frames: {0} uploaded a new video!".format(channel_information["name"]),
             url=channel_information["last_video"]["url"],
             colour=discord.Colour(value=int(channel_information["color"].replace("#", ""), 16)),
             description=channel_information["last_video"]["title"])
         embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
-        embed_data.set_image(url=channel_information["last_video"]["thumbnail"])
+        embed_data.set_image(url=str(channel_information["last_video"]["thumbnail"]))
+        embed_data.set_footer(text="via vlive.tv")
+        embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["last_video"]["plays"]))
+        embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["last_video"]["likes"]))
+
+        await self.bot.send_message(channel, "<{0}>".format(channel_information["last_video"]["url"]), embed=embed_data)
+
+    async def _post_live_item(self, channel, channel_information):
+        embed_data = discord.Embed(
+            title=":mega: {0} just went live!".format(channel_information["name"]),
+            url=channel_information["last_video"]["url"],
+            colour=discord.Colour(value=int(channel_information["color"].replace("#", ""), 16)),
+            description=channel_information["last_video"]["title"])
+        embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
+        embed_data.set_image(url=str(channel_information["last_video"]["thumbnail"]))
         embed_data.set_footer(text="via vlive.tv")
         embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["last_video"]["plays"]))
         embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["last_video"]["likes"]))
@@ -311,15 +325,15 @@ class Vlive:
                     continue
                 channel_information = await self.get_channel_information_from_channel_id(vlive_channel["vliveChannelId"])
 
-                if channel_information["last_video"]["type"] == "LIVE":
-                    if vlive_channel["isLive"] == False:
-                        await self._post_live_item(channel, channel_information)
-                        self.channels[self.channels.index(vlive_channel)]["isLive"] = True
-                        dataIO.save_json(self.channels_file_path, self.channels)
-                else:
-                    if vlive_channel["isLive"] == True:
-                        self.channels[self.channels.index(vlive_channel)]["isLive"] = False
-                        dataIO.save_json(self.channels_file_path, self.channels)
+                if "lastVideoSeq" not in vlive_channel or channel_information["last_video"]["seq"] != vlive_channel["lastVideoSeq"]:
+                    if "lastVideoSeq" in vlive_channel and vlive_channel["lastVideoSeq"] != 0:
+                        if channel_information["last_video"]["type"] == "LIVE":
+                            await self._post_live_item(channel, channel_information)
+                        else:
+                            await self._post_regular_item(channel, channel_information)
+
+                    self.channels[self.channels.index(vlive_channel)]["lastVideoSeq"] = channel_information["last_video"]["seq"]
+                    dataIO.save_json(self.channels_file_path, self.channels)
             await loop.create_task(sleep(90))
 
 def check_folders():
