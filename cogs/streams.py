@@ -371,8 +371,8 @@ class Streams:
         url = channel["url"]
         embed = discord.Embed(title=channel["status"], url=url)
         embed.set_author(name=channel["display_name"])
-        embed.add_field(name="Followers", value=channel["followers"])
-        embed.add_field(name="Total views", value=channel["views"])
+        embed.add_field(name="Followers", value="{0:,}".format(channel["followers"]))
+        embed.add_field(name="Total views", value="{0:,}".format(channel["views"]))
         embed.set_thumbnail(url=channel["logo"])
         embed.set_image(url=data["stream"]["preview"]["medium"])
         embed.set_footer(text="Playing: " + channel["game"])
@@ -385,7 +385,7 @@ class Streams:
         url = channel["channel_link"]
         embed = discord.Embed(title=livestream["media_status"], url=url)
         embed.set_author(name=livestream["media_name"])
-        embed.add_field(name="Followers", value=channel["followers"])
+        embed.add_field(name="Followers", value="{0:,}".format(channel["followers"]))
         #embed.add_field(name="Views", value=channel["views"])
         embed.set_thumbnail(url=base_url + channel["user_logo"])
         embed.set_image(url=base_url + livestream["media_thumbnail"])
@@ -397,8 +397,8 @@ class Streams:
         url = "https://beam.pro/" + data["token"]
         embed = discord.Embed(title=data["name"], url=url)
         embed.set_author(name=user["username"])
-        embed.add_field(name="Followers", value=data["numFollowers"])
-        embed.add_field(name="Total views", value=data["viewersTotal"])
+        embed.add_field(name="Followers", value="{0:,}".format(data["numFollowers"]))
+        embed.add_field(name="Total views", value="{0:,}".format(data["viewersTotal"]))
         embed.set_thumbnail(url=user["avatarUrl"])
         embed.set_image(url=data["thumbnail"]["url"])
         if data["type"] is not None:
