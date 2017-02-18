@@ -25,7 +25,7 @@ class Lastfm:
     async def _lastfm(self, context):
         """Get Last.fm statistics of a user.
 
-Will remember your username after setting one. [p]lastfm last @username will become [p]lastfm last."""
+        Will remember your username after setting one. [p]lastfm last @username will become [p]lastfm last."""
         if context.invoked_subcommand is None:
             await send_cmd_help(context)
 
@@ -68,6 +68,9 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 settings = dataIO.load_json(self.settings_file)
                 if context.message.author.id in settings['USERS']:
                     username = settings['USERS'][context.message.author.id]
+                else:
+                    await self.bot.say("```Please set your lastfm username with /lf set <username> first```")
+                    return
             else:
                 user_patch = username[0].replace('!', '')
                 settings = dataIO.load_json(self.settings_file)
@@ -124,6 +127,9 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 settings = dataIO.load_json(self.settings_file)
                 if context.message.author.id in settings['USERS']:
                     username = settings['USERS'][context.message.author.id]
+                else:
+                    await self.bot.say("```Please set your lastfm username with /lf set <username> first```")
+                    return
             else:
                 user_patch = username[0].replace('!', '')
                 settings = dataIO.load_json(self.settings_file)
@@ -189,6 +195,9 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 settings = dataIO.load_json(self.settings_file)
                 if context.message.author.id in settings['USERS']:
                     username = settings['USERS'][context.message.author.id]
+                else:
+                    await self.bot.say("```Please set your lastfm username with /lf set <username> first```")
+                    return
             else:
                 user_patch = username[0].replace('!', '')
                 settings = dataIO.load_json(self.settings_file)
@@ -244,6 +253,9 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 settings = dataIO.load_json(self.settings_file)
                 if context.message.author.id in settings['USERS']:
                     username = settings['USERS'][context.message.author.id]
+                else:
+                    await self.bot.say("```Please set your lastfm username with /lf set <username> first```")
+                    return
             else:
                 user_patch = username[0].replace('!', '')
                 settings = dataIO.load_json(self.settings_file)
@@ -299,6 +311,9 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 settings = dataIO.load_json(self.settings_file)
                 if context.message.author.id in settings['USERS']:
                     username = settings['USERS'][context.message.author.id]
+                else:
+                    await self.bot.say("```Please set your lastfm username with /lf set <username> first```")
+                    return
             else:
                 user_patch = username[0].replace('!', '')
                 settings = dataIO.load_json(self.settings_file)
@@ -354,6 +369,9 @@ Will remember your username after setting one. [p]lastfm last @username will bec
                 settings = dataIO.load_json(self.settings_file)
                 if context.message.author.id in settings['USERS']:
                     username = settings['USERS'][context.message.author.id]
+                else:
+                    await self.bot.say("```Please set your lastfm username with /lf set <username> first```")
+                    return
             else:
                 user_patch = username[0].replace('!', '')
                 settings = dataIO.load_json(self.settings_file)
