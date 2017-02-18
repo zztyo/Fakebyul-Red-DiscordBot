@@ -24,7 +24,7 @@ class Vlive:
         self.channels_file_path = "data/vlive/channels.json"
         self.channels = dataIO.load_json(self.channels_file_path)
         self.main_base_url = "http://www.vlive.tv/{0}"
-        self.channel_base_url = "http://channels.vlive.tv/{0}/video"
+        self.channel_base_url = "http://channels.vlive.tv/{0}"
         self.api_base_url = "http://api.vfan.vlive.tv/{0}?app_id={1}&{2}"
         self.channel_id_regex = r"(http(s)?:\/\/channels.vlive.tv)?(\/)?(channels\/)?(?P<channel_id>[A-Z0-9]+)(\/video)?"
         self.headers = {"user-agent": "Red-cog-VLive/"+__version__}

@@ -34,7 +34,7 @@ class RandomPictures:
         {"folder_ids": ["0BwVumX-VvI_SSWdETXpCUTJNclk"], "labels": ["강미나", "Mina"]},
         {"folder_ids": ["0BwVumX-VvI_SaU1taDlXZmhZXzQ"], "labels": ["임나영", "Nayoung"]},
         {"folder_ids": ["0BwVumX-VvI_SZERaVXFPRUJWQWM"], "labels": ["유연정", "Yeonjung"]},
-        {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc"], "labels": ["아이오아이", "I.O.I", "IOI"]},
+        {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc"], "labels": ["아이오아이", "I.O.I", "IOI", "OT11"]},
         {"folder_ids": ["0BwVumX-VvI_SaUQ2WW9NUkQ0bnc",
         "0BwVumX-VvI_SZERaVXFPRUJWQWM",
         "0BwVumX-VvI_SVktfVzM1ZFV6bE0",
