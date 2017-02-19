@@ -11,7 +11,7 @@ from .utils import checks
 from .utils.chat_formatting import pagify
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
-__version__ = "0.1"
+__version__ = "1.0"
 
 class Vlive:
     """Get VLive notifications and more"""
