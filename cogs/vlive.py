@@ -28,6 +28,7 @@ class Vlive:
         self.api_base_url = "http://api.vfan.vlive.tv/{0}?app_id={1}&{2}"
         self.notice_base_url = "http://notice.vlive.tv/notice/list.json?channel_seq={0}"
         self.notice_friendly_url = "http://channels.vlive.tv/{0}/notice/{1}"
+        self.celeb_friendly_url = "http://channels.vlive.tv/{0}/celeb/{1}"
         self.channel_id_regex = r"(http(s)?:\/\/channels.vlive.tv)?(\/)?(channels\/)?(?P<channel_id>[A-Z0-9]+)(\/video)?"
         self.headers = {"user-agent": "Red-cog-VLive/"+__version__}
 
@@ -89,6 +90,7 @@ class Vlive:
             "lastVideoSeq" : channel_information["last_video"]["seq"],
             "lastUpcomingVideoSeq": channel_information["next_upcoming_video"]["seq"],
             "lastNoticeNumber": channel_information["last_notice"]["number"],
+            "lastCelebPostId": channel_information["last_celeb_post"]["id"],
             "channelId" : post_channel.id,
             "serverId" : post_channel.server.id})
         dataIO.save_json(self.channels_file_path, self.channels)
@@ -174,15 +176,16 @@ class Vlive:
     async def get_channel_information_from_channel_id(self, channel_id):
         channel_seq = await self.get_channel_seq_from_channel_id(channel_id)
 
-        channel_api_url = self.api_base_url.format("channel.{0}".format(channel_seq), self.settings["VLIVE_APP_ID"], "fields=channel_name,fan_count,channel_cover_img,channel_profile_img,representative_color")
+        channel_api_url = self.api_base_url.format("channel.{0}".format(channel_seq), self.settings["VLIVE_APP_ID"], "fields=channel_name,fan_count,channel_cover_img,channel_profile_img,representative_color,celeb_board")
         channel_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getChannelVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
         channel_upcoming_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getUpcomingVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
         channel_notices_api_url = self.notice_base_url.format(channel_seq)
 
-        channel_data = {"name": "", "followers": 0, "cover_img": "", "profile_img": "", "color": "", "total_videos": 0,
+        channel_data = {"name": "", "followers": 0, "cover_img": "", "profile_img": "", "color": "", "total_videos": 0, "celeb_board_id": 0,
         "last_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""},
         "next_upcoming_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""},
-        "last_notice": {"number": 0, "image_url": "", "title": "", "summary": ""}}
+        "last_notice": {"number": 0, "image_url": "", "title": "", "summary": "", "url": ""},
+        "last_celeb_post": {"id": "", "summary": "", "url": ""}}
 
         try:
             conn = aiohttp.TCPConnector()
@@ -200,6 +203,8 @@ class Vlive:
             channel_data["profile_img"] = result["channel_profile_img"]
             channel_data["color"] = result["representative_color"]
             channel_data["channel_url"] = self.channel_base_url.format(channel_id)
+            if "celeb_board" in result and "board_id" in result["celeb_board"]:
+                channel_data["celeb_board_id"] = result["celeb_board"]["board_id"]
 
             async with session.get(channel_video_list_api_url, headers=self.headers) as r:
                 result = await r.json()
@@ -242,6 +247,18 @@ class Vlive:
                 channel_data["last_notice"]["image_url"] = last_notice["listImageUrl"]
                 channel_data["last_notice"]["summary"] = last_notice["summary"]
                 channel_data["last_notice"]["url"] = self.notice_friendly_url.format(channel_id, last_notice["noticeNo"])
+
+            if channel_data["celeb_board_id"] != 0:
+                channel_celeb_api_url = self.api_base_url.format("board.{0}/posts".format(channel_data["celeb_board_id"]), self.settings["VLIVE_APP_ID"], "")
+
+                async with session.get(channel_celeb_api_url, headers=self.headers) as r:
+                    result = await r.json()
+
+                if "data" in result and len(result["data"]) > 0:
+                    last_celeb_post = result["data"][0]
+                    channel_data["last_celeb_post"]["id"] = last_celeb_post["post_id"]
+                    channel_data["last_celeb_post"]["summary"] = last_celeb_post["body_summary"]
+                    channel_data["last_celeb_post"]["url"] = self.celeb_friendly_url.format(channel_id, last_celeb_post["post_id"])
 
             session.close()
 
@@ -357,6 +374,17 @@ class Vlive:
 
         await self.bot.send_message(channel, "<{0}>".format(channel_information["last_notice"]["url"]), embed=embed_data)
 
+    async def _post_celebpost(self, channel, channel_information):
+        embed_data = discord.Embed(
+            title=":star2: {0} posted a new celeb post!".format(channel_information["name"]),
+            url=channel_information["last_celeb_post"]["url"],
+            colour=discord.Colour(value=int(channel_information["color"].replace("#", ""), 16)),
+            description="{0}".format(channel_information["last_celeb_post"]["summary"]))
+        embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
+        embed_data.set_footer(text="via vlive.tv")
+
+        await self.bot.send_message(channel, "<{0}>".format(channel_information["last_celeb_post"]["url"]), embed=embed_data)
+
     async def check_feed_loop(self, sleep, loop):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Vlive'):
@@ -390,6 +418,13 @@ class Vlive:
                         await self._post_notice(channel, channel_information)
 
                     self.channels[self.channels.index(vlive_channel)]["lastNoticeNumber"] = channel_information["last_notice"]["number"]
+                    dataIO.save_json(self.channels_file_path, self.channels)
+
+                if "lastCelebPostId" not in vlive_channel or channel_information["last_celeb_post"]["id"] != vlive_channel["lastCelebPostId"]:
+                    if "lastCelebPostId" in vlive_channel and channel_information["last_celeb_post"]["id"] != "":
+                        await self._post_celebpost(channel, channel_information)
+
+                    self.channels[self.channels.index(vlive_channel)]["lastCelebPostId"] = channel_information["last_celeb_post"]["id"]
                     dataIO.save_json(self.channels_file_path, self.channels)
 
             await loop.create_task(sleep(60))
