@@ -84,7 +84,8 @@ class Vlive:
 
         self.channels.append({"vliveChannelId": channel_id,
             "vliveChannelName": channel_information["name"],
-            "lastVideoSeq" : 0,
+            "lastVideoSeq" : channel_information["last_video"]["seq"],
+            "lastUpcomingVideoSeq": channel_information["next_upcoming_video"]["seq"],
             "channelId" : post_channel.id,
             "serverId" : post_channel.server.id})
         dataIO.save_json(self.channels_file_path, self.channels)
@@ -175,8 +176,8 @@ class Vlive:
         channel_upcoming_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getUpcomingVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
 
         channel_data = {"name": "", "followers": 0, "cover_img": "", "profile_img": "", "color": "", "total_videos": 0,
-        "last_video": {"seq": "", "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""},
-        "next_upcoming_video": {"seq": "", "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""}}
+        "last_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""},
+        "next_upcoming_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""}}
 
         try:
             conn = aiohttp.TCPConnector()
@@ -295,8 +296,8 @@ class Vlive:
         embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
         embed_data.set_image(url=str(channel_information["last_video"]["thumbnail"]))
         embed_data.set_footer(text="via vlive.tv")
-        embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["last_video"]["plays"]))
-        embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["last_video"]["likes"]))
+        #embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["last_video"]["plays"]))
+        #embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["last_video"]["likes"]))
 
         await self.bot.send_message(channel, "<{0}>".format(channel_information["last_video"]["url"]), embed=embed_data)
 
@@ -309,10 +310,24 @@ class Vlive:
         embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
         embed_data.set_image(url=str(channel_information["last_video"]["thumbnail"]))
         embed_data.set_footer(text="via vlive.tv")
-        embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["last_video"]["plays"]))
-        embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["last_video"]["likes"]))
+        #embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["last_video"]["plays"]))
+        #embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["last_video"]["likes"]))
 
         await self.bot.send_message(channel, "<{0}>".format(channel_information["last_video"]["url"]), embed=embed_data)
+
+    async def _post_upcoming_item(self, channel, channel_information):
+        embed_data = discord.Embed(
+            title=":calendar_spiral: {0} scheduled a new video for {1} KST!".format(channel_information["name"], channel_information["next_upcoming_video"]["date"]),
+            url=channel_information["next_upcoming_video"]["url"],
+            colour=discord.Colour(value=int(channel_information["color"].replace("#", ""), 16)),
+            description=channel_information["next_upcoming_video"]["title"])
+        embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
+        embed_data.set_image(url=str(channel_information["next_upcoming_video"]["thumbnail"]))
+        embed_data.set_footer(text="via vlive.tv")
+        #embed_data.add_field(name="Plays", value="{0:,}".format(channel_information["next_upcoming_video"]["plays"]))
+        #embed_data.add_field(name="Likes", value="{0:,}".format(channel_information["next_upcoming_video"]["likes"]))
+
+        await self.bot.send_message(channel, "<{0}>".format(channel_information["next_upcoming_video"]["url"]), embed=embed_data)
 
     async def check_feed_loop(self, sleep, loop):
         await self.bot.wait_until_ready()
@@ -326,7 +341,7 @@ class Vlive:
                 channel_information = await self.get_channel_information_from_channel_id(vlive_channel["vliveChannelId"])
 
                 if "lastVideoSeq" not in vlive_channel or channel_information["last_video"]["seq"] != vlive_channel["lastVideoSeq"]:
-                    if "lastVideoSeq" in vlive_channel and vlive_channel["lastVideoSeq"] != 0:
+                    if "lastVideoSeq" in vlive_channel and channel_information["last_video"]["seq"] != 0:
                         if channel_information["last_video"]["type"] == "LIVE":
                             await self._post_live_item(channel, channel_information)
                         else:
@@ -334,7 +349,16 @@ class Vlive:
 
                     self.channels[self.channels.index(vlive_channel)]["lastVideoSeq"] = channel_information["last_video"]["seq"]
                     dataIO.save_json(self.channels_file_path, self.channels)
-            await loop.create_task(sleep(90))
+
+                if "lastUpcomingVideoSeq" not in vlive_channel or channel_information["next_upcoming_video"]["seq"] != vlive_channel["lastUpcomingVideoSeq"]:
+                    if "lastUpcomingVideoSeq" in vlive_channel and channel_information["next_upcoming_video"]["seq"] != 0:
+                        await self._post_upcoming_item(channel, channel_information)
+
+                    self.channels[self.channels.index(vlive_channel)]["lastUpcomingVideoSeq"] = channel_information["next_upcoming_video"]["seq"]
+                    dataIO.save_json(self.channels_file_path, self.channels)
+
+
+            await loop.create_task(sleep(60))
 
 def check_folders():
     folders = ("data", "data/vlive/")
