@@ -26,6 +26,8 @@ class Vlive:
         self.main_base_url = "http://www.vlive.tv/{0}"
         self.channel_base_url = "http://channels.vlive.tv/{0}"
         self.api_base_url = "http://api.vfan.vlive.tv/{0}?app_id={1}&{2}"
+        self.notice_base_url = "http://notice.vlive.tv/notice/list.json?channel_seq={0}"
+        self.notice_friendly_url = "http://channels.vlive.tv/{0}/notice/{1}"
         self.channel_id_regex = r"(http(s)?:\/\/channels.vlive.tv)?(\/)?(channels\/)?(?P<channel_id>[A-Z0-9]+)(\/video)?"
         self.headers = {"user-agent": "Red-cog-VLive/"+__version__}
 
@@ -86,6 +88,7 @@ class Vlive:
             "vliveChannelName": channel_information["name"],
             "lastVideoSeq" : channel_information["last_video"]["seq"],
             "lastUpcomingVideoSeq": channel_information["next_upcoming_video"]["seq"],
+            "lastNoticeNumber": channel_information["last_notice"]["number"],
             "channelId" : post_channel.id,
             "serverId" : post_channel.server.id})
         dataIO.save_json(self.channels_file_path, self.channels)
@@ -174,10 +177,12 @@ class Vlive:
         channel_api_url = self.api_base_url.format("channel.{0}".format(channel_seq), self.settings["VLIVE_APP_ID"], "fields=channel_name,fan_count,channel_cover_img,channel_profile_img,representative_color")
         channel_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getChannelVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
         channel_upcoming_video_list_api_url = self.api_base_url.format("vproxy/channelplus/getUpcomingVideoList", self.settings["VLIVE_APP_ID"], "channelSeq={0}&maxNumOfRows=1".format(channel_seq))
+        channel_notices_api_url = self.notice_base_url.format(channel_seq)
 
         channel_data = {"name": "", "followers": 0, "cover_img": "", "profile_img": "", "color": "", "total_videos": 0,
         "last_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""},
-        "next_upcoming_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""}}
+        "next_upcoming_video": {"seq": 0, "title": "", "plays": 0, "likes": 0, "thumbnail": "", "date": "", "type": ""},
+        "last_notice": {"number": 0, "image_url": "", "title": "", "summary": ""}}
 
         try:
             conn = aiohttp.TCPConnector()
@@ -226,6 +231,17 @@ class Vlive:
                 channel_data["next_upcoming_video"]["date"] = next_upcoming_video["onAirStartAt"]
                 channel_data["next_upcoming_video"]["type"] = next_upcoming_video["videoType"]
                 channel_data["next_upcoming_video"]["url"] = self.main_base_url.format("video/{0}".format(next_upcoming_video["videoSeq"]))
+
+            async with session.get(channel_notices_api_url, headers=self.headers) as r:
+                result = await r.json()
+
+            if "data" in result and len(result["data"]) > 0:
+                last_notice = result["data"][0]
+                channel_data["last_notice"]["number"] = last_notice["noticeNo"]
+                channel_data["last_notice"]["title"] = last_notice["title"]
+                channel_data["last_notice"]["image_url"] = last_notice["listImageUrl"]
+                channel_data["last_notice"]["summary"] = last_notice["summary"]
+                channel_data["last_notice"]["url"] = self.notice_friendly_url.format(channel_id, last_notice["noticeNo"])
 
             session.close()
 
@@ -329,6 +345,18 @@ class Vlive:
 
         await self.bot.send_message(channel, "<{0}>".format(channel_information["next_upcoming_video"]["url"]), embed=embed_data)
 
+    async def _post_notice(self, channel, channel_information):
+        embed_data = discord.Embed(
+            title=":pencil: {0} posted a new notice!".format(channel_information["name"]),
+            url=channel_information["last_notice"]["url"],
+            colour=discord.Colour(value=int(channel_information["color"].replace("#", ""), 16)),
+            description="**{0}**\n{1}".format(channel_information["last_notice"]["title"], channel_information["last_notice"]["summary"]))
+        embed_data.set_thumbnail(url=str(channel_information["profile_img"]))
+        embed_data.set_image(url=str(channel_information["last_notice"]["image_url"]))
+        embed_data.set_footer(text="via vlive.tv")
+
+        await self.bot.send_message(channel, "<{0}>".format(channel_information["last_notice"]["url"]), embed=embed_data)
+
     async def check_feed_loop(self, sleep, loop):
         await self.bot.wait_until_ready()
         while self == self.bot.get_cog('Vlive'):
@@ -357,6 +385,12 @@ class Vlive:
                     self.channels[self.channels.index(vlive_channel)]["lastUpcomingVideoSeq"] = channel_information["next_upcoming_video"]["seq"]
                     dataIO.save_json(self.channels_file_path, self.channels)
 
+                if "lastNoticeNumber" not in vlive_channel or channel_information["last_notice"]["number"] != vlive_channel["lastNoticeNumber"]:
+                    if "lastNoticeNumber" in vlive_channel and channel_information["last_notice"]["number"] != 0:
+                        await self._post_notice(channel, channel_information)
+
+                    self.channels[self.channels.index(vlive_channel)]["lastNoticeNumber"] = channel_information["last_notice"]["number"]
+                    dataIO.save_json(self.channels_file_path, self.channels)
 
             await loop.create_task(sleep(60))
 
