@@ -396,7 +396,7 @@ class Vlive:
                     continue
                 channel_information = await self.get_channel_information_from_channel_id(vlive_channel["vliveChannelId"])
 
-                if "lastVideoSeq" not in vlive_channel or channel_information["last_video"]["seq"] != vlive_channel["lastVideoSeq"]:
+                if "lastVideoSeq" not in vlive_channel or channel_information["last_video"]["seq"] >= vlive_channel["lastVideoSeq"]:
                     if "lastVideoSeq" in vlive_channel and channel_information["last_video"]["seq"] != 0:
                         if channel_information["last_video"]["type"] == "LIVE":
                             await self._post_live_item(channel, channel_information)
@@ -406,14 +406,14 @@ class Vlive:
                     self.channels[self.channels.index(vlive_channel)]["lastVideoSeq"] = channel_information["last_video"]["seq"]
                     dataIO.save_json(self.channels_file_path, self.channels)
 
-                if "lastUpcomingVideoSeq" not in vlive_channel or channel_information["next_upcoming_video"]["seq"] != vlive_channel["lastUpcomingVideoSeq"]:
+                if "lastUpcomingVideoSeq" not in vlive_channel or channel_information["next_upcoming_video"]["seq"] >= vlive_channel["lastUpcomingVideoSeq"]:
                     if "lastUpcomingVideoSeq" in vlive_channel and channel_information["next_upcoming_video"]["seq"] != 0:
                         await self._post_upcoming_item(channel, channel_information)
 
                     self.channels[self.channels.index(vlive_channel)]["lastUpcomingVideoSeq"] = channel_information["next_upcoming_video"]["seq"]
                     dataIO.save_json(self.channels_file_path, self.channels)
 
-                if "lastNoticeNumber" not in vlive_channel or channel_information["last_notice"]["number"] != vlive_channel["lastNoticeNumber"]:
+                if "lastNoticeNumber" not in vlive_channel or channel_information["last_notice"]["number"] >= vlive_channel["lastNoticeNumber"]:
                     if "lastNoticeNumber" in vlive_channel and channel_information["last_notice"]["number"] != 0:
                         await self._post_notice(channel, channel_information)
 
