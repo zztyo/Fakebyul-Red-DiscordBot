@@ -12,7 +12,7 @@ class RemindMe:
     def __init__(self, bot):
         self.bot = bot
         self.reminders = fileIO("data/remindme/reminders.json", "load")
-        self.units = {"minute" : 60, "hour" : 3600, "day" : 86400, "week": 604800, "month": 2592000}
+        self.units = {"minute" : 60, "hour" : 3600, "day" : 86400, "week": 604800, "month": 2592000, "min":60, "hr":3600}
 
     @commands.command(pass_context=True)
     async def remindme(self, ctx,  quantity : int, time_unit : str, *, text : str):
