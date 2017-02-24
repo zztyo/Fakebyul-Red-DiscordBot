@@ -231,7 +231,8 @@ class Bias:
                 await self.bot.delete_message(successMessage)
                 await self.bot.delete_message(message)
                 return
-
+                
+            
             selfAssignableRoles = 0
             selfAssignablePrimaryRoles = 0
             selfAssignableGroupRoles = 0
@@ -244,8 +245,9 @@ class Bias:
                 
                 if cleanedRoleName in list(availableRoles.values()):
                     selfAssignableRoles +=1
-                    if self.settings[server.id]["SUB_ROLES"] and (suffix in role.name and prefix in role.name) and not (subSuffix in role.name or subPrefix in role.name):
+                    if self.settings[server.id]["SUB_ROLES"] and (suffix == "" or suffix in role.name) and (prefix == "" or prefix in role.name) and (subSuffix =="" or subSuffix not in role.name) and  (subPrefix == "" or subPrefix not in role.name):
                         selfAssignablePrimaryRoles+=1
+                        
                 if len(availableGroupRoles) > 0 and cleanedRoleName in list(availableGroupRoles.values()):
                     selfAssignableGroupRoles += 1
             if changingRoleAlias in availableRoles:
@@ -264,7 +266,7 @@ class Bias:
                     await self.bot.delete_message(successMessage)
                     await self.bot.delete_message(message)
                     return
-
+            
         if message.content[0] == "-":
             if changingRole not in author.roles and (changingPrimaryRole == None or changingPrimaryRole not in author.roles):
                 successMessage = await self.bot.send_message(channel, "{} you don't have this role! :thinking:".format(author.mention))
