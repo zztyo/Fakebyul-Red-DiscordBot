@@ -1,218 +1,36 @@
 {
-    "250216966436945920" : {
+    "276921429277147147" : {
         "ASSIGNABLE_ROLES" : {
-            "somi" : "Somi",
-            "sejeong" : "Sejeong",
-            "yoojung" : "Yoojung",
-            "chungha" : "Chungha",
-            "sohye" : "Sohye",
-            "jieqiong" : "Jieqiong",
-            "chaeyeon" : "Chaeyeon",
-            "doyeon" : "Doyeon",
-            "mina" : "Mina",
-            "nayoung" : "Nayoung",
-            "yeonjung" : "Yeonjung",
-            "ot11" : "OT11",
-            "pinky" : "Jieqiong",
-            "\u5468\u6d01\u743c" : "Jieqiong",
-            "\uac15\ubbf8\ub098" : "Mina",
-            "\uae40\ub3c4\uc5f0" : "Doyeon",
-            "\uae40\uc138\uc815" : "Sejeong",
-            "\uae40\uc18c\ud61c" : "Sohye",
-            "\uae40\ucc2c\ubbf8" : "Chungha",
-            "\uc720\uc5f0\uc815" : "Yeonjung",
-            "\uc784\ub098\uc601" : "Nayoung",
-            "\uc804\uc18c\ubbf8" : "Somi",
-            "\uc815\ucc44\uc5f0" : "Chaeyeon",
-            "\ucd5c\uc720\uc815" : "Yoojung",
-            "dodaeng": "DoDaeng"
-        },
-        "GROUP_ASSIGNABLE_ROLES" : {
-            "dia" : "DIA",
-            "gugudan" : "Gugudan",
-            "iteen" : "iTeen",
-            "jyp" : "JYP",
-            "m&h" : "M&H",
-            "pristin" : "Pristin",
-            "s&p" : "S&P",
-            "wjsn" : "WJSN",
-            "cosmic girls" : "WJSN"
-        },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-            "overwatch" : "Overwatch",
-            "dota" : "DOTA",
-            "league of legends" : "League of Legends",
-            "ow" : "Overwatch",
-            "dota2" : "DOTA",
-            "lol" : "League of Legends",
-            "league" : "League of Legends",
-            "karaoke" : "Karaoke",
-            "norebang" : "Karaoke"
-        },
-        "CHANNELS" : [
-            "250220888077631489"
-        ],
-        "MAX_ROLES" : 3,
-        "MAX_GROUP_ROLES" : 1,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : " 💎"
+	    "changsub" : "Changsub",
+	    "sungjae" : "Sungjae"
+	},
+	"GROUP_ASSIGNABLE_ROLES" : {},
+	"EXTRA_ASSIGNABLE_ROLES" : {},
+	"MAX_ROLES" : 3,
+        "SUB_ROLES" : true,
+	"SUB_ROLE_PREFIX":"+",
+	"CHANNELS" : [
+            "284722700046303232"
+        ]
     },
-    "265559543272964097" : {
+    "253833262408007680" : {
         "ASSIGNABLE_ROLES" : {
-            "yoojung" : "Yoojung",
-            "doyeon" : "Doyeon",
-            "\ucd5c\uc720\uc815" : "Yoojung",
-            "\uae40\ub3c4\uc5f0" : "Doyeon"
+            "changsub" : "Changsub \ucc3d\uc12d",
+	    "eunkwang" : "Eunkwang \uc740\uad11",
+	    "hyunsik" : "Hyunsik \ud604\uc2dd",
+	    "ilhoon" : "Ilhoon \uc77c\ud6c8",
+	    "minhyuk" :"Minhyuk \ubbfc\ud601",
+            "peniel" : "Peniel \ud504\ub2c8\uc5d8",
+	    "sungjae" :"Sungjae \uc131\uc7ac"
         },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-        },
-        "CHANNELS" : [
-            "265566697065414672"
-        ],
-        "MAX_ROLES" : 2,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : " 💎"
-    },
-    "170399623859404800" : {
-        "ASSIGNABLE_ROLES" : {
-            "nara" : "Nara",
-            "alice" : "Alice",
-            "yeoreum" : "Yeoreum",
-            "yooyoung" : "Yooyoung",
-            "lime" : "Lime",
-            "seoyoung" : "Seoyoung",
-            "yooara" : "YooAra",
-            "yoonjo" : "Yoonjo"
-        },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-        },
-        "CHANNELS" : [
-            "265860727372382208"
-        ],
-        "MAX_ROLES" : 2,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : " 💎"
-    },
-    "208673735580844032": {
-        "ASSIGNABLE_ROLES" : {
-            "nayoung" : "Nayoung",
-            "sohye" : "Sohye",
-            "yoojung" : "Yoojung",
-            "chungha" : "Chungha",
-            "ot11" : "OT11",
-            "the test" : "Nayoung",
-            "\uc784\ub098\uc601" : "Nayoung",
-            "\uae40\uc18c\ud61c" : "Sohye",
-            "\ucd5c\uc720\uc815" : "Yoojung",
-            "\uae40\ucc2c\ubbf8" : "Chungha"
-        },
-        "GROUP_ASSIGNABLE_ROLES" : {
-            "dia" : "DIA",
-            "gugudan" : "Gugudan",
-            "iteen" : "iTeen",
-            "jyp" : "JYP",
-            "m&h" : "M&H",
-            "pristin" : "Pristin",
-            "s&p" : "S&P",
-            "wjsn" : "WJSN",
-            "cosmic girls" : "WJSN"
-        },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-            "extra1" : "Extra1",
-            "extra2" : "Extra2",
-            "extra3" : "Extra3",
-            "extra4" : "Extra4",
-            "overwatch" : "Overwatch",
-            "dota" : "DOTA",
-            "league of legends" : "League of Legends",
-            "ow" : "Overwatch",
-            "dota2" : "DOTA",
-            "lol" : "League of Legends",
-            "league" : "League of Legends",
-            "karaoke" : "Karaoke",
-            "norebang" : "Karaoke"
-        },
-        "CHANNELS" : [
-            "252000620565889024"
-        ],
-        "MAX_ROLES" : 2,
-        "MAX_GROUP_ROLES" : 1,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : " 💎"
-    },
-    "272744019119964160": {
-        "ASSIGNABLE_ROLES" : {
-            "ftisland" : "FTISLAND",
-            "cnblue" : "CNBLUE",
-            "juniel" : "Juniel",
-            "aoa" : "AOA",
-            "n.flying" : "N.Flying",
-            "innovator" : "InnoVator",
-            "sf9" : "SF9",
-            "honeyst" : "HONEYST",
-            "neoz school" : "NEOZ SCHOOL",
-            "trainee" : "Trainee"
-        },
-        "GROUP_ASSIGNABLE_ROLES" : {
-        },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-        },
-        "CHANNELS" : [
-            "272773260469600266"
-        ],
+        "GROUP_ASSIGNABLE_ROLES" : {},
+        "EXTRA_ASSIGNABLE_ROLES" : {},
         "MAX_ROLES" : 0,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : " 🎵"
-    },
-    "202869425353785344": {
-        "ASSIGNABLE_ROLES" : {
-            "nct" : "NCT",
-            "red velvet" : "Red Velvet",
-            "girls generation" : "Girls Generation",
-            "super junior" : "Super Junior",
-            "f(x)" : "f(x)",
-            "exo" : "EXO",
-            "boa" : "BoA",
-            "shinee" : "SHINee",
-            "tvxq" : "TVXQ",
-            "fly to the sky" : "Fly to the Sky",
-            "trax" : "TRAX",
-            "the grace" : "The Grace",
-            "hitchhiker" : "Hitchhiker",
-            "kim min-jong" : "Kim Min-Jong",
-            "sm the ballad" : "SM The Ballad",
-            "snsd" : "Girls Generation",
-            "kim minjong" : "Kim Min-Jong"
-        },
-        "GROUP_ASSIGNABLE_ROLES" : {
-        },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-        },
+        "SUB_ROLES" : true,
+        "SUB_ROLE_PREFIX":"+",
         "CHANNELS" : [
-            "274617849404850176"
-        ],
-        "MAX_ROLES" : 4,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : ""
-    },
-    "275365003643715584": {
-        "ASSIGNABLE_ROLES" : {
-            "after school" : "After School",
-            "orange caramel" : "Orange Caramel",
-            "nu'est" : "NU'EST",
-            "seventeen" : "SEVENTEEN",
-            "pristin" : "PRISTIN",
-            "nuest" : "NU'EST"
-        },
-        "GROUP_ASSIGNABLE_ROLES" : {
-        },
-        "EXTRA_ASSIGNABLE_ROLES" : {
-        },
-        "CHANNELS" : [
-            "275682637383729161"
-        ],
-        "MAX_ROLES" : 0,
-        "PRIMARY_ROLE_PREFIX" : "",
-        "PRIMARY_ROLE_SUFFIX" : " 🎵"
+            "284722700046303232"
+        ]
     }
+    
 }

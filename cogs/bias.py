@@ -244,7 +244,7 @@ class Bias:
                 
                 if cleanedRoleName in list(availableRoles.values()):
                     selfAssignableRoles +=1
-                    if self.settings[server.id]["SUB_ROLES"] and (suffix in role.name and prefix in role.name) and not (subSuffix in role.name or subPrefix in role.name)/:
+                    if self.settings[server.id]["SUB_ROLES"] and (suffix in role.name and prefix in role.name) and not (subSuffix in role.name or subPrefix in role.name):
                         selfAssignablePrimaryRoles+=1
                 if len(availableGroupRoles) > 0 and cleanedRoleName in list(availableGroupRoles.values()):
                     selfAssignableGroupRoles += 1
