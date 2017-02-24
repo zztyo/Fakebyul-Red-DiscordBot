@@ -93,8 +93,7 @@ class Statistics:
 
         cpu_p = psutil.cpu_percent(interval=None, percpu=True)
         cpu_usage = sum(cpu_p)/len(cpu_p)
-        disk_usage=psutil.disk_usage('/')
-
+        
         mem_v = psutil.virtual_memory()
 
         for channel in self.bot.get_all_channels():
@@ -127,9 +126,8 @@ class Statistics:
 
         em.add_field(name='\a', value='\a', inline=False)
         em.add_field(name='**CPU usage**', value='{0:.1f}%'.format(cpu_usage))
-        em.add_field(name='**Memory usage**', value='{0}MB/{1}MB'.format((mem_v.total-mem_v.available)>>20,mem_v.total>>20))
-        em.add_field(name='**Disk usage**', value='{0}MB/{1}MB'.format(disk_usage.used>>20,disk_usage.total>>20))
-
+        em.add_field(name='**Memory usage**', value='{0:.1f}%'.format(mem_v.percent)
+        
         em.add_field(name='\a', value='\a')
         em.set_footer(text='API version {}'.format(discord.__version__))
         return em
