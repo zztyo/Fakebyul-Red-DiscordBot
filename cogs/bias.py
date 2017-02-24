@@ -66,7 +66,7 @@ class Bias:
             else:
                 helpMessage += "."
 
-        if ("PRIMARY_ROLE_PREFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_PREFIX"] != "") or ("PRIMARY_ROLE_SUFFIX" in self.settings[server.id] and self.settings[server.id]["PRIMARY_ROLE_SUFFIX"] != ""):
+        if self.settings[server.id]["SUB_ROLES"]:
             helpMessage += "\nThe bias role you assign **first** will be your **primary role** and **appear above the others**. "
         helpMessage += "\nAvailable biases: "
         example = ""
@@ -74,7 +74,7 @@ class Bias:
             if role not in rolesHandled:
                 rolesHandled.append(role)
                 alias = str(alias).title()
-                aliasToPrint.append(role)
+                aliasToPrint.append(alias)
         i = 0
         for role in aliasToPrint:
             i += 1
@@ -171,15 +171,18 @@ class Bias:
             return
 
         availableRoles = self.settings[server.id]["ASSIGNABLE_ROLES"]
+
         availableGroupRoles = []
         availableExtraRoles = []
+        #for role in availableRoles:
+        #    await self.bot.send_message(channel, role);
         if "GROUP_ASSIGNABLE_ROLES" in self.settings[server.id]:
             availableGroupRoles = self.settings[server.id]["GROUP_ASSIGNABLE_ROLES"]
         if "EXTRA_ASSIGNABLE_ROLES" in self.settings[server.id]:
             availableExtraRoles = self.settings[server.id]["EXTRA_ASSIGNABLE_ROLES"]
-        if changingRoleAlias not in availableRoles and changingRoleAlias not in availableGroupRoles and changingRoleAlias not in availableExtraRoles:
+        if changingRoleAlias not in availableRoles.keys() and changingRoleAlias not in availableGroupRoles and changingRoleAlias not in availableExtraRoles:
             successMessage = await self.bot.send_message(channel, "{} I can't find this bias role! :thinking:".format(author.mention))
-
+            
             await asyncio.sleep(10)
             await self.bot.delete_message(successMessage)
             await self.bot.delete_message(message)
@@ -192,14 +195,21 @@ class Bias:
         if "PRIMARY_ROLE_SUFFIX" in self.settings[server.id]:
             suffix = self.settings[server.id]["PRIMARY_ROLE_SUFFIX"]
 
+        subSuffix = ""
+        subPrefix = ""
+        if "SUB_ROLE_SUFFIX" in self.settings[server.id]:
+            subSuffix = self.settings[server.id]["SUB_ROLE_SUFFIX"]
+        if "SUB_ROLE_PREFIX" in self.settings[server.id]:
+            subPrefix = self.settings[server.id]["SUB_ROLE_PREFIX"]
+
         changingRole = None
         if changingRoleAlias in availableRoles:
-            changingRole = self._role_from_string(server, availableRoles[changingRoleAlias])
+            changingRole = self._role_from_string(server, subPrefix+availableRoles[changingRoleAlias]+subSuffix)
         elif changingRoleAlias in availableGroupRoles:
             changingRole = self._role_from_string(server, availableGroupRoles[changingRoleAlias])
         elif changingRoleAlias in availableExtraRoles:
             changingRole = self._role_from_string(server, availableExtraRoles[changingRoleAlias])
-
+        
         if changingRole is None:
             print("role not found")
             somethingWentWrong = await self.bot.send_message(channel, "Something went wrong.")
@@ -208,6 +218,7 @@ class Bias:
             await self.bot.delete_message(somethingWentWrong)
             await self.bot.delete_message(message)
             return
+        
         changingPrimaryRole = None
         if changingRoleAlias in availableRoles:
             changingPrimaryRole = self._role_from_string(server, prefix+availableRoles[changingRoleAlias]+suffix)
@@ -220,6 +231,7 @@ class Bias:
                 await self.bot.delete_message(successMessage)
                 await self.bot.delete_message(message)
                 return
+
             selfAssignableRoles = 0
             selfAssignablePrimaryRoles = 0
             selfAssignableGroupRoles = 0
@@ -227,10 +239,13 @@ class Bias:
                 cleanedRoleName = role.name
                 cleanedRoleName = cleanedRoleName.replace(prefix, "")
                 cleanedRoleName = cleanedRoleName.replace(suffix, "")
+                cleanedRoleName = cleanedRoleName.replace(subPrefix,"")
+                cleanedRoleName = cleanedRoleName.replace(subSuffix,"")
+                
                 if cleanedRoleName in list(availableRoles.values()):
-                    selfAssignableRoles += 1
-                    if (prefix != "" and prefix in role.name) or (suffix != "" and suffix in role.name):
-                        selfAssignablePrimaryRoles += 1
+                    selfAssignableRoles +=1
+                    if self.settings[server.id]["SUB_ROLES"] and (suffix in role.name and prefix in role.name) and not (subSuffix in role.name or subPrefix in role.name)/:
+                        selfAssignablePrimaryRoles+=1
                 if len(availableGroupRoles) > 0 and cleanedRoleName in list(availableGroupRoles.values()):
                     selfAssignableGroupRoles += 1
             if changingRoleAlias in availableRoles:
@@ -258,7 +273,7 @@ class Bias:
                 await self.bot.delete_message(successMessage)
                 await self.bot.delete_message(message)
                 return
-
+        
         try:
             randomEmoji = ""
             if message.content[0] == "+":
