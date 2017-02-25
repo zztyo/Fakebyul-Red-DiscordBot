@@ -8,6 +8,8 @@ from .utils import checks
 from collections import OrderedDict
 import json
 import re
+import aiohttp
+from aiohttp.helpers import FormData
 
 __author__ = "Sebastian Winkler <sekl@slmn.de>"
 __version__ = "0.1"
@@ -275,22 +277,37 @@ class Bias:
                 await self.bot.delete_message(successMessage)
                 await self.bot.delete_message(message)
                 return
+        logs=None
+        if "LOG" in self.settings[server.id]:
+            logs=self.bot.get_channel(self.settings[server.id]["LOG"])
         
         try:
             randomEmoji = ""
+            role = ""
             if message.content[0] == "+":
                 randomEmoji = random.choice([":clap:", ":thumbsup:", ":blush:", ":sparkles:"])
+                role = "added "
                 if changingPrimaryRole != None and selfAssignablePrimaryRoles <= 0:
                     await self.bot.add_roles(author, changingPrimaryRole)
+                    role+=changingPrimaryRole.name
                 else:
                     await self.bot.add_roles(author, changingRole)
+                    role+=changingRole.name
+
             else:
                 randomEmoji = random.choice([":scream:", ":thumbsdown:", ":mask:", ":flushed:"])
+                role="removed "
                 if changingPrimaryRole != None and changingPrimaryRole in author.roles:
                     await self.bot.remove_roles(author, changingPrimaryRole)
+                    role+=changingPrimaryRole.name
                 else:
                     await self.bot.remove_roles(author, changingRole)
-            successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention, randomEmoji))
+                    role+=changingRole.name
+            successMessage = await self.bot.send_message(channel, "{0} done! {1}".format(author.mention,randomEmoji))
+            if logs !=None:
+                em = discord.Embed (title="{0} {1} role! {2}".format(author.display_name,role, randomEmoji), colour=author.colour)
+                em.set_author(name=author.display_name, icon_url=author.avatar_url)
+                await self.bot.send_message(logs, embed=em)
         except Exception as e:
             print(e)
             somethingWentWrong = await self.bot.send_message(channel, "Something went wrong.")
@@ -361,6 +378,42 @@ class Bias:
         else: return int_to_en(num // t) + ' trillion, ' + int_to_en(num % t)
 
         raise AssertionError('num is too large: %s' % str(num))
+
+    #Echos role changes to  secondary channel
+    async def _echo_bias(self, author, msg, channel):
+        headers = {"user-agent": "Red-cog-Mod/1", "content-type": "application/json", "Authorization": "Bot " + self.bot.settings.token}
+        # create webhook                                                                                                                                                             
+        url = "https://discordapp.com/api/channels/{0.id}/webhooks".format(channel)
+        payload = {"name": "MelodyBot/mod: move message webhook"}
+        conn = aiohttp.TCPConnector(verify_ssl=False)
+        session = aiohttp.ClientSession(connector=conn)
+        async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+            resultWebhookObject = await r.json()
+        if "token" in resultWebhookObject and "id" in resultWebhookObject:
+            await asyncio.sleep(2)
+            payload = FormData()
+            payload.add_field("username", author.name)
+            payload.add_field("avatar_url", author.avatar_url)
+            payload.add_field("content", msg)
+            async with session.post(url, data=payload, headers=headers) as r:
+                result = await r.text()
+
+            await asyncio.sleep(2)
+            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+            #embed = {"footer": {"text": "messaged moved from #{0.name} to #{1.name} by {2.name}".format(source_channel, new_channel, mover), "icon_url": mover.avatar_url}}
+            embed = {"title": msg, "icon_url": author.avatar_url}
+            payload = {"username": author.name, "avatar_url": author.avatar_url, "content": "test", "embeds": [embed]}
+            async with session.post(url, data=json.dumps(payload), headers=headers) as r:
+                #await r.text()
+                result = await r.text()
+
+            await asyncio.sleep(2)
+            url = "https://discordapp.com/api/webhooks/{0[id]}/{0[token]}".format(resultWebhookObject)
+            payload = {}
+            async with session.delete(url, data=json.dumps(payload), headers=headers) as r:
+                await r.text()
+        session.close()
+
 
 def check_folders():
     folders = ("data", "data/bias/")
