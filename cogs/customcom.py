@@ -88,6 +88,23 @@ class CustomCommands:
         else:
             await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
 
+    @_commands.command(pass_context=True, no_pm=True, name="count")
+    async def _count(self, ctx):
+        """Searches in the custom commands"""
+        server = ctx.message.server
+        if server.id in self.c_commands:
+            cmdlist = self.c_commands[server.id]
+            if cmdlist:
+                if len(cmdlist)==1:
+                    msg = "```There is 1 custom command on this server```"
+                else:
+                    msg="```There are {} custom commands on this server```".format(len(cmdlist))
+                await self.bot.say(msg);
+            else:
+                await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+        else:
+            await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+
     """
     @_commands.command(pass_context=True, no_pm=True, name="full-list")
     async def _full_list(self, ctx):
