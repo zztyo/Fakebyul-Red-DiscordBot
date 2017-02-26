@@ -83,6 +83,7 @@ class CustomCommands:
                     return
                 for cmds in msg:
                     await self.bot.say(cmds)
+                await self.bot.say("There are {} commands with \"{}\" in the server".format(commandsFound,keyword))
             else:
                 await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
         else:
