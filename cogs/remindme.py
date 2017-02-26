@@ -102,6 +102,7 @@ class RemindMe:
             nextreminder="Removed reminder for `{1}` in `{0}`\n".format(timeString,reminder["TEXT"])
             await self.bot.send_message(author,nextreminder)
             self.reminders.remove(reminders[idx-1])
+            fileIO("data/remindme/reminders.json", "save", self.reminders)
             if not channel.is_private:
                 await self.bot.say("{0} Please check your DMs".format(author.mention))
         else:
