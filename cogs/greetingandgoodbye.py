@@ -68,6 +68,14 @@ class Greetingandgoodbye:
                 except:
                     return None
                 await self.bot.send_message(channel, serverSettings["GREETING"].format(member))
+            if "DEFAULT_ROLE" in serverSettings:
+                roles=server.roles
+                rolename=serverSettings["DEFAULT_ROLE"].strip().replace("name ","")
+                role = discord.utils.find(lambda r: r.name.lower() == rolename.lower(), roles)
+                try:
+                    await self.bot.add_roles(member, role)
+                except Exception as e:
+                    print(e)
 
     async def member_remove(self, member):
         server = member.server
@@ -83,6 +91,18 @@ class Greetingandgoodbye:
                     return None
                 await self.bot.send_message(channel, serverSettings["GOODBYE"].format(member))
 
+    @commands.command(pass_context=True, no_pm=True, name='defaultrole')
+    @checks.mod_or_permissions(administrator=True)
+    async def _default_role(self, ctx, *, text):
+        '''Sets the default role that all new members get when they join'''
+        server=ctx.message.server
+        if server.id in self.settings:
+            glist=self.settings[server.id]
+            glist["DEFAULT_ROLE"] = text
+            self.settings[server.id]=glist
+            dataIO.save_json(self.file_path, self.settings)
+            await self.bot.say("Default role successfully set.")
+        
 def check_folders():
     folders = ("data", "data/greetingandgoodbye/")
     for folder in folders:
@@ -96,7 +116,8 @@ def check_files():
     "GREETING": "Welcome {0.mention}! :clap:",
     "GOODBYE": "Goodbye {0.name}! :wave:",
     "POST_GREETING": True,
-    "POST_GOODBYE": True
+    "POST_GOODBYE": True,
+    "DEFAULT_ROLE":""
     },
     }
 
