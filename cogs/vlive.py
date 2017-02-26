@@ -30,6 +30,7 @@ class Vlive:
         self.notice_friendly_url = "http://channels.vlive.tv/{0}/notice/{1}"
         self.celeb_friendly_url = "http://channels.vlive.tv/{0}/celeb/{1}"
         self.channel_id_regex = r"(http(s)?:\/\/channels.vlive.tv)?(\/)?(channels\/)?(?P<channel_id>[A-Z0-9]+)(\/video)?"
+        self.video_regex = r"^(http(s)?:\/\/www\.vlive\.tv\/video\/)?(?P<video_id>[0-9]+)(\?.+)?$" # currently not in use, since there is no api to get a video by id? Was meant for [p]vlive info <video id>
         self.headers = {"user-agent": "Red-cog-VLive/"+__version__}
 
     @commands.group(pass_context=True, no_pm=True, name="vlive", aliases=["vl"])
