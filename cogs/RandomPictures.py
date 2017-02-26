@@ -49,7 +49,7 @@ class RandomPictures:
         "0BwVumX-VvI_SaU1taDlXZmhZXzQ"],
         "post_to_channels": ["250216966436945920"],
         "labels": ["아이오아이-all", "I.O.I-all", "IOI-all"]},
-        {"folder_ids": ["0ByR8toqsAlGrSGtmZURfTVdBUEk"], "post_to_channels": ["113799375272017929"]}
+        {"folder_ids": ["0ByR8toqsAlGreGdnMlFBRk5uRmc", "0ByR8toqsAlGrNmtQdlAxQ1V3TDA"], "post_to_channels": ["113799375272017929"]}
         ]
         self.aliases = [{}]
         self.settings = {"post_interval": 5400} # 1.5 hours
