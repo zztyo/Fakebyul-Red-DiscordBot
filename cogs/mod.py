@@ -210,6 +210,36 @@ class Mod:
 
     @commands.command(no_pm=True, pass_context=True)
     @checks.admin_or_permissions(ban_members=True)
+    async def preban(self, ctx, member_id: int):
+        """Bans a member via their ID.
+        In order for this to work, the bot must have Ban Member permissions.
+        To use this command you must have Ban Members permission or have the
+        Bot Admin role.
+        """
+        server=ctx.message.server
+        author=ctx.message.author
+        user=self.bot.get_user_info(member_id)
+        try:
+            self._tmp_banned_cache.append(user)
+            await self.bot.http.ban(member_id, ctx.message.server.id)
+            logger.info("{}({}) banned <@{}>".format(
+                author.name, author.id, member_id))
+            await self.new_case(server,
+                                action="Ban \N{HAMMER}",
+                                mod=author,
+                                user=user)
+        except discord.Forbidden:
+            await self.bot.say('The bot does not have permissions to ban members.')
+        except discord.HTTPException:
+            await self.bot.say('Banning failed.')
+        else:
+            await self.bot.say('\U0001f44c')
+        finally:
+            await asyncio.sleep(1)
+            self._tmp_banned_cache.remove(user)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.admin_or_permissions(ban_members=True)
     async def ban(self, ctx, user: discord.Member, days: int=0):
         """Bans user and deletes last X days worth of messages.
 
@@ -228,7 +258,7 @@ class Mod:
                                 action="Ban \N{HAMMER}",
                                 mod=author,
                                 user=user)
-            await self.bot.say("Done. It was about time.")
+            await self.bot.say("Done. '\U0001f44c'")
         except discord.errors.Forbidden:
             await self.bot.say("I'm not allowed to do that.")
         except Exception as e:
