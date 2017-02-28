@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from .utils.dataIO import dataIO
-from .utils.chat_formatting import *
+from .utils.chat_formatting import escape_mass_mentions
 from .utils import checks
 from __main__ import send_cmd_help
 from collections import defaultdict
@@ -316,7 +316,7 @@ class Streams:
         url = "https://api.hitbox.tv/media/live/" + stream
         try:
             async with aiohttp.get(url) as r:
-                data = await r.json()
+                data = await r.json(encoding='utf-8')
             if "livestream" not in data:
                 return None
             if data["livestream"][0]["media_is_live"] == "0":
@@ -334,7 +334,7 @@ class Streams:
         header = {'Client-ID': self.settings.get("TWITCH_TOKEN", "")}
         try:
             async with session.get(url, headers=header) as r:
-                data = await r.json()
+                data = await r.json(encoding='utf-8')
             await session.close()
             if r.status == 400:
                 return 400
@@ -353,7 +353,7 @@ class Streams:
         url = "https://beam.pro/api/v1/channels/" + stream
         try:
             async with aiohttp.get(url) as r:
-                data = await r.json()
+                data = await r.json(encoding='utf-8')
             if "online" in data:
                 if data["online"] is True:
                     data = self.beam_embed(data)
@@ -369,13 +369,21 @@ class Streams:
     def twitch_embed(self, data):
         channel = data["stream"]["channel"]
         url = channel["url"]
-        embed = discord.Embed(title=channel["status"], url=url)
+        logo = channel["logo"]
+        if logo is None:
+            logo = "https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_70x70.png"
+        status = channel["status"]
+        if not status:
+            status = "Untitled broadcast"
+        embed = discord.Embed(title=status, url=url)
         embed.set_author(name=channel["display_name"])
         embed.add_field(name="Followers", value="{0:,}".format(channel["followers"]))
         embed.add_field(name="Total views", value="{0:,}".format(channel["views"]))
-        embed.set_thumbnail(url=channel["logo"])
+        embed.set_thumbnail(url=logo)
         embed.set_image(url=data["stream"]["preview"]["medium"])
-        embed.set_footer(text="Playing: " + channel["game"])
+        if channel["game"]:
+            embed.set_footer(text="Playing: " + channel["game"])
+        embed.color = 0x6441A4
         return embed
 
     def hitbox_embed(self, data):
@@ -390,17 +398,24 @@ class Streams:
         embed.set_thumbnail(url=base_url + channel["user_logo"])
         embed.set_image(url=base_url + livestream["media_thumbnail"])
         embed.set_footer(text="Playing: " + livestream["category_name"])
+        embed.color = 0x98CB00
         return embed
 
     def beam_embed(self, data):
+        default_avatar = ("https://beam.pro/_latest/assets/images/main/"
+                          "avatars/default.jpg")
         user = data["user"]
         url = "https://beam.pro/" + data["token"]
         embed = discord.Embed(title=data["name"], url=url)
         embed.set_author(name=user["username"])
         embed.add_field(name="Followers", value="{0:,}".format(data["numFollowers"]))
         embed.add_field(name="Total views", value="{0:,}".format(data["viewersTotal"]))
-        embed.set_thumbnail(url=user["avatarUrl"])
+        if user["avatarUrl"]:
+            embed.set_thumbnail(url=user["avatarUrl"])
+        else:
+            embed.set_thumbnail(url=default_avatar)
         embed.set_image(url=data["thumbnail"]["url"])
+        embed.color = 0x4C90F3
         if data["type"] is not None:
             embed.set_footer(text="Playing: " + data["type"]["name"])
         return embed
