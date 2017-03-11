@@ -6,7 +6,7 @@ data/audio/playlists/*/*
 !data/trivia/*
 *.exe
 *.dll
-!data/leveler/*x
+!data/leveler/*
 !data/bias/settings.json
 !data/red/cogs.json
 !data/mod/settings.json
