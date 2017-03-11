@@ -1,4 +1,11 @@
 {
+    "" : {
+        "CHANNEL" : "272744019119964160",
+        "GOODBYE" : "Goodbye {0.name}! :wave:",
+        "GREETING" : "Welcome {0.mention}! :fnc:\nCheck out <#275681973232467978> and go to <#275682637383729161> to get your bias roles.",
+        "POST_GOODBYE" : false,
+        "POST_GREETING" : true
+    },
     "170045482264035328" : {
         "CHANNEL" : "170045482264035328",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
@@ -27,6 +34,14 @@
         "POST_GOODBYE" : true,
         "POST_GREETING" : true
     },
+    "253833262408007680" : {
+        "CHANNEL" : "253833262408007680",
+        "DEFAULT_ROLE" : "Melody \u266c",
+        "GOODBYE" : "{0.mention} just left BTOB (Born to Beat). We will find you and turn you back into a Melody :upside_down:",
+        "GREETING" : "Welcome {0.mention} to BTOB!  Get ready to experience the best vocals in K-pop :fire: :fire: :fire: \nCheck out <#272606829639499776> and go to <#284348584936210433> to get your bias roles.",
+        "POST_GOODBYE" : true,
+        "POST_GREETING" : true
+    },
     "265559543272964097" : {
         "CHANNEL" : "265559543272964097",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
@@ -45,13 +60,6 @@
         "CHANNEL" : "275365003643715584",
         "GOODBYE" : "Goodbye {0.name}! :wave:",
         "GREETING" : "Welcome {0.mention}! :smiley_cat:\nCheck out <#272766650133250049> and go to <#272773260469600266> to get your bias roles.",
-        "POST_GOODBYE" : false,
-        "POST_GREETING" : true
-    },
-    "272744019119964160" : {
-        "CHANNEL" : "272744019119964160",
-        "GOODBYE" : "Goodbye {0.name}! :wave:",
-        "GREETING" : "Welcome {0.mention}! :fnc:\nCheck out <#275681973232467978> and go to <#275682637383729161> to get your bias roles.",
         "POST_GOODBYE" : false,
         "POST_GREETING" : true
     }

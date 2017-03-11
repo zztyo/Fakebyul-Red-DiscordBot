@@ -29,7 +29,7 @@
     "cogs.reactionpolls" : true,
     "cogs.remindme" : true,
     "cogs.rss" : true,
-    "cogs.statistics" : true,
+    "cogs.statistics" : false,
     "cogs.streams" : true,
     "cogs.translated" : true,
     "cogs.trivia" : true,

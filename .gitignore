@@ -17,3 +17,5 @@ data/audio/playlists/*/*
 !data/youtube/settings.json
 !data/customcom/commands.json
 updateFork.bat
+lib/*
+lib2/*

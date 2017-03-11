@@ -14,5 +14,9 @@
         "np" : "lastfm np",
         "pd101choose" : "choose \"Ahn Yu Mi\" \"An Ye Seul\" \"Ariyoshi Risa\" \"Bang Joon Hee\" \"Cho Shi Yoon\" \"Choi Eun Bin\" \"Choi Yoo Jung\" \"Choi Yu Bin\" \"Chu Ye Jin\" \"Ham Ye Ji\" \"Han Hye Ri\" \"Han Ji Yeon\" \"Heo Chanmi\" \"Heo Saem\" \"Hwang A Young\" \"Hwang In Sun\" \"Hwang Ri Yu\" \"Hwang Se Young\" \"Hwang Soo Yeon\" \"Jeon So Mi\" \"Jeon So Yeon\" \"Jung Chae Yeon\" \"Jung Eun Woo\" \"Jung Hae Rim\" \"Kang Gyeong Won\" \"Kang Mi Na\" \"Kang Si Hyeon\" \"Kang Si Ra\" \"Kang Si Won\" \"Kang Yae Bin\" \"Ki Heui Hyeon\" \"Kim Bo Seon\" \"Kim Chung Ha\" \"Kim Da Jeong\" \"Kim Dani\" \"Kim Do Hee\" \"Kim Do Yeon\" \"Kim Ha Yun\" \"Kim Hyeong Eun\" \"Kim Hong Eun\" \"Kim Ja Yeon\" \"Kim Ji Sung\" \"Kim Ju Na\" \"Kim Mi So\" \"Kim Min Ji\" \"Kim Min Jung\" \"Kim Min Kyeong\" \"Kim Na Young\" \"Kim Se Jeong\" \"Kim Seo Kyoung\" \"Kim Seol A\" \"Kim Si Hyeon\" \"Kim Si Hyeon\" \"Kim So Hee\" \"Kim So Hye\" \"Kim Sol Ee\" \"Kim Su Hyun\" \"Kim Tae Ha\" \"Kim Woo Jung\" \"Kim Yeon Kyeong\" \"Kim Yun Ji\" \"Kwon Eun Bean\" \"Lee Chae Lin\" \"Lee Hae In\" \"Lee Jin Hee\" \"Katherine C. Lee\" \"Lee Se Heun\" \"Lee Seo Jeong\" \"Lee Soo Min\" \"Lee Su Hyeon\" \"Lee Su Hyun\" \"Lee Youn Seo\" \"Lim Hyo Sun\" \"Lim Jung Min\" \"Lim Na Young\" \"Ma Eun Jin\" \"Moon Hyun Ju\" \"Nam Su Jin\" \"Ng Sze Kai\" \"Niwa Shiori\" \"Oh Han Areum\" \"Oh Seo Jung\" \"Park Ga Eul\" \"Park Ha Yi\" \"Park Hae Young\" \"Park Min Ji\" \"Park Se Hee\" \"Park Si Yeon\" \"Park So Yeon\" \"Pyun Kang Yoon\" \"Seo Hye Lin\" \"Seong Hye Min\" \"Shim Chae Eun\" \"Shin Hye Hyeon\" \"Yim Kyung Ha\" \"Yoon Seo Hyeung\" \"Yu Su A\" \"Yu Yeun Jung\" \"Yun Chae Kyoung\" \"Yun Yu Dam\" \"Zhou Jieqiong\"",
         "pyochingooland" : "w time in belgium"
+    },
+    "253833262408007680" : {
+        "ichart" : "charts ichart realtime",
+        "melon" : "charts melon realtime"
     }
 }
