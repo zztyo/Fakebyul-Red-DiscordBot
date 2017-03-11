@@ -1,0 +1,24 @@
+{
+    "levelup" : {
+        "default" : "http://puu.sh/qJJjz/27f499f989.jpg"
+    },
+    "profile" : {
+        "alice" : "http://puu.sh/qAoLx/7335f697fb.png",
+        "bluestairs" : "http://puu.sh/qAqpi/5e64aa6804.png",
+        "coastline" : "http://puu.sh/qJJVl/f4bf98d408.jpg",
+        "default" : "http://puu.sh/qNrD6/ee0ef9462d.jpg",
+        "iceberg" : "http://puu.sh/qAr6p/1d4e031a9e.png",
+        "lamp" : "http://puu.sh/qJJIb/05e4e02edd.jpg",
+        "miraiglasses" : "http://puu.sh/qArax/ce8a8bf12e.png",
+        "miraikuriyama" : "http://puu.sh/qArbY/59b883fe71.png",
+        "mountaindawn" : "http://puu.sh/qJJLa/568b9a318b.jpg",
+        "redblack" : "http://puu.sh/qI0lQ/3a5e04ff05.jpg",
+        "waterlilies" : "http://puu.sh/qJJSL/43b0f852c0.jpg"
+    },
+    "rank" : {
+        "aurora" : "http://puu.sh/qJJv4/82aeb6de54.jpg",
+        "default" : "http://puu.sh/qJJgx/abeda18e15.jpg",
+        "mountain" : "http://puu.sh/qJvR4/52a5797b4f.jpg",
+        "nebula" : "http://puu.sh/qJJqh/4a530e48ef.jpg"
+    }
+}

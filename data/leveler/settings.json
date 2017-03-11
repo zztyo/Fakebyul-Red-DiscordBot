@@ -1,0 +1,8 @@
+{
+    "badge_type" : "circles",
+    "bg_price" : 0,
+    "disabled_servers" : [],
+    "lvl_msg" : [],
+    "mention" : true,
+    "text_only" : []
+}
