@@ -19,6 +19,7 @@
     "cogs.image" : false,
     "cogs.instagram" : true,
     "cogs.lastfm" : true,
+    "cogs.levels" : true,
     "cogs.mirror" : true,
     "cogs.mod" : true,
     "cogs.naver" : true,
