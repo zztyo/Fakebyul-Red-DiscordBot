@@ -1162,7 +1162,65 @@ class Leveler:
             await self.bot.say("**The level-up background(`{}`) has been deleted.**".format(name))
         else:                                 
             await self.bot.say("**That level-up background name doesn't exist.**")
-    
+
+    @checks.is_owner()
+    @commands.command(pass_context=True, no_pm=True, name="retrolvl")
+    async def _init_levels(self, ctx):
+        server = ctx.message.server
+        author = ctx.message.author
+        if server.id in self.settings["Initialized"]:
+            await self.bot.say("XP and levels have already been retroactively assigned on this server")
+            return
+        await self.bot.say("gathering stats, this will take a long time...")
+        global_emote_usage = []
+        global_total_messages = 0
+        for channel in server.channels:
+            if channel.type == discord.ChannelType.text:
+                logs_before = ctx.message
+                total_messages = 0
+                logs_before = None
+                total_messages_before = -1
+                while True:
+                    if total_messages_before == total_messages:
+                        break
+                    else:
+                        total_messages_before = total_messages
+                    async for message in self.bot.logs_from(channel, limit=100, before=logs_before):
+                        user=message.author
+                        if user.bot:
+                            continue
+                        exp=0
+                        text=message.content
+                        msgTime=message.timestamp.timestamp()
+                        await self._create_user(user, server)
+                        userinfo = fileIO("data/leveler/users/{}/info.json".format(user.id), "load")
+                        if abs(float(msgTime) - float(userinfo["chat_block"])) >= 120 and not any(text.startswith(x) for x in prefix):
+                            exp=random.randint(15, 20)
+                            required = self._required_exp(userinfo["servers"][server.id]["level"])
+                            userinfo["total_exp"] += exp
+                            userinfo["chat_block"] = msgTime
+                            userinfo["servers"][server.id]["current_exp"] += exp
+                            fileIO("data/leveler/users/{}/info.json".format(user.id), "save", userinfo)
+                            fileIO('data/leveler/settings.json', "save", self.settings)
+                        logs_before = message
+                        total_messages += 1
+                        
+                await self.bot.say("Adding XP from {}({}): {} messages found".format(channel.mention,channel.id, total_messages))
+        await self.bot.say("XP and levels successfully retroactively added")
+        self.settings["Initialized"].append(server.id)
+        fileIO("data/leveler/settings.json", "save",self.settings)
+
+    @commands.command(pass_context=True, name = "lvltest", hidden = True)
+    async def test(self,ctx):
+        server=ctx.message.server
+        for x in prefix:
+            await self.bot.say("{}".format(x))
+        #await self.bot.say("Message timestamp format: {}, Time.time format: {}".format(ctx.message.timestamp.timestamp(),time.time()))
+        for channel in server.channels:
+            if channel.type==discord.ChannelType.text:
+                #await self.bot.say("{}: {}\n".format(channel.name, channel.))
+                return
+
     async def draw_profile(self, user, server):
         name_fnt = ImageFont.truetype(font_bold_file, 22)
         header_u_fnt = ImageFont.truetype(font_unicode_file, 18)

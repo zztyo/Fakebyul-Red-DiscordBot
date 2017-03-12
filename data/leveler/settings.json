@@ -1,8 +1,11 @@
 {
+    "Initialized" : [
+        "276921429277147147"
+    ],
     "badge_type" : "circles",
     "bg_price" : 0,
     "disabled_servers" : [],
     "lvl_msg" : [],
-    "mention" : true,
+    "mention" : false,
     "text_only" : []
 }

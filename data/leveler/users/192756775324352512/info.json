@@ -1,22 +1,22 @@
 {
     "badge_col_color" : [],
     "badges" : [],
-    "chat_block" : 1489197341.676934,
+    "chat_block" : 1489281807.8572257,
     "info" : "I am a mysterious person.",
     "levelup_background" : "http://puu.sh/qJJjz/27f499f989.jpg",
     "profile_background" : "http://puu.sh/qNrD6/ee0ef9462d.jpg",
-    "profile_block" : 0,
+    "profile_block" : 1489210089.9621797,
     "rank_background" : "http://puu.sh/qJJgx/abeda18e15.jpg",
-    "rank_block" : 0,
+    "rank_block" : 1489281825.0843954,
     "rep" : 0,
     "rep_block" : 0,
     "rep_color" : [],
     "servers" : {
         "276921429277147147" : {
-            "current_exp" : 17,
-            "level" : 0
+            "current_exp" : 3425,
+            "level" : 4
         }
     },
     "title" : "",
-    "total_exp" : 17
+    "total_exp" : 4519
 }

@@ -9,7 +9,7 @@
     "cogs.customcom" : true,
     "cogs.dota" : true,
     "cogs.downloader" : false,
-    "cogs.economy" : false,
+    "cogs.economy" : true,
     "cogs.facebook" : true,
     "cogs.gallery" : true,
     "cogs.general" : true,
